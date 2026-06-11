@@ -1,5 +1,3 @@
-export const environments = ['Production', 'Staging', 'Sandbox']
-
 // Status tone drives badge color, progress bar color, and iconography.
 // healthy | approaching-limit | over-entitlement | no-data
 export const statusConfig = {

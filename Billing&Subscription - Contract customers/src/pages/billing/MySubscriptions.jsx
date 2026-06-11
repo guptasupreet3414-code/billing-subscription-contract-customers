@@ -3,7 +3,6 @@ import styled from 'styled-components'
 import { InboxIcon } from '../../components/Icons'
 import { subscriptions, getSummary } from '../../data/billingData'
 import GuidanceBanner from '../../components/billing/GuidanceBanner'
-import EnvironmentSelector from '../../components/billing/EnvironmentSelector'
 import SubscriptionCard from '../../components/billing/SubscriptionCard'
 import SubscriptionDetailDrawer from '../../components/billing/SubscriptionDetailDrawer'
 import ContactAccountManagerButton from '../../components/billing/ContactAccountManagerButton'
@@ -31,7 +30,7 @@ const PageDescription = styled.p`
 const ContextBar = styled.div`
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   flex-wrap: wrap;
   gap: 12px;
   margin-bottom: 24px;
@@ -132,7 +131,6 @@ const ProductGrid = styled.div`
 `
 
 export default function MySubscriptions() {
-  const [environment, setEnvironment] = useState('Production')
   const [previewState, setPreviewState] = useState('default')
   const [selectedSubscription, setSelectedSubscription] = useState(null)
 
@@ -153,8 +151,6 @@ export default function MySubscriptions() {
       <GuidanceBanner />
 
       <ContextBar>
-        <EnvironmentSelector value={environment} onChange={setEnvironment} />
-
         <PreviewSwitcher>
           Preview state:
           <PreviewGroup>
@@ -179,10 +175,10 @@ export default function MySubscriptions() {
       {visibleSubscriptions.length === 0 ? (
         <BillingEmptyState
           icon={<InboxIcon size={40} color="currentColor" />}
-          title="No active subscriptions in this environment"
+          title="No active subscriptions"
           action={<ContactAccountManagerButton subject="No active subscriptions visible in DigiCert ONE" />}
         >
-          We couldn't find any active product subscriptions for {environment}. If you believe
+          We couldn't find any active product subscriptions for your account. If you believe
           this is incorrect, or you'd like to add products to your contract, contact your
           account manager.
         </BillingEmptyState>
@@ -192,7 +188,7 @@ export default function MySubscriptions() {
             <SummaryCard>
               <SummaryLabel>Active subscriptions</SummaryLabel>
               <SummaryValue>{summary.active} products</SummaryValue>
-              <SummarySub>Across your account in {environment}</SummarySub>
+              <SummarySub>Across your account</SummarySub>
             </SummaryCard>
 
             <SummaryCard>
