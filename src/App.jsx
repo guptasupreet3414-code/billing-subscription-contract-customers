@@ -9,6 +9,7 @@ import MobileDrawer from './components/MobileDrawer'
 import Dashboard from './pages/Dashboard'
 import StubPage from './pages/StubPage'
 import MySubscriptions from './pages/billing/MySubscriptions'
+import SubscriptionDetail from './pages/billing/SubscriptionDetail'
 import Receipts from './pages/billing/Receipts'
 import PaymentDetails from './pages/billing/PaymentDetails'
 import { allRoutes } from './data/navigation'
@@ -94,6 +95,7 @@ function useAppState() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const [isSpokeOpen, setIsSpokeOpen] = useState(true)
   const [activeTopNav, setActiveTopNav] = useState(null)
+  const [billingScenario, setBillingScenario] = useState('mixed')
 
   const toggleDrawer = useCallback(() => setIsDrawerOpen((v) => !v), [])
   const closeDrawer = useCallback(() => setIsDrawerOpen(false), [])
@@ -117,16 +119,16 @@ function useAppState() {
   const closeTopNav = useCallback(() => setActiveTopNav(null), [])
 
   return {
-    activeProductId, isDrawerOpen, isSpokeOpen, activeTopNav,
-    toggleDrawer, closeDrawer, toggleSpoke,
+    activeProductId, isDrawerOpen, isSpokeOpen, activeTopNav, billingScenario,
+    toggleDrawer, closeDrawer, toggleSpoke, setBillingScenario,
     selectProduct, selectProductFromDrawer, openTopNav, closeTopNav,
   }
 }
 
 export default function App() {
   const {
-    activeProductId, isDrawerOpen, isSpokeOpen, activeTopNav,
-    toggleDrawer, closeDrawer, toggleSpoke,
+    activeProductId, isDrawerOpen, isSpokeOpen, activeTopNav, billingScenario,
+    toggleDrawer, closeDrawer, toggleSpoke, setBillingScenario,
     selectProduct, selectProductFromDrawer, openTopNav, closeTopNav,
   } = useAppState()
 
@@ -178,6 +180,7 @@ export default function App() {
         activeProductId={activeProductId}
         isSpokeOpen={isSpokeOpen}
         onToggleSpoke={toggleSpoke}
+        billingScenario={billingScenario}
       />
 
       <MobileDrawer
@@ -200,11 +203,12 @@ export default function App() {
             .map((r) => {
               let element = <StubPage />
               if (r === '/dashboard') element = <Dashboard />
-              else if (r === '/settings/billing') element = <MySubscriptions />
-              else if (r === '/settings/billing/receipts') element = <Receipts />
-              else if (r === '/settings/billing/payment-details') element = <PaymentDetails />
+              else if (r === '/settings/billing') element = <MySubscriptions scenario={billingScenario} onScenarioChange={setBillingScenario} />
+              else if (r === '/settings/billing/receipts') element = <Receipts scenario={billingScenario} />
+              else if (r === '/settings/billing/payment-details') element = <PaymentDetails scenario={billingScenario} />
               return <Route key={r} path={r} element={element} />
             })}
+          <Route path="/settings/billing/:subscriptionId" element={<SubscriptionDetail scenario={billingScenario} />} />
           <Route path="*" element={<StubPage />} />
         </Routes>
       </MainContent>

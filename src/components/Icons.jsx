@@ -217,6 +217,79 @@ export const CreditCardIcon = ({ size = 32, color = 'currentColor' }) => (
   </svg>
 )
 
+export const PlusIcon = ({ size = 16, color = 'currentColor' }) => (
+  <svg width={size} height={size} viewBox="0 0 16 16" fill="none" aria-hidden="true">
+    <line x1="8" y1="2" x2="8" y2="14" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+    <line x1="2" y1="8" x2="14" y2="8" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+  </svg>
+)
+
+export const DotsVerticalIcon = ({ size = 16, color = 'currentColor' }) => (
+  <svg width={size} height={size} viewBox="0 0 16 16" fill="none" aria-hidden="true">
+    <circle cx="8" cy="3" r="1.5" fill={color} />
+    <circle cx="8" cy="8" r="1.5" fill={color} />
+    <circle cx="8" cy="13" r="1.5" fill={color} />
+  </svg>
+)
+
+export const DownloadIcon = ({ size = 16, color = 'currentColor' }) => (
+  <svg width={size} height={size} viewBox="0 0 16 16" fill="none" aria-hidden="true">
+    <path d="M8 2v8M5 7l3 3 3-3" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M2 12h12" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+  </svg>
+)
+
+export const FilterIcon = ({ size = 16, color = 'currentColor' }) => (
+  <svg width={size} height={size} viewBox="0 0 16 16" fill="none" aria-hidden="true">
+    <path d="M2 4h12M4 8h8M6 12h4" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+  </svg>
+)
+
+export const AlertCircleFillIcon = ({ size = 16, color = 'currentColor' }) => (
+  <svg width={size} height={size} viewBox="0 0 16 16" fill="none" aria-hidden="true">
+    <circle cx="8" cy="8" r="7" fill={color} />
+    <line x1="8" y1="5" x2="8" y2="8.5" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+    <circle cx="8" cy="11" r="1" fill="white" />
+  </svg>
+)
+
+export const CalendarIcon = ({ size = 20, color = 'currentColor' }) => (
+  <svg width={size} height={size} viewBox="0 0 20 20" fill="none" aria-hidden="true">
+    <rect x="2" y="4" width="16" height="14" rx="2" stroke={color} strokeWidth="1.5" />
+    <path d="M2 9h16" stroke={color} strokeWidth="1.5" />
+    <path d="M6 2v4M14 2v4" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+  </svg>
+)
+
+export const LayersIcon = ({ size = 20, color = 'currentColor' }) => (
+  <svg width={size} height={size} viewBox="0 0 20 20" fill="none" aria-hidden="true">
+    <path d="M2 6l8-4 8 4-8 4-8-4z" stroke={color} strokeWidth="1.5" strokeLinejoin="round" />
+    <path d="M2 10l8 4 8-4" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M2 14l8 4 8-4" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+)
+
+export const CartOutlineIcon = ({ size = 20, color = 'currentColor' }) => (
+  <svg width={size} height={size} viewBox="0 0 20 20" fill="none" aria-hidden="true">
+    <path d="M2 2h2l2.4 9.6a1 1 0 0 0 1 .8h6.8a1 1 0 0 0 1-.8L17 7H5" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    <circle cx="8" cy="17" r="1" stroke={color} strokeWidth="1.5" />
+    <circle cx="14" cy="17" r="1" stroke={color} strokeWidth="1.5" />
+  </svg>
+)
+
+export const CubeIcon = ({ size = 20, color = 'currentColor' }) => (
+  <svg width={size} height={size} viewBox="0 0 20 20" fill="none" aria-hidden="true">
+    <path d="M10 2L3 6v8l7 4 7-4V6l-7-4z" stroke={color} strokeWidth="1.5" strokeLinejoin="round" />
+    <path d="M10 10L3 6M10 10l7-4M10 10v8" stroke={color} strokeWidth="1.5" />
+  </svg>
+)
+
+export const DollarIcon = ({ size = 20, color = 'currentColor' }) => (
+  <svg width={size} height={size} viewBox="0 0 20 20" fill="none" aria-hidden="true">
+    <path d="M10 3v14M13 6.5c0-1.4-1.3-2.5-3-2.5S7 5.1 7 6.5 8.3 9 10 9s3 1.1 3 2.5-1.3 2.5-3 2.5-3-1.1-3-2.5" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+  </svg>
+)
+
 export function getIcon(iconType, size = 20, color = 'white') {
   const props = { size, color }
   switch (iconType) {

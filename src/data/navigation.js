@@ -286,8 +286,6 @@ export const productSubNavs = {
       defaultExpanded: true,
       items: [
         { label: 'My subscriptions', route: '/settings/billing' },
-        { label: 'Receipts', route: '/settings/billing/receipts' },
-        { label: 'Payment details', route: '/settings/billing/payment-details' },
       ],
     }],
   },

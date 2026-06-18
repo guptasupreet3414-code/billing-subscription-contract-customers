@@ -223,8 +223,18 @@ function NavSection({ section, index }) {
   )
 }
 
-export default function SpokeNav({ activeProductId, isSpokeOpen, onToggleSpoke }) {
-  const product = productSubNavs[activeProductId]
+export default function SpokeNav({ activeProductId, isSpokeOpen, onToggleSpoke, billingScenario }) {
+  let product = productSubNavs[activeProductId]
+
+  if (activeProductId === 'settings-billing' && billingScenario === 'enterprise') {
+    product = {
+      ...product,
+      sections: product.sections.map((section) => ({
+        ...section,
+        items: section.items.filter((item) => item.route === '/settings/billing'),
+      })),
+    }
+  }
 
   useEffect(() => {
     const handleKey = (e) => {

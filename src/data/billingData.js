@@ -7,6 +7,22 @@ export const statusConfig = {
   'no-data': { label: 'No usage data', tone: 'neutral' },
 }
 
+// Distinguishes Enterprise CertCentral Contracts from E-commerce CertCentral
+// Subscriptions. Drives terminology, badge styling, and which billing
+// actions/navigation are available for a given subscription.
+export const subscriptionTypeConfig = {
+  enterprise: {
+    label: 'Enterprise plan',
+    description:
+      'Billed and managed directly through your DigiCert account team. Contract terms, renewals, and invoicing are handled by your account manager, so no self-service payment actions are needed here.',
+  },
+  ecommerce: {
+    label: 'E-commerce plan',
+    description:
+      'A self-service subscription billed automatically to the payment method on file. Manage your plan, payment details, and receipts at any time from this account.',
+  },
+}
+
 export const accountManager = {
   name: 'Sarah Mitchell',
   title: 'Enterprise Account Manager, DigiCert',
@@ -14,13 +30,16 @@ export const accountManager = {
   phone: '+1 (801) 555-0142',
 }
 
-export const subscriptions = [
+// ── Enterprise CertCentral Contract products ──
+// Each entry below is rendered as a single-instance subscription.
+const enterpriseProducts = [
   {
     id: 'document-trust',
     name: 'Document Trust',
     iconType: 'document',
-    billingType: 'Enterprise contract',
     contractId: 'CTR-2024-DT-00231',
+    contractTerm: 'Jun 7, 2025 – Jun 6, 2026',
+    contractOwner: 'Compliance Operations',
     renewalDate: 'Jun 6, 2026',
     environment: 'Production',
     status: 'approaching-limit',
@@ -35,8 +54,9 @@ export const subscriptions = [
     id: 'software-trust',
     name: 'Software Trust',
     iconType: 'code',
-    billingType: 'Enterprise contract',
     contractId: 'CTR-2024-ST-00187',
+    contractTerm: 'Jun 7, 2025 – Jun 6, 2026',
+    contractOwner: 'DevOps Engineering',
     renewalDate: 'Jun 6, 2026',
     environment: 'Production',
     status: 'healthy',
@@ -51,8 +71,9 @@ export const subscriptions = [
     id: 'trust-lifecycle',
     name: 'Trust Lifecycle Manager',
     iconType: 'cycle',
-    billingType: 'Enterprise contract',
     contractId: 'CTR-2024-TL-00098',
+    contractTerm: 'Sep 2, 2025 – Sep 1, 2026',
+    contractOwner: 'PKI Operations',
     renewalDate: 'Sep 1, 2026',
     environment: 'Production',
     status: 'healthy',
@@ -67,8 +88,9 @@ export const subscriptions = [
     id: 'keylocker',
     name: 'KeyLocker',
     iconType: 'key',
-    billingType: 'Enterprise contract',
     contractId: 'CTR-2024-KL-00045',
+    contractTerm: 'Sep 2, 2025 – Sep 1, 2026',
+    contractOwner: 'DevOps Engineering',
     renewalDate: 'Sep 1, 2026',
     environment: 'Production',
     status: 'approaching-limit',
@@ -80,27 +102,12 @@ export const subscriptions = [
     ],
   },
   {
-    id: 'certcentral',
-    name: 'CertCentral',
-    iconType: 'shield',
-    billingType: 'Enterprise contract',
-    contractId: 'CTR-2024-CC-00012',
-    renewalDate: 'Jun 6, 2026',
-    environment: 'Production',
-    status: 'over-entitlement',
-    primaryEntitlement: { label: 'SSL/TLS certificates', consumed: 108, total: 100 },
-    entitlements: [
-      { name: 'SSL/TLS certificates', purchased: 100, allocated: 100, consumed: 108, remaining: -8 },
-      { name: 'Code signing certificates', purchased: 24, allocated: 24, consumed: 16, remaining: 8 },
-      { name: 'S/MIME certificates', purchased: 200, allocated: 200, consumed: 140, remaining: 60 },
-    ],
-  },
-  {
     id: 'dns',
     name: 'DigiCert DNS',
     iconType: 'globe',
-    billingType: 'Enterprise contract',
     contractId: 'CTR-2024-DNS-00076',
+    contractTerm: 'Jun 7, 2025 – Jun 6, 2026',
+    contractOwner: 'Network Engineering',
     renewalDate: 'Jun 6, 2026',
     environment: 'Production',
     status: 'no-data',
@@ -111,8 +118,9 @@ export const subscriptions = [
     id: 'device-trust',
     name: 'Device Trust',
     iconType: 'mobile',
-    billingType: 'Enterprise contract',
     contractId: 'CTR-2024-DVT-00153',
+    contractTerm: 'Aug 15, 2025 – Aug 14, 2026',
+    contractOwner: 'IoT Platform Team',
     renewalDate: 'Aug 14, 2026',
     environment: 'Production',
     status: 'healthy',
@@ -127,8 +135,9 @@ export const subscriptions = [
     id: 'private-ca',
     name: 'Private CA',
     iconType: 'hierarchy',
-    billingType: 'Enterprise contract',
     contractId: 'CTR-2024-PCA-00071',
+    contractTerm: 'Sep 2, 2025 – Sep 1, 2026',
+    contractOwner: 'PKI Operations',
     renewalDate: 'Sep 1, 2026',
     environment: 'Production',
     status: 'approaching-limit',
@@ -143,8 +152,9 @@ export const subscriptions = [
     id: 'valimail',
     name: 'Valimail',
     iconType: 'envelope',
-    billingType: 'Enterprise contract',
     contractId: 'CTR-2024-VML-00038',
+    contractTerm: 'Jul 16, 2025 – Jul 15, 2026',
+    contractOwner: 'IT Security Team',
     renewalDate: 'Jul 15, 2026',
     environment: 'Production',
     status: 'healthy',
@@ -159,8 +169,9 @@ export const subscriptions = [
     id: 'ai-agents',
     name: 'AI Agents',
     iconType: 'sparkle',
-    billingType: 'Enterprise contract',
     contractId: 'CTR-2024-AIA-00012',
+    contractTerm: 'Jun 7, 2025 – Jun 6, 2026',
+    contractOwner: 'AI Platform Team',
     renewalDate: 'Jun 6, 2026',
     environment: 'Production',
     status: 'over-entitlement',
@@ -175,8 +186,9 @@ export const subscriptions = [
     id: 'quantum-central',
     name: 'Quantum Central',
     iconType: 'atom',
-    billingType: 'Enterprise contract',
     contractId: 'CTR-2024-QC-00005',
+    contractTerm: 'Jun 7, 2025 – Jun 6, 2026',
+    contractOwner: 'IT Security Team',
     renewalDate: 'Jun 6, 2026',
     environment: 'Production',
     status: 'no-data',
@@ -184,6 +196,165 @@ export const subscriptions = [
     entitlements: [],
   },
 ]
+
+// ── CertCentral instances ──
+// CertCentral can exist as an Enterprise Contract instance, an E-commerce
+// Subscription instance, or both at once within the same environment. The
+// "hybrid" pattern groups every CertCentral instance under a single
+// subscription card; the details page provides an instance switcher.
+export const certCentralInstances = [
+  {
+    instanceId: 'certcentral-enterprise',
+    instanceLabel: 'Enterprise',
+    subscriptionType: 'enterprise',
+    contractId: 'CTR-2024-CC-00012',
+    contractTerm: 'Jun 7, 2025 – Jun 6, 2026',
+    contractOwner: 'IT Security Team',
+    renewalDate: 'Jun 6, 2026',
+    environment: 'Production',
+    status: 'over-entitlement',
+    primaryEntitlement: { label: 'SSL/TLS certificates', consumed: 108, total: 100 },
+    entitlements: [
+      { name: 'SSL/TLS certificates', purchased: 100, allocated: 100, consumed: 108, remaining: -8 },
+      { name: 'Code signing certificates', purchased: 24, allocated: 24, consumed: 16, remaining: 8 },
+      { name: 'S/MIME certificates', purchased: 200, allocated: 200, consumed: 140, remaining: 60 },
+      { name: 'Document signing certificates', purchased: 12, allocated: 12, consumed: 5, remaining: 7 },
+      { name: 'Common mark certificates', purchased: 5, allocated: 5, consumed: 1, remaining: 4 },
+    ],
+  },
+  {
+    instanceId: 'certcentral-ecommerce',
+    instanceLabel: 'Self-service',
+    subscriptionType: 'ecommerce',
+    renewalDate: 'Jun 6, 2026',
+    environment: 'Marketing sandbox',
+    status: 'healthy',
+    primaryEntitlement: { label: 'SSL/TLS certificates', consumed: 1, total: 4 },
+    entitlements: [
+      { name: 'SSL/TLS certificates', purchased: 4, allocated: 4, consumed: 1, remaining: 3 },
+      { name: 'Codesigning certificates', purchased: 4, allocated: 4, consumed: 1, remaining: 3 },
+      { name: 'S/MIME certificates', purchased: 4, allocated: 4, consumed: 1, remaining: 3 },
+    ],
+    billing: {
+      plan: 'Pay-as-you-go',
+      price: '$249.00 / month',
+      billingCycle: 'Monthly',
+      nextChargeDate: 'Jul 1, 2026',
+    },
+    paymentMethod: { type: 'Visa', last4: '4242', expiry: '08/27' },
+    productCategories: [
+      {
+        id: 'ssl-tls',
+        name: 'SSL/TLS certificates',
+        buyLabel: 'Buy SSL/TLS',
+        products: [
+          { name: 'Basic OV', type: 'Single domain', purchased: 4, used: 1, available: 3 },
+          { name: 'Secure Site OV', type: 'Single domain', purchased: 10, used: 8, available: 2 },
+          { name: 'Secure Site Pro OV', type: 'Single domain', purchased: 6, used: 3, available: 3 },
+          { name: 'Secure Site Pro OV', type: 'Multi-domain', purchased: 8, used: 4, available: 4 },
+          { name: 'Basic OV', type: 'Multi-domain', purchased: 1, used: 1, available: 0 },
+          { name: 'Basic OV', type: 'Wildcard domain', purchased: 1, used: 1, available: 0 },
+        ],
+      },
+      {
+        id: 'code-signing',
+        name: 'Code signing certificates',
+        buyLabel: 'Buy code signing',
+        products: [
+          { name: 'Code signing OV', type: 'USB', purchased: 6, used: 0, available: 6 },
+          { name: 'Code signing OV', type: 'HSM', purchased: 6, used: 0, available: 6 },
+          { name: 'Code signing EV', type: 'KeyLocker', purchased: 6, used: 0, available: 6 },
+        ],
+      },
+      {
+        id: 'document-signing',
+        name: 'Document signing',
+        buyLabel: 'Buy document signing',
+        products: [
+          { name: 'Individual', type: 'USB', purchased: 6, used: 0, available: 6 },
+          { name: 'Organization', type: 'USB', purchased: 6, used: 0, available: 6 },
+        ],
+      },
+      {
+        id: 'smime',
+        name: 'S/MIME certificates',
+        buyLabel: 'Buy S/MIME',
+        products: [],
+      },
+      {
+        id: 'common-mark',
+        name: 'Common mark certificates',
+        buyLabel: 'Buy common mark',
+        products: [],
+      },
+    ],
+    receipts: [
+      { id: 'INV-100245', date: 'Jun 1, 2026', amount: '$249.00', description: 'CertCentral monthly subscription' },
+      { id: 'INV-100198', date: 'May 1, 2026', amount: '$249.00', description: 'CertCentral monthly subscription' },
+      { id: 'INV-100142', date: 'Apr 1, 2026', amount: '$249.00', description: 'CertCentral monthly subscription' },
+    ],
+  },
+]
+
+const statusPriority = ['over-entitlement', 'approaching-limit', 'no-data', 'healthy']
+
+function pickStatus(statuses) {
+  return statusPriority.find((s) => statuses.includes(s)) || 'healthy'
+}
+
+// Wraps a single-product Enterprise Contract as a one-instance subscription
+// so cards and the details page can treat every subscription uniformly.
+function wrapEnterpriseProduct(product) {
+  const { id, name, iconType, ...rest } = product
+  return {
+    id,
+    name,
+    iconType,
+    subscriptionTypes: ['enterprise'],
+    renewalDate: rest.renewalDate,
+    status: rest.status,
+    primaryEntitlement: rest.primaryEntitlement,
+    entitlements: rest.entitlements,
+    instances: [{ instanceId: id, instanceLabel: name, subscriptionType: 'enterprise', ...rest }],
+  }
+}
+
+// Groups the requested CertCentral instances into a single subscription card.
+function buildCertCentral(instanceIds) {
+  const instances = certCentralInstances.filter((i) => instanceIds.includes(i.instanceId))
+  const subscriptionTypes = [...new Set(instances.map((i) => i.subscriptionType))]
+  const renewalDates = [...new Set(instances.map((i) => i.renewalDate))]
+
+  return {
+    id: 'certcentral',
+    name: 'CertCentral',
+    iconType: 'shield',
+    subscriptionTypes,
+    renewalDate: renewalDates.length === 1 ? renewalDates[0] : 'Varies by instance',
+    status: pickStatus(instances.map((i) => i.status)),
+    primaryEntitlement: instances[0].primaryEntitlement,
+    entitlements: instances[0].entitlements,
+    instances,
+  }
+}
+
+const enterpriseSubscriptions = enterpriseProducts.map(wrapEnterpriseProduct)
+
+// Returns the subscription list for a given scenario. All scenarios share the
+// same enterprise contract products; only the CertCentral subscription's
+// billing type(s) change:
+// - 'enterprise': CertCentral is an Enterprise Contract only
+// - 'ecommerce':  CertCentral is an E-commerce Subscription only
+// - 'mixed':      CertCentral has both an Enterprise and an E-commerce instance
+export function getSubscriptions(scenario) {
+  if (scenario === 'enterprise') {
+    return [...enterpriseSubscriptions, buildCertCentral(['certcentral-enterprise'])]
+  }
+  if (scenario === 'ecommerce') {
+    return [...enterpriseSubscriptions, buildCertCentral(['certcentral-ecommerce'])]
+  }
+  return [...enterpriseSubscriptions, buildCertCentral(['certcentral-enterprise', 'certcentral-ecommerce'])]
+}
 
 export function getSummary(subs) {
   const active = subs.length
@@ -201,4 +372,18 @@ export function getSummary(subs) {
     over,
     needsAttention,
   }
+}
+
+// Drives the "Billing type" summary card on the subscriptions page.
+export function getBillingTypeSummary(subs) {
+  const types = new Set()
+  subs.forEach((s) => s.subscriptionTypes.forEach((t) => types.add(t)))
+
+  if (types.has('enterprise') && types.has('ecommerce')) {
+    return { label: 'Enterprise + E-commerce', sub: 'Mixed billing across subscriptions' }
+  }
+  if (types.has('ecommerce')) {
+    return { label: 'E-commerce subscription', sub: 'Self-service billing' }
+  }
+  return { label: 'Enterprise contract', sub: 'Managed by your account team' }
 }
