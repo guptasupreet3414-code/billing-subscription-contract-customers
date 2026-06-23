@@ -171,8 +171,8 @@ export default function MySubscriptions({ scenario, onScenarioChange }) {
       <SummaryGrid>
         <SummaryCard>
           <SummaryLabel>Active subscriptions</SummaryLabel>
-          <SummaryValue>{summary.active} products</SummaryValue>
-          <SummarySub>Across your account</SummarySub>
+          <SummaryValue>{summary.productCount + 1} products</SummaryValue>
+          <SummarySub>{summary.certCentralCount} CertCentral account{summary.certCentralCount !== 1 ? 's' : ''} linked</SummarySub>
         </SummaryCard>
 
         <SummaryCard>

@@ -207,6 +207,8 @@ const NoUsageBlock = styled.div`
   color: ${({ theme }) => theme.colors.neutral600};
 `
 
+const AccountNameSpan = styled.span``
+
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
 function singleInstanceSubtitle(subscription) {
@@ -254,6 +256,7 @@ function MixedInstanceCard({ subscription }) {
             <CardTitle>{subscription.name}</CardTitle>
             <SubtitleText>
               {subscription.subscriptionTypes.map((t) => subscriptionTypeConfig[t].label).join(' · ')}
+              {subscription.accountName && <AccountNameSpan> | {subscription.accountName}</AccountNameSpan>}
             </SubtitleText>
           </TitleBlock>
         </HeaderLeft>
@@ -311,7 +314,10 @@ export default function SubscriptionCard({ subscription }) {
           <IconBadge>{getIcon(iconType, 20, 'currentColor')}</IconBadge>
           <TitleBlock>
             <CardTitle>{name}</CardTitle>
-            <SubtitleText>{singleInstanceSubtitle(subscription)}</SubtitleText>
+            <SubtitleText>
+              {singleInstanceSubtitle(subscription)}
+              {subscription.accountName && <AccountNameSpan> | {subscription.accountName}</AccountNameSpan>}
+            </SubtitleText>
           </TitleBlock>
         </HeaderLeft>
         <RenewalPill>Renews {renewalDate}</RenewalPill>
