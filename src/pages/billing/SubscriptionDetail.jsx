@@ -57,6 +57,12 @@ const TitleBlock = styled.div`
   min-width: 0;
 `
 
+const PageTitleRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+`
+
 const PageTitle = styled.h1`
   margin: 0;
   font-size: 24px;
@@ -237,20 +243,34 @@ const TooltipBox = styled.div`
 
 // ── Shared KPI helper cards ───────────────────────────────────────────────────
 
-function StatusCard({ instance, onOpenBillingModal }) {
-  const planLabel = subscriptionTypeConfig[instance.subscriptionType].label
+const PlanTypeSecondary = styled.p`
+  margin: 0;
+  font-size: 13px;
+  color: ${({ theme }) => theme.colors.neutral600};
+`
+
+function PlanTypeCard({ instance, onOpenBillingModal }) {
+  const isEnterprise = instance.subscriptionType === 'enterprise'
+  const planLabel = isEnterprise ? 'Enterprise' : 'E-commerce'
+  const contractConfig = isEnterprise && instance.contractType ? contractTypeConfig[instance.contractType] : null
+  const secondaryLabel = contractConfig
+    ? `${contractConfig.label} contract`
+    : instance.billing
+    ? instance.billing.plan
+    : null
+
   return (
     <KPICard>
       <KPICardHeader>
-        <KPILabel>Status</KPILabel>
-        <ActiveBadge>Active</ActiveBadge>
+        <KPILabel style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+          Plan type
+          <PlanInfoBtn type="button" onClick={onOpenBillingModal} aria-haspopup="dialog">
+            <InfoCircleIcon size={13} color="currentColor" />
+          </PlanInfoBtn>
+        </KPILabel>
       </KPICardHeader>
-      <KPIValue>
-        {planLabel}
-        <PlanInfoBtn type="button" onClick={onOpenBillingModal} aria-haspopup="dialog">
-          <InfoCircleIcon size={14} color="currentColor" />
-        </PlanInfoBtn>
-      </KPIValue>
+      <KPIValue>{planLabel}</KPIValue>
+      {secondaryLabel && <PlanTypeSecondary>{secondaryLabel}</PlanTypeSecondary>}
     </KPICard>
   )
 }
@@ -308,35 +328,7 @@ function RenewalCard({ dateStr, sub }) {
   )
 }
 
-// ── Contract type card (CertCentral only) ─────────────────────────────────────
-
-function ContractTypeCard({ contractType }) {
-  const [tooltipOpen, setTooltipOpen] = useState(false)
-  const config = contractTypeConfig[contractType]
-  if (!config) return null
-
-  return (
-    <KPICard>
-      <KPICardHeader>
-        <KPILabel>Contract type</KPILabel>
-      </KPICardHeader>
-      <KPIValue>
-        {config.label}
-        <TooltipBtn
-          type="button"
-          onMouseEnter={() => setTooltipOpen(true)}
-          onMouseLeave={() => setTooltipOpen(false)}
-          onFocus={() => setTooltipOpen(true)}
-          onBlur={() => setTooltipOpen(false)}
-          aria-label={`About ${config.label}`}
-        >
-          <InfoCircleIcon size={14} color="currentColor" />
-          {tooltipOpen && <TooltipBox>{config.tooltip}</TooltipBox>}
-        </TooltipBtn>
-      </KPIValue>
-    </KPICard>
-  )
-}
+// ── (ContractTypeCard merged into PlanTypeCard above) ─────────────────────────
 
 // ── Entitlements table ────────────────────────────────────────────────────────
 
@@ -676,13 +668,11 @@ function AccountTeamSection({ isCertCentral }) {
 
 // ── Enterprise contract section ───────────────────────────────────────────────
 
-function ContractInfoSection({ instance, isCertCentral, onOpenBillingModal }) {
-  const cols = isCertCentral ? 4 : 3
+function ContractInfoSection({ instance, onOpenBillingModal }) {
   return (
     <Section>
-      <KPIGrid $cols={cols}>
-        <StatusCard instance={instance} onOpenBillingModal={onOpenBillingModal} />
-        {isCertCentral && <ContractTypeCard contractType={instance.contractType} />}
+      <KPIGrid $cols={3}>
+        <PlanTypeCard instance={instance} onOpenBillingModal={onOpenBillingModal} />
         <RenewalCard dateStr={instance.renewalDate} sub={instance.contractTerm} />
         <UsageCard entitlements={instance.entitlements} />
       </KPIGrid>
@@ -746,7 +736,7 @@ function EcommerceBillingSection({ instance, onOpenBillingModal }) {
   return (
     <Section>
       <KPIGrid $cols={4}>
-        <StatusCard instance={instance} onOpenBillingModal={onOpenBillingModal} />
+        <PlanTypeCard instance={instance} onOpenBillingModal={onOpenBillingModal} />
 
         <KPICard>
           <KPICardHeader>
@@ -976,7 +966,10 @@ export default function SubscriptionDetail({ scenario }) {
         <HeaderLeft>
           <IconBadge>{getIcon(subscription.iconType, 24, 'currentColor')}</IconBadge>
           <TitleBlock>
-            <PageTitle>{subscription.name}</PageTitle>
+            <PageTitleRow>
+              <PageTitle>{subscription.name}</PageTitle>
+              <ActiveBadge>Active</ActiveBadge>
+            </PageTitleRow>
             {subscription.accountName && (
               <SummaryLine>{subscription.accountName}</SummaryLine>
             )}
@@ -1003,7 +996,7 @@ export default function SubscriptionDetail({ scenario }) {
 
       {activeInstance.subscriptionType === 'enterprise' ? (
         <>
-          <ContractInfoSection instance={activeInstance} isCertCentral={isCertCentral} onOpenBillingModal={openBillingModal} />
+          <ContractInfoSection instance={activeInstance} onOpenBillingModal={openBillingModal} />
           <Section>
             <SectionTitle>Entitlements and usage</SectionTitle>
             <EntitlementsTable entitlements={activeInstance.entitlements} />

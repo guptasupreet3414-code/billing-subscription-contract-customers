@@ -6,8 +6,17 @@ import SubscriptionCard from '../../components/billing/SubscriptionCard'
 
 const Main = styled.main`
   padding: 32px;
-  max-width: 1280px;
 `
+
+const PageHeader = styled.div`
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+`
+
+const PageHeaderLeft = styled.div``
 
 const PageTitle = styled.h1`
   margin: 0 0 8px;
@@ -17,19 +26,10 @@ const PageTitle = styled.h1`
 `
 
 const PageDescription = styled.p`
-  margin: 0 0 24px;
+  margin: 0;
   font-size: 14px;
   color: ${({ theme }) => theme.colors.neutral700};
   max-width: 640px;
-`
-
-const ContextBar = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-bottom: 24px;
 `
 
 /* ── Scenario switcher (for design review only) ── */
@@ -143,14 +143,13 @@ export default function MySubscriptions({ scenario, onScenarioChange }) {
 
   return (
     <Main>
-      <PageTitle>My subscriptions</PageTitle>
-      <PageDescription>
-        View your active product subscriptions, entitlement usage, and renewal information.
-      </PageDescription>
-
-      <GuidanceBanner scenario={scenario} />
-
-      <ContextBar>
+      <PageHeader>
+        <PageHeaderLeft>
+          <PageTitle>My subscriptions</PageTitle>
+          <PageDescription>
+            View your active product subscriptions, entitlement usage, and renewal information.
+          </PageDescription>
+        </PageHeaderLeft>
         <ScenarioSwitcher>
           Scenario:
           <ScenarioGroup>
@@ -166,7 +165,9 @@ export default function MySubscriptions({ scenario, onScenarioChange }) {
             ))}
           </ScenarioGroup>
         </ScenarioSwitcher>
-      </ContextBar>
+      </PageHeader>
+
+      <GuidanceBanner scenario={scenario} />
 
       <SummaryGrid>
         <SummaryCard>

@@ -162,14 +162,30 @@ const LinkAction = styled(Link)`
 `
 
 function EnterpriseSection({ instance }) {
+  const contractTypeLabels = {
+    'committed-value': 'Committed Value',
+    'negotiated-pricing': 'Negotiated Pricing',
+  }
+  const contractTypeDescs = {
+    'committed-value': 'A contract with a committed spend amount. You receive negotiated pricing in exchange for a minimum purchase commitment over the contract term.',
+    'negotiated-pricing': 'A contract with custom pricing negotiated by your account team. You pay per-unit pricing without a minimum spend commitment.',
+  }
+
   return (
     <Body>
       <Description>{subscriptionTypeConfig.enterprise.description}</Description>
+      {instance.contractType && (
+        <>
+          <InfoItem>
+            <InfoLabel>Contract type</InfoLabel>
+            <InfoValue>{contractTypeLabels[instance.contractType]}</InfoValue>
+          </InfoItem>
+          <Description style={{ fontSize: '13px', color: '#6B7280' }}>
+            {contractTypeDescs[instance.contractType]}
+          </Description>
+        </>
+      )}
       <InfoGrid>
-        <InfoItem>
-          <InfoLabel>Contract ID</InfoLabel>
-          <InfoValue>{instance.contractId}</InfoValue>
-        </InfoItem>
         <InfoItem>
           <InfoLabel>Contract term</InfoLabel>
           <InfoValue>{instance.contractTerm}</InfoValue>
@@ -179,14 +195,14 @@ function EnterpriseSection({ instance }) {
           <InfoValue>{instance.renewalDate}</InfoValue>
         </InfoItem>
         <InfoItem>
-          <InfoLabel>Contract owner</InfoLabel>
-          <InfoValue>{instance.contractOwner}</InfoValue>
+          <InfoLabel>Contract ID</InfoLabel>
+          <InfoValue>{instance.contractId}</InfoValue>
         </InfoItem>
       </InfoGrid>
       <ActionsRow>
         <ContactAccountManagerButton
           variant="outline"
-          subject={`Billing question about ${instance.instanceLabel} (${instance.contractId})`}
+          subject={`Question about ${instance.instanceLabel} (${instance.contractId})`}
         />
       </ActionsRow>
     </Body>
@@ -262,20 +278,20 @@ export default function BillingTypeModal({ open, onClose, instances = [], initia
       >
         <Header>
           <div>
-            <Title id="billing-type-heading">Billing type</Title>
+            <Title id="billing-type-heading">Plan type</Title>
             <Subtitle>
               {instances.length > 1
                 ? 'This environment includes both Enterprise and E-commerce CertCentral subscriptions.'
                 : 'How this subscription is billed and managed.'}
             </Subtitle>
           </div>
-          <CloseBtn ref={closeBtnRef} onClick={onClose} aria-label="Close billing type details">
+          <CloseBtn ref={closeBtnRef} onClick={onClose} aria-label="Close plan type details">
             <CloseIcon size={16} color="currentColor" />
           </CloseBtn>
         </Header>
 
         {instances.length > 1 && (
-          <TabRow role="tablist" aria-label="Billing type by instance">
+          <TabRow role="tablist" aria-label="Plan type by instance">
             {instances.map((instance) => (
               <Tab
                 key={instance.instanceId}

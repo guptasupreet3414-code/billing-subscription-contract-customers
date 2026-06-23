@@ -288,7 +288,12 @@ function MixedInstanceCard({ subscription }) {
           </BottomRow>
         </>
       ) : (
-        <EntitlementRows entitlements={instance.entitlements} maxVisible={3} />
+        <>
+          <EntitlementRows entitlements={instance.entitlements} maxVisible={3} />
+          <BottomRow>
+            <ManagedByText>Self-service subscription</ManagedByText>
+          </BottomRow>
+        </>
       )}
     </Card>
   )
@@ -303,9 +308,15 @@ export default function SubscriptionCard({ subscription }) {
 
   const { id, name, iconType, renewalDate, entitlements } = subscription
   const isEnterprise = subscription.subscriptionTypes.includes('enterprise')
+  const isEcommerce = subscription.subscriptionTypes.includes('ecommerce')
   const visibleEntitlements = entitlements.slice(0, 3)
   const extraCount = entitlements.length - visibleEntitlements.length
-  const hasBottom = isEnterprise
+
+  const bottomText = isEnterprise
+    ? 'Managed by your Account Manager'
+    : isEcommerce
+    ? 'Self-service subscription'
+    : null
 
   return (
     <Card to={`/settings/billing/${id}`}>
@@ -329,9 +340,9 @@ export default function SubscriptionCard({ subscription }) {
         <NoUsageBlock>Usage data is not available for this product yet.</NoUsageBlock>
       )}
 
-      {hasBottom && (
+      {bottomText && (
         <BottomRow>
-          <ManagedByText>Managed by your Account Manager</ManagedByText>
+          <ManagedByText>{bottomText}</ManagedByText>
           {extraCount > 0 && <MoreLink>+{extraCount} more</MoreLink>}
         </BottomRow>
       )}

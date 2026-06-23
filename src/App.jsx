@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { createGlobalStyle } from 'styled-components'
 import styled from 'styled-components'
 import TopNav from './components/TopNav'
@@ -13,6 +13,15 @@ import SubscriptionDetail from './pages/billing/SubscriptionDetail'
 import Receipts from './pages/billing/Receipts'
 import PaymentDetails from './pages/billing/PaymentDetails'
 import { allRoutes } from './data/navigation'
+
+function ScrollToTop({ containerRef }) {
+  const { pathname } = useLocation()
+  useEffect(() => {
+    if (containerRef.current) containerRef.current.scrollTop = 0
+    else window.scrollTo(0, 0)
+  }, [pathname, containerRef])
+  return null
+}
 
 const GlobalStyle = createGlobalStyle`
   *, *::before, *::after {
@@ -196,6 +205,7 @@ export default function App() {
         $leftOffset={leftOffset}
         $rightOffset={rightOffset}
       >
+        <ScrollToTop containerRef={mainRef} />
         <Routes>
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           {allRoutes
