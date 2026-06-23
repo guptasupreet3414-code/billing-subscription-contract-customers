@@ -1,9 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import styled from 'styled-components'
 import { ChevronLeftIcon, ChevronUpIcon, ChevronDownIcon, InfoCircleIcon, EnvelopeIcon, PhoneIcon, CartOutlineIcon, CalendarIcon, LayersIcon, DollarIcon, getIcon } from '../../components/Icons'
-import { getSubscriptions, accountManager, subscriptionTypeConfig, contractTypeConfig } from '../../data/billingData'
-import BillingTypeModal from '../../components/billing/BillingTypeModal'
+import { getSubscriptions, accountManager, contractTypeConfig } from '../../data/billingData'
 
 const Main = styled.main`
   padding: 32px;
@@ -199,6 +198,57 @@ const PlanInfoBtn = styled.button`
   &:focus-visible { outline: 2px solid ${({ theme }) => theme.colors.blue300}; outline-offset: 2px; }
 `
 
+const PlanInfoBtnWrap = styled.div`
+  position: relative;
+  display: inline-flex;
+`
+
+const PlanInfoTooltipBox = styled.div`
+  position: absolute;
+  top: calc(100% + 10px);
+  left: -8px;
+  width: 320px;
+  padding: 14px 16px;
+  border-radius: 8px;
+  background: ${({ theme }) => theme.colors.neutral900};
+  color: white;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.55;
+  z-index: 10;
+  pointer-events: auto;
+
+  &::before {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    left: 14px;
+    border: 5px solid transparent;
+    border-bottom-color: ${({ theme }) => theme.colors.neutral900};
+  }
+
+  p {
+    margin: 0 0 10px;
+    &:last-child { margin-bottom: 0; }
+  }
+`
+
+const TooltipKVBlock = styled.div`
+  margin: 0 0 10px;
+`
+
+const TooltipKVLabel = styled.span`
+  display: block;
+  font-size: 11px;
+  opacity: 0.7;
+`
+
+const TooltipKVValue = styled.span`
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+`
+
 const TooltipBtn = styled.button`
   position: relative;
   display: inline-flex;
@@ -249,7 +299,19 @@ const PlanTypeSecondary = styled.p`
   color: ${({ theme }) => theme.colors.neutral600};
 `
 
-function PlanTypeCard({ instance, onOpenBillingModal }) {
+function PlanTypeCard({ instance, isCertCentral }) {
+  const [tooltipOpen, setTooltipOpen] = useState(false)
+  const wrapRef = useRef(null)
+
+  useEffect(() => {
+    if (!tooltipOpen) return
+    const handler = (e) => {
+      if (wrapRef.current && !wrapRef.current.contains(e.target)) setTooltipOpen(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [tooltipOpen])
+
   const isEnterprise = instance.subscriptionType === 'enterprise'
   const planLabel = isEnterprise ? 'Enterprise' : 'E-commerce'
   const contractConfig = isEnterprise && instance.contractType ? contractTypeConfig[instance.contractType] : null
@@ -259,14 +321,63 @@ function PlanTypeCard({ instance, onOpenBillingModal }) {
     ? instance.billing.plan
     : null
 
+  let tooltipContent
+  if (isEnterprise && !isCertCentral) {
+    tooltipContent = (
+      <>
+        <p>This product is covered by an enterprise agreement with DigiCert.</p>
+        <p>Contract renewals, billing changes, and additional capacity requests are managed through your DigiCert account team.</p>
+        <p>Contact your account manager for contract-related questions.</p>
+      </>
+    )
+  } else if (isEnterprise && isCertCentral && instance.contractType === 'committed-value') {
+    tooltipContent = (
+      <>
+        <p>This CertCentral account is managed through an enterprise agreement with DigiCert.</p>
+        <TooltipKVBlock>
+          <TooltipKVLabel>Contract Type:</TooltipKVLabel>
+          <TooltipKVValue>Committed Value</TooltipKVValue>
+        </TooltipKVBlock>
+        <p>Your organization has committed to a minimum spend amount over the contract term and receives negotiated pricing in return.</p>
+        <p>Billing, renewals, and contract changes are managed through your DigiCert account team.</p>
+        <p>Contact your account manager for contract-related questions.</p>
+      </>
+    )
+  } else if (isEnterprise && isCertCentral && instance.contractType === 'negotiated-pricing') {
+    tooltipContent = (
+      <>
+        <p>This CertCentral account is managed through an enterprise agreement with DigiCert.</p>
+        <TooltipKVBlock>
+          <TooltipKVLabel>Contract Type:</TooltipKVLabel>
+          <TooltipKVValue>Negotiated Pricing</TooltipKVValue>
+        </TooltipKVBlock>
+        <p>Your organization has negotiated pricing for specific products. Purchases and usage are billed according to the agreed pricing terms.</p>
+        <p>Billing, renewals, and contract changes are managed through your DigiCert account team.</p>
+        <p>Contact your account manager for contract-related questions.</p>
+      </>
+    )
+  } else {
+    tooltipContent = (
+      <>
+        <p>This subscription is purchased and managed through DigiCert's self-service purchasing experience.</p>
+        <p>You can manage payment methods, receipts, renewals, and purchases directly from this account.</p>
+      </>
+    )
+  }
+
   return (
     <KPICard>
       <KPICardHeader>
         <KPILabel style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
           Plan type
-          <PlanInfoBtn type="button" onClick={onOpenBillingModal} aria-haspopup="dialog">
-            <InfoCircleIcon size={13} color="currentColor" />
-          </PlanInfoBtn>
+          <PlanInfoBtnWrap ref={wrapRef}>
+            <PlanInfoBtn type="button" onClick={() => setTooltipOpen((v) => !v)}>
+              <InfoCircleIcon size={13} color="currentColor" />
+            </PlanInfoBtn>
+            {tooltipOpen && (
+              <PlanInfoTooltipBox>{tooltipContent}</PlanInfoTooltipBox>
+            )}
+          </PlanInfoBtnWrap>
         </KPILabel>
       </KPICardHeader>
       <KPIValue>{planLabel}</KPIValue>
@@ -398,7 +509,6 @@ function EntitlementsTable({ entitlements }) {
         <thead>
           <tr>
             <Th style={{ width: '30%' }}>Entitlement</Th>
-            <Th $align="right">Purchased</Th>
             <Th $align="right">Allocated</Th>
             <Th $align="right">Used</Th>
             <Th $align="right">Remaining</Th>
@@ -411,7 +521,6 @@ function EntitlementsTable({ entitlements }) {
             return (
               <tr key={ent.name}>
                 <Td>{ent.name}</Td>
-                <Td $align="right">{ent.purchased.toLocaleString()}</Td>
                 <Td $align="right">{ent.allocated.toLocaleString()}</Td>
                 <Td $align="right">{ent.consumed.toLocaleString()}</Td>
                 <Td $align="right">
@@ -668,11 +777,11 @@ function AccountTeamSection({ isCertCentral }) {
 
 // ── Enterprise contract section ───────────────────────────────────────────────
 
-function ContractInfoSection({ instance, onOpenBillingModal }) {
+function ContractInfoSection({ instance, isCertCentral }) {
   return (
     <Section>
       <KPIGrid $cols={3}>
-        <PlanTypeCard instance={instance} onOpenBillingModal={onOpenBillingModal} />
+        <PlanTypeCard instance={instance} isCertCentral={isCertCentral} />
         <RenewalCard dateStr={instance.renewalDate} sub={instance.contractTerm} />
         <UsageCard entitlements={instance.entitlements} />
       </KPIGrid>
@@ -730,13 +839,13 @@ const OutlineLink = styled(Link)`
   }
 `
 
-function EcommerceBillingSection({ instance, onOpenBillingModal }) {
+function EcommerceBillingSection({ instance, isCertCentral }) {
   const [priceAmount, pricePeriod] = instance.billing.price.split(' / ')
 
   return (
     <Section>
       <KPIGrid $cols={4}>
-        <PlanTypeCard instance={instance} onOpenBillingModal={onOpenBillingModal} />
+        <PlanTypeCard instance={instance} isCertCentral={isCertCentral} />
 
         <KPICard>
           <KPICardHeader>
@@ -927,7 +1036,6 @@ function ProductsSection({ categories }) {
 export default function SubscriptionDetail({ scenario }) {
   const { subscriptionId } = useParams()
   const [activeInstanceId, setActiveInstanceId] = useState(null)
-  const [billingModalOpen, setBillingModalOpen] = useState(false)
 
   const subscription = getSubscriptions(scenario).find((s) => s.id === subscriptionId)
   const isCertCentral = subscriptionId?.startsWith('certcentral-') ?? false
@@ -953,7 +1061,6 @@ export default function SubscriptionDetail({ scenario }) {
   }
 
   const activeInstance = subscription.instances.find((i) => i.instanceId === activeInstanceId) || subscription.instances[0]
-  const openBillingModal = () => setBillingModalOpen(true)
 
   return (
     <Main>
@@ -996,7 +1103,7 @@ export default function SubscriptionDetail({ scenario }) {
 
       {activeInstance.subscriptionType === 'enterprise' ? (
         <>
-          <ContractInfoSection instance={activeInstance} onOpenBillingModal={openBillingModal} />
+          <ContractInfoSection instance={activeInstance} isCertCentral={isCertCentral} />
           <Section>
             <SectionTitle>Entitlements and usage</SectionTitle>
             <EntitlementsTable entitlements={activeInstance.entitlements} />
@@ -1005,17 +1112,11 @@ export default function SubscriptionDetail({ scenario }) {
         </>
       ) : (
         <>
-          <EcommerceBillingSection instance={activeInstance} onOpenBillingModal={openBillingModal} />
+          <EcommerceBillingSection instance={activeInstance} isCertCentral={isCertCentral} />
           <ProductsSection categories={activeInstance.productCategories} />
         </>
       )}
 
-      <BillingTypeModal
-        open={billingModalOpen}
-        onClose={() => setBillingModalOpen(false)}
-        instances={subscription.instances}
-        initialInstanceId={activeInstance.instanceId}
-      />
     </Main>
   )
 }
