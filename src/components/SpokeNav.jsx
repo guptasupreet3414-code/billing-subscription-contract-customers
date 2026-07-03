@@ -143,9 +143,7 @@ const SectionBtn = styled.button`
   cursor: pointer;
   font-family: ${({ theme }) => theme.typography.fontFamily};
   font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-weight: 600;
   color: ${({ theme }) => theme.colors.neutral700};
   transition: color 0.15s;
 

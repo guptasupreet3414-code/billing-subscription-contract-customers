@@ -213,12 +213,12 @@ export default function App() {
             .map((r) => {
               let element = <StubPage />
               if (r === '/dashboard') element = <Dashboard />
-              else if (r === '/settings/billing') element = <MySubscriptions scenario={billingScenario} onScenarioChange={setBillingScenario} />
+              else if (r === '/settings/billing') element = <MySubscriptions />
               else if (r === '/settings/billing/receipts') element = <Receipts scenario={billingScenario} />
               else if (r === '/settings/billing/payment-details') element = <PaymentDetails scenario={billingScenario} />
               return <Route key={r} path={r} element={element} />
             })}
-          <Route path="/settings/billing/:subscriptionId" element={<SubscriptionDetail scenario={billingScenario} />} />
+          <Route path="/settings/billing/:subscriptionId" element={<SubscriptionDetail />} />
           <Route path="*" element={<StubPage />} />
         </Routes>
       </MainContent>

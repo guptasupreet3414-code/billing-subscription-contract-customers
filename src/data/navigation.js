@@ -16,7 +16,7 @@ export const secondaryProducts = [
 ]
 
 const defaultSubNav = (id) => [{
-  title: 'OVERVIEW',
+  title: 'Overview',
   defaultExpanded: true,
   items: [
     { label: 'Dashboard', route: `/${id}/dashboard` },
@@ -45,7 +45,7 @@ export const productSubNavs = {
     route: '/quantum-central',
     ariaLabel: 'Quantum Central navigation',
     sections: [{
-      title: 'OVERVIEW',
+      title: 'Overview',
       defaultExpanded: true,
       items: [
         { label: 'Dashboard', route: '/quantum-central/dashboard' },
@@ -60,7 +60,7 @@ export const productSubNavs = {
     ariaLabel: 'CertCentral navigation',
     sections: [
       {
-        title: 'OVERVIEW',
+        title: 'Overview',
         defaultExpanded: true,
         items: [
           { label: 'Dashboard', route: '/certcentral/dashboard' },
@@ -69,14 +69,14 @@ export const productSubNavs = {
         ],
       },
       {
-        title: 'INVENTORY',
+        title: 'Inventory',
         items: [
           { label: 'Inventory', route: '/certcentral/inventory' },
           { label: 'Trust store', route: '/certcentral/trust-store' },
         ],
       },
       {
-        title: 'POLICIES',
+        title: 'Policies',
         items: [
           { label: 'Certificate profiles', route: '/certcentral/certificate-profiles' },
           { label: 'Certificate templates', route: '/certcentral/certificate-templates' },
@@ -85,7 +85,7 @@ export const productSubNavs = {
         ],
       },
       {
-        title: 'AUTOMATION',
+        title: 'Automation',
         items: [
           { label: 'Agents', route: '/certcentral/agents' },
           { label: 'Sensors', route: '/certcentral/sensors' },
@@ -94,14 +94,14 @@ export const productSubNavs = {
         ],
       },
       {
-        title: 'INTEGRATIONS',
+        title: 'Integrations',
         items: [
           { label: 'Connectors', route: '/certcentral/connectors' },
           { label: 'Client tools', route: '/certcentral/client-tools' },
         ],
       },
       {
-        title: 'CONFIGURATION',
+        title: 'Configuration',
         items: [
           { label: 'Product settings', route: '/certcentral/product-settings' },
           { label: 'Alert destinations', route: '/certcentral/alert-destinations' },
@@ -118,7 +118,7 @@ export const productSubNavs = {
     ariaLabel: 'Trust Lifecycle navigation',
     sections: [
       {
-        title: 'OVERVIEW',
+        title: 'Overview',
         defaultExpanded: true,
         items: [
           { label: 'Dashboard', route: '/trust-lifecycle/dashboard' },
@@ -128,14 +128,14 @@ export const productSubNavs = {
         ],
       },
       {
-        title: 'RELEASE SECURITY',
+        title: 'Release security',
         items: [
           { label: 'Releases', route: '/trust-lifecycle/releases' },
           { label: 'Threat scanning', route: '/trust-lifecycle/threat-scanning' },
         ],
       },
       {
-        title: 'SIGNING',
+        title: 'Signing',
         items: [
           { label: 'Keypairs', route: '/trust-lifecycle/keypairs' },
           { label: 'Key rotations', route: '/trust-lifecycle/key-rotations' },
@@ -147,14 +147,14 @@ export const productSubNavs = {
         ],
       },
       {
-        title: 'INTEGRATIONS',
+        title: 'Integrations',
         items: [
           { label: 'Connectors', route: '/trust-lifecycle/connectors' },
           { label: 'Tools', route: '/trust-lifecycle/tools' },
         ],
       },
       {
-        title: 'CONFIGURATION',
+        title: 'Configuration',
         items: [
           { label: 'Product settings', route: '/trust-lifecycle/product-settings' },
           { label: 'Projects', route: '/trust-lifecycle/projects' },
@@ -171,7 +171,7 @@ export const productSubNavs = {
     ariaLabel: 'Private CA navigation',
     sections: [
       {
-        title: 'OVERVIEW',
+        title: 'Overview',
         defaultExpanded: true,
         items: [
           { label: 'Dashboard', route: '/private-ca/dashboard' },
@@ -179,7 +179,7 @@ export const productSubNavs = {
         ],
       },
       {
-        title: 'MANAGE CA',
+        title: 'Manage CA',
         items: [
           { label: 'Roots', route: '/private-ca/roots' },
           { label: 'Intermediates', route: '/private-ca/intermediates' },
@@ -188,14 +188,14 @@ export const productSubNavs = {
         ],
       },
       {
-        title: 'POLICIES',
+        title: 'Policies',
         items: [
           { label: 'Certificate profiles', route: '/private-ca/certificate-profiles' },
           { label: 'Certificate templates', route: '/private-ca/certificate-templates' },
         ],
       },
       {
-        title: 'REVOCATION & VALIDATION',
+        title: 'Revocation & validation',
         items: [
           { label: 'CRLs', route: '/private-ca/crls' },
           { label: 'OCSPs', route: '/private-ca/ocsps' },
@@ -212,7 +212,7 @@ export const productSubNavs = {
         ],
       },
       {
-        title: 'CONFIGURATION',
+        title: 'Configuration',
         items: [
           { label: 'Product settings', route: '/private-ca/product-settings' },
           { label: 'Accounts', route: '/private-ca/accounts' },

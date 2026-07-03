@@ -236,9 +236,9 @@ export default function Receipts({ scenario }) {
   if (scenario === 'enterprise') {
     return (
       <Main>
-        <BackLink to="/settings/billing">
+        <BackLink to="/settings/billing/certcentral-acme-devops">
           <ChevronLeftIcon size={14} color="currentColor" />
-          Back to Subscriptions
+          Back to CertCentral
         </BackLink>
         <PageTitle>Receipts and invoices</PageTitle>
         <PageDescription>Download receipts, invoices, and other billing documents for your account.</PageDescription>
@@ -266,9 +266,9 @@ export default function Receipts({ scenario }) {
 
   return (
     <Main>
-      <BackLink to="/settings/billing">
+      <BackLink to="/settings/billing/certcentral-acme-devops">
         <ChevronLeftIcon size={14} color="currentColor" />
-        Back to Subscriptions
+        Back to CertCentral
       </BackLink>
 
       <PageTitle>Receipts and invoices</PageTitle>

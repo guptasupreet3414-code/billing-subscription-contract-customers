@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import styled from 'styled-components'
 import { ChevronLeftIcon, ChevronUpIcon, ChevronDownIcon, InfoCircleIcon, EnvelopeIcon, PhoneIcon, CartOutlineIcon, CalendarIcon, LayersIcon, DollarIcon, getIcon } from '../../components/Icons'
-import { getSubscriptions, accountManager, contractTypeConfig } from '../../data/billingData'
+import { getFixedSubscriptions, accountManager, contractTypeConfig } from '../../data/billingData'
 
 const Main = styled.main`
   padding: 32px;
@@ -108,9 +108,7 @@ const Section = styled.section`
 const SectionTitle = styled.h2`
   margin: 0 0 14px;
   font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-weight: 600;
   color: ${({ theme }) => theme.colors.neutral600};
 `
 
@@ -144,9 +142,7 @@ const KPICardHeader = styled.div`
 
 const KPILabel = styled.span`
   font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
+  font-weight: 600;
   color: ${({ theme }) => theme.colors.neutral500};
 `
 
@@ -335,10 +331,10 @@ function PlanTypeCard({ instance, isCertCentral }) {
       <>
         <p>This CertCentral account is managed through an enterprise agreement with DigiCert.</p>
         <TooltipKVBlock>
-          <TooltipKVLabel>Contract Type:</TooltipKVLabel>
-          <TooltipKVValue>Committed Value</TooltipKVValue>
+          <TooltipKVLabel>Contract type:</TooltipKVLabel>
+          <TooltipKVValue>Fixed value</TooltipKVValue>
         </TooltipKVBlock>
-        <p>Your organization has committed to a minimum spend amount over the contract term and receives negotiated pricing in return.</p>
+        <p>Your organization has committed to a fixed spend amount over the contract term and receives negotiated pricing in return.</p>
         <p>Billing, renewals, and contract changes are managed through your DigiCert account team.</p>
         <p>Contact your account manager for contract-related questions.</p>
       </>
@@ -348,8 +344,8 @@ function PlanTypeCard({ instance, isCertCentral }) {
       <>
         <p>This CertCentral account is managed through an enterprise agreement with DigiCert.</p>
         <TooltipKVBlock>
-          <TooltipKVLabel>Contract Type:</TooltipKVLabel>
-          <TooltipKVValue>Negotiated Pricing</TooltipKVValue>
+          <TooltipKVLabel>Contract type:</TooltipKVLabel>
+          <TooltipKVValue>Negotiated pricing</TooltipKVValue>
         </TooltipKVBlock>
         <p>Your organization has negotiated pricing for specific products. Purchases and usage are billed according to the agreed pricing terms.</p>
         <p>Billing, renewals, and contract changes are managed through your DigiCert account team.</p>
@@ -1033,11 +1029,11 @@ function ProductsSection({ categories }) {
 
 // ── Main component ────────────────────────────────────────────────────────────
 
-export default function SubscriptionDetail({ scenario }) {
+export default function SubscriptionDetail() {
   const { subscriptionId } = useParams()
   const [activeInstanceId, setActiveInstanceId] = useState(null)
 
-  const subscription = getSubscriptions(scenario).find((s) => s.id === subscriptionId)
+  const subscription = getFixedSubscriptions().find((s) => s.id === subscriptionId)
   const isCertCentral = subscriptionId?.startsWith('certcentral-') ?? false
 
   useEffect(() => {
@@ -1046,16 +1042,16 @@ export default function SubscriptionDetail({ scenario }) {
 
   useEffect(() => {
     setActiveInstanceId(subscription?.instances[0]?.instanceId ?? null)
-  }, [subscriptionId, scenario])
+  }, [subscriptionId])
 
   if (!subscription) {
     return (
       <Main>
         <BackLink to="/settings/billing">
           <ChevronLeftIcon size={14} color="currentColor" />
-          Back to Subscriptions
+          Back to subscriptions
         </BackLink>
-        <NoDataBox>This subscription is not available in the current scenario.</NoDataBox>
+        <NoDataBox>This subscription could not be found.</NoDataBox>
       </Main>
     )
   }
@@ -1066,7 +1062,7 @@ export default function SubscriptionDetail({ scenario }) {
     <Main>
       <BackLink to="/settings/billing">
         <ChevronLeftIcon size={14} color="currentColor" />
-        Back to Subscriptions
+        Back to subscriptions
       </BackLink>
 
       <HeaderRow>

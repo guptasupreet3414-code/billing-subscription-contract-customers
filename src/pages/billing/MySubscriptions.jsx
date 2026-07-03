@@ -1,7 +1,6 @@
 import { useEffect } from 'react'
 import styled from 'styled-components'
-import { getSubscriptions, getSummary, getBillingTypeSummary } from '../../data/billingData'
-import GuidanceBanner from '../../components/billing/GuidanceBanner'
+import { getFixedSubscriptions, getSummary, getBillingTypeSummary } from '../../data/billingData'
 import SubscriptionCard from '../../components/billing/SubscriptionCard'
 
 const Main = styled.main`
@@ -9,14 +8,8 @@ const Main = styled.main`
 `
 
 const PageHeader = styled.div`
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
   margin-bottom: 24px;
 `
-
-const PageHeaderLeft = styled.div``
 
 const PageTitle = styled.h1`
   margin: 0 0 8px;
@@ -31,46 +24,6 @@ const PageDescription = styled.p`
   color: ${({ theme }) => theme.colors.neutral700};
   max-width: 640px;
 `
-
-/* ── Scenario switcher (for design review only) ── */
-const ScenarioSwitcher = styled.div`
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 12px;
-  color: ${({ theme }) => theme.colors.neutral600};
-`
-
-const ScenarioGroup = styled.div`
-  display: inline-flex;
-  border: 1px solid ${({ theme }) => theme.colors.neutral300};
-  border-radius: ${({ theme }) => theme.borderRadius.md};
-  overflow: hidden;
-`
-
-const ScenarioOption = styled.button`
-  padding: 6px 12px;
-  border: none;
-  border-left: 1px solid ${({ theme }) => theme.colors.neutral300};
-  background: ${({ theme, $active }) => ($active ? theme.colors.blue300 : theme.colors.white)};
-  color: ${({ theme, $active }) => ($active ? theme.colors.white : theme.colors.neutral800)};
-  font-family: ${({ theme }) => theme.typography.fontFamily};
-  font-size: 12px;
-  cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease;
-
-  &:first-child { border-left: none; }
-
-  &:hover {
-    background: ${({ theme, $active }) => ($active ? theme.colors.blue500 : theme.colors.neutral50)};
-  }
-`
-
-const scenarios = [
-  { id: 'mixed', label: 'Enterprise + E-commerce' },
-  { id: 'enterprise', label: 'Enterprise only' },
-  { id: 'ecommerce', label: 'E-commerce only' },
-]
 
 /* ── Summary cards ── */
 const SummaryGrid = styled.div`
@@ -132,42 +85,23 @@ const ProductGrid = styled.div`
   }
 `
 
-export default function MySubscriptions({ scenario, onScenarioChange }) {
+export default function MySubscriptions() {
   useEffect(() => {
     document.title = 'My subscriptions — DigiCert ONE'
   }, [])
 
-  const visibleSubscriptions = getSubscriptions(scenario)
-  const summary = getSummary(visibleSubscriptions)
-  const billingType = getBillingTypeSummary(visibleSubscriptions)
+  const subscriptions = getFixedSubscriptions()
+  const summary = getSummary(subscriptions)
+  const billingType = getBillingTypeSummary(subscriptions)
 
   return (
     <Main>
       <PageHeader>
-        <PageHeaderLeft>
-          <PageTitle>My subscriptions</PageTitle>
-          <PageDescription>
-            View your active product subscriptions, entitlement usage, and renewal information.
-          </PageDescription>
-        </PageHeaderLeft>
-        <ScenarioSwitcher>
-          Scenario:
-          <ScenarioGroup>
-            {scenarios.map((option) => (
-              <ScenarioOption
-                key={option.id}
-                type="button"
-                $active={scenario === option.id}
-                onClick={() => onScenarioChange(option.id)}
-              >
-                {option.label}
-              </ScenarioOption>
-            ))}
-          </ScenarioGroup>
-        </ScenarioSwitcher>
+        <PageTitle>My subscriptions</PageTitle>
+        <PageDescription>
+          View your active product subscriptions, entitlement usage, and renewal information.
+        </PageDescription>
       </PageHeader>
-
-      <GuidanceBanner scenario={scenario} />
 
       <SummaryGrid>
         <SummaryCard>
@@ -205,7 +139,7 @@ export default function MySubscriptions({ scenario, onScenarioChange }) {
 
       <SectionTitle>Product subscriptions</SectionTitle>
       <ProductGrid>
-        {visibleSubscriptions.map((subscription) => (
+        {subscriptions.map((subscription) => (
           <SubscriptionCard key={subscription.id} subscription={subscription} />
         ))}
       </ProductGrid>

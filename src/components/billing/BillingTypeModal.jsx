@@ -163,11 +163,11 @@ const LinkAction = styled(Link)`
 
 function EnterpriseSection({ instance }) {
   const contractTypeLabels = {
-    'committed-value': 'Committed Value',
-    'negotiated-pricing': 'Negotiated Pricing',
+    'committed-value': 'Fixed value',
+    'negotiated-pricing': 'Negotiated pricing',
   }
   const contractTypeDescs = {
-    'committed-value': 'A contract with a committed spend amount. You receive negotiated pricing in exchange for a minimum purchase commitment over the contract term.',
+    'committed-value': 'A contract with a fixed spend amount. You receive negotiated pricing in exchange for a minimum purchase commitment over the contract term.',
     'negotiated-pricing': 'A contract with custom pricing negotiated by your account team. You pay per-unit pricing without a minimum spend commitment.',
   }
 

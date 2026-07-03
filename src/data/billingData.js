@@ -25,11 +25,11 @@ export const subscriptionTypeConfig = {
 
 export const contractTypeConfig = {
   'committed-value': {
-    label: 'Committed Value',
-    tooltip: 'A contract with a committed spend amount. You receive negotiated pricing in exchange for a minimum purchase commitment over the contract term.',
+    label: 'Fixed value',
+    tooltip: 'A contract with a fixed spend amount. You receive negotiated pricing in exchange for a minimum purchase commitment over the contract term.',
   },
   'negotiated-pricing': {
-    label: 'Negotiated Pricing',
+    label: 'Negotiated pricing',
     tooltip: 'A contract with custom pricing negotiated by your account team. You pay per-unit pricing without a minimum spend commitment.',
   },
 }
@@ -391,7 +391,7 @@ const certCentralAccounts = [
       instanceId: 'acme-devops-enterprise',
       instanceLabel: 'Enterprise',
       subscriptionType: 'enterprise',
-      contractType: 'committed-value',
+      contractType: 'negotiated-pricing',
       contractId: 'CTR-2024-CC-00156',
       contractTerm: 'Jan 1, 2026 – Dec 31, 2026',
       contractOwner: 'DevOps Engineering',
@@ -512,6 +512,17 @@ const enterpriseSubscriptions = enterpriseProducts.map(wrapEnterpriseProduct)
 // - 'ecommerce':  every account shows its E-commerce instance
 // - 'mixed':      account 1 enterprise only, account 2 ecommerce only,
 //                 account 3 both — to demonstrate the mixed layout
+// Fixed subscription set used by MySubscriptions:
+// all enterprise products + 3 CertCentral cards (fixed value, negotiated pricing, ecommerce).
+export function getFixedSubscriptions() {
+  const certCentralCards = [
+    buildCertCentralCard(certCentralAccounts[0], ['enterprise']),
+    buildCertCentralCard(certCentralAccounts[1], ['enterprise']),
+    buildCertCentralCard(certCentralAccounts[2], ['ecommerce']),
+  ]
+  return [...enterpriseSubscriptions, ...certCentralCards]
+}
+
 export function getSubscriptions(scenario) {
   let certCentralCards
   if (scenario === 'enterprise') {

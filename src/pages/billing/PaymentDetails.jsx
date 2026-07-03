@@ -234,9 +234,9 @@ export default function PaymentDetails({ scenario }) {
   if (scenario === 'enterprise') {
     return (
       <Main>
-        <BackLink to="/settings/billing">
+        <BackLink to="/settings/billing/certcentral-acme-devops">
           <ChevronLeftIcon size={14} color="currentColor" />
-          Back to Subscriptions
+          Back to CertCentral
         </BackLink>
         <PageTitle>Payment details</PageTitle>
         <PageDescription style={{ marginBottom: 24 }}>
@@ -255,9 +255,9 @@ export default function PaymentDetails({ scenario }) {
 
   return (
     <Main>
-      <BackLink to="/settings/billing">
+      <BackLink to="/settings/billing/certcentral-acme-devops">
         <ChevronLeftIcon size={14} color="currentColor" />
-        Back to Subscriptions
+        Back to CertCentral
       </BackLink>
 
       <PageHeader>

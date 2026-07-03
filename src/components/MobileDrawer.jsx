@@ -176,9 +176,7 @@ const SectionTitle = styled.div`
   padding: 10px 16px 4px;
   font-family: ${({ theme }) => theme.typography.fontFamily};
   font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
+  font-weight: 600;
   color: ${({ theme }) => theme.colors.neutral500};
 `
 

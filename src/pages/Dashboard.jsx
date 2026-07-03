@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import styled from 'styled-components'
-import { ChevronRightIcon, CloseIcon } from '../components/Icons'
+import { CloseIcon, HamburgerIcon, getIcon } from '../components/Icons'
 
 const Main = styled.main`
   padding: 32px;
@@ -8,89 +8,59 @@ const Main = styled.main`
   background: ${({ theme }) => theme.colors.white};
 `
 
-/* ── Hero section ── */
-const HeroSection = styled.section`
+/* ── Greeting ── */
+const GreetingRow = styled.div`
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 24px;
+  gap: 16px;
   margin-bottom: 32px;
-  flex-wrap: wrap;
 `
 
-const HeroText = styled.div`
-  flex: 1 1 520px;
-  min-width: 280px;
+const GreetingText = styled.div``
+
+const GreetingTitle = styled.h1`
+  margin: 0 0 6px;
+  font-size: 40px;
+  font-weight: 400;
+  line-height: 1.2;
+  color: ${({ theme }) => theme.colors.neutral900};
 `
 
-const HeroLabel = styled.p`
-  margin: 0 0 8px;
-  font-size: 14px;
+const GreetingSubtitle = styled.p`
+  margin: 0;
+  font-size: 15px;
   color: ${({ theme }) => theme.colors.neutral600};
 `
 
-const HeroHeading = styled.h1`
-  margin: 0;
-  font-size: 40px;
-  line-height: 48px;
-  max-width: 720px;
-  color: ${({ theme }) => theme.colors.neutral900};
-  font-weight: 400;
-`
-
-const HeroDesc = styled.p`
-  margin: 16px 0 0;
-  max-width: 680px;
-  font-size: 16px;
-  line-height: 24px;
-  color: ${({ theme }) => theme.colors.neutral700};
-`
-
-const HeroCTAs = styled.div`
+const PageSettingsBtn = styled.button`
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  gap: 12px;
-  flex: 0 1 auto;
-  min-width: 220px;
-`
-
-const CTABtn = styled.a`
-  display: inline-flex;
-  align-items: center;
   justify-content: center;
-  min-width: 140px;
-  padding: 12px 20px;
+  width: 36px;
+  height: 36px;
+  border: 1px solid ${({ theme }) => theme.colors.neutral200};
   border-radius: ${({ theme }) => theme.borderRadius.md};
-  border: 1px solid ${({ theme, $primary }) => ($primary ? 'transparent' : theme.colors.blue300)};
-  background: ${({ theme, $primary }) => ($primary ? theme.colors.blue300 : theme.colors.white)};
-  color: ${({ theme, $primary }) => ($primary ? theme.colors.white : theme.colors.blue300)};
-  font-size: 14px;
-  font-weight: 500;
-  text-decoration: none;
-  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  background: ${({ theme }) => theme.colors.white};
+  color: ${({ theme }) => theme.colors.neutral600};
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s, border-color 0.15s;
 
   &:hover {
-    background: ${({ theme, $primary }) => ($primary ? theme.colors.blue500 : theme.colors.neutral100)};
-    border-color: ${({ theme, $primary }) => ($primary ? 'transparent' : theme.colors.blue500)};
-    color: ${({ theme, $primary }) => ($primary ? theme.colors.white : theme.colors.blue500)};
+    background: ${({ theme }) => theme.colors.neutral100};
+    border-color: ${({ theme }) => theme.colors.neutral300};
   }
-`
-
-/* ── Section label ── */
-const SectionLabel = styled.h2`
-  margin: 0 0 16px;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: ${({ theme }) => theme.colors.neutral600};
+  &:focus-visible {
+    outline: 2px solid ${({ theme }) => theme.colors.blue300};
+    outline-offset: 2px;
+  }
 `
 
 /* ── Two-col layout ── */
 const ContentGrid = styled.section`
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 360px;
+  grid-template-columns: minmax(0, 1fr) 300px;
   gap: 24px;
   align-items: start;
 
@@ -99,7 +69,7 @@ const ContentGrid = styled.section`
   }
 `
 
-/* ── Product action cards ── */
+/* ── Product cards ── */
 const ProductGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -114,49 +84,61 @@ const ProductCard = styled.article`
   background: ${({ theme }) => theme.colors.white};
   border: 1px solid ${({ theme }) => theme.colors.neutral200};
   border-radius: ${({ theme }) => theme.borderRadius.md};
-  box-shadow: 0 1px 2px rgba(53,56,58,0.05);
-  padding: 24px;
+  padding: 20px 24px;
+`
+
+const CardHeader = styled.div`
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 16px;
+`
+
+const CardIconWrap = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: ${({ theme }) => theme.colors.neutral500};
+`
+
+const CardTitleBlock = styled.div`
+  min-width: 0;
 `
 
 const CardTitle = styled.h3`
-  margin: 0 0 6px;
-  font-size: 16px;
+  margin: 0 0 3px;
+  font-size: 15px;
   color: ${({ theme }) => theme.colors.neutral900};
-  font-weight: 500;
+  font-weight: 600;
 `
 
 const CardSubtitle = styled.p`
-  margin: 0 0 16px;
+  margin: 0;
   font-size: 13px;
-  color: ${({ theme }) => theme.colors.neutral600};
+  color: ${({ theme }) => theme.colors.neutral500};
 `
 
 const ActionList = styled.ul`
   list-style: none;
   margin: 0;
   padding: 0;
-  display: grid;
-  gap: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 `
 
 const ActionLink = styled.a`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  width: 100%;
-  padding: 14px 16px;
-  border: 1px solid ${({ theme }) => theme.colors.neutral200};
-  border-radius: ${({ theme }) => theme.borderRadius.md};
-  text-decoration: none;
-  color: ${({ theme }) => theme.colors.neutral900};
+  display: block;
   font-size: 14px;
-  background: ${({ theme }) => theme.colors.white};
-  transition: background 0.15s ease, border-color 0.15s ease;
+  color: ${({ theme }) => theme.colors.blue300};
+  text-decoration: none;
 
   &:hover {
-    background: ${({ theme }) => theme.colors.neutral50};
-    border-color: ${({ theme }) => theme.colors.blue300};
+    text-decoration: underline;
   }
 `
 
@@ -177,40 +159,33 @@ const BlogCard = styled.article`
 `
 
 const BlogImageWrap = styled.div`
-  position: relative;
   width: 100%;
-  min-height: 192px;
+  min-height: 180px;
   background: linear-gradient(180deg, #0F3565 0%, #0C1F43 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
 `
 
 const BlogImage = styled.img`
   width: 100%;
-  height: 100%;
-  min-height: 192px;
+  height: 180px;
   object-fit: cover;
   display: block;
 `
 
 const BlogBody = styled.div`
-  padding: 20px 20px 24px;
+  padding: 16px 20px 20px;
 `
 
 const BlogBadge = styled.div`
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  margin-bottom: 12px;
-  padding: 6px 10px;
+  margin-bottom: 10px;
+  padding: 3px 10px;
   border-radius: 999px;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  background: rgba(1, 116, 195, 0.12);
+  font-size: 11px;
+  font-weight: 600;
+  border: 1px solid rgba(1, 116, 195, 0.45);
   color: ${({ theme }) => theme.colors.blue300};
+  letter-spacing: 0.02em;
 `
 
 const BlogMeta = styled.div`
@@ -221,21 +196,21 @@ const BlogMeta = styled.div`
   flex-wrap: wrap;
   font-size: 12px;
   color: ${({ theme }) => theme.colors.neutral500};
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 `
 
 const BlogTitle = styled.h3`
-  margin: 0 0 10px;
-  font-size: 18px;
-  line-height: 26px;
+  margin: 0 0 8px;
+  font-size: 17px;
+  line-height: 24px;
   color: ${({ theme }) => theme.colors.neutral900};
   font-weight: 500;
 `
 
 const BlogDesc = styled.p`
-  margin: 0 0 18px;
-  font-size: 14px;
-  line-height: 21px;
+  margin: 0 0 14px;
+  font-size: 13px;
+  line-height: 20px;
   color: ${({ theme }) => theme.colors.neutral700};
 `
 
@@ -243,18 +218,20 @@ const BlogLink = styled.a`
   text-decoration: none;
   color: ${({ theme }) => theme.colors.blue300};
   font-weight: 500;
+  font-size: 14px;
 
   &:hover { text-decoration: underline; }
 `
 
 /* ── Spotlight card ── */
 const SpotlightCard = styled.article`
-  background: ${({ theme }) => theme.colors.neutral100};
-  border: 1px solid ${({ theme }) => theme.colors.neutral200};
+  background: #EAF4FC;
+  border: 1px solid #C9E3F7;
   border-radius: ${({ theme }) => theme.borderRadius.md};
-  padding: 20px;
-  display: grid;
-  gap: 16px;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 `
 
 const SpotlightHeader = styled.div`
@@ -265,11 +242,15 @@ const SpotlightHeader = styled.div`
 `
 
 const SpotlightTag = styled.span`
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: ${({ theme }) => theme.colors.neutral600};
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  border: 1px solid rgba(0, 155, 135, 0.45);
+  color: #007B6E;
+  letter-spacing: 0.02em;
 `
 
 const SpotlightDismiss = styled.button`
@@ -282,10 +263,11 @@ const SpotlightDismiss = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 
   &:hover {
     color: ${({ theme }) => theme.colors.neutral900};
-    background: ${({ theme }) => theme.colors.neutral200};
+    background: rgba(0,0,0,0.06);
   }
 `
 
@@ -298,7 +280,7 @@ const SpotlightTitle = styled.h3`
 
 const SpotlightDesc = styled.p`
   margin: 0;
-  font-size: 14px;
+  font-size: 13px;
   line-height: 20px;
   color: ${({ theme }) => theme.colors.neutral700};
 `
@@ -306,9 +288,10 @@ const SpotlightDesc = styled.p`
 const SpotlightLink = styled.a`
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   color: ${({ theme }) => theme.colors.blue300};
   font-weight: 500;
+  font-size: 14px;
   text-decoration: none;
 
   &:hover { text-decoration: underline; }
@@ -317,43 +300,112 @@ const SpotlightLink = styled.a`
 /* ── Data ── */
 const productCards = [
   {
-    title: 'CertCentral',
-    subtitle: 'Public certificates',
+    title: 'Trust Lifecycle',
+    subtitle: 'Certificate management',
+    iconType: 'cycle',
     actions: [
-      { label: 'Order a new certificate', href: '/certcentral/dashboard' },
-      { label: 'Reissue a certificate', href: '/certcentral/dashboard' },
-      { label: 'Configure ACME automation', href: '/certcentral/client-tools' },
-      { label: 'Manage organizations', href: '/certcentral/client-tools' },
-    ],
-  },
-  {
-    title: 'Trust Lifecycle Manager',
-    subtitle: 'Certificate lifecycle',
-    actions: [
-      { label: 'Discover certificates', href: '/trust-lifecycle/dashboard' },
-      { label: 'Apply policies', href: '/trust-lifecycle/dashboard' },
       { label: 'Set up alerts', href: '/trust-lifecycle/alerts' },
-      { label: 'Set up certificate automation', href: '/trust-lifecycle/tools' },
+      { label: 'Discover certificates', href: '/trust-lifecycle/dashboard' },
+      { label: 'Automate certificate lifecycle', href: '/trust-lifecycle/tools' },
     ],
   },
   {
-    title: 'DNS Trust Manager',
-    subtitle: 'DNS & DNSSEC',
+    title: 'Valimail',
+    subtitle: 'Email authentication',
+    iconType: 'envelope',
     actions: [
-      { label: 'Update CAA records', href: '/dns/dashboard' },
-      { label: 'Add or edit a zone', href: '/dns/dashboard' },
-      { label: 'Enable DNSSEC', href: '/dns/dashboard' },
-      { label: 'Set traffic routing rules', href: '/dns/dashboard' },
+      { label: 'Review DMARC status', href: '/valimail/dashboard' },
+      { label: 'Manage sender sources', href: '/valimail/dashboard' },
+      { label: 'Monitor domains', href: '/valimail/dashboard' },
+      { label: 'Investigate spoofing risks', href: '/valimail/dashboard' },
+    ],
+  },
+  {
+    title: 'Quantum Central',
+    subtitle: 'Post-quantum readiness',
+    iconType: 'settings',
+    actions: [
+      { label: 'Assess cryptographic risk', href: '/quantum-central/dashboard' },
+      { label: 'Review PQC readiness', href: '/quantum-central/dashboard' },
+      { label: 'View algorithm inventory', href: '/quantum-central/dashboard' },
+      { label: 'Track remediation', href: '/quantum-central/dashboard' },
+    ],
+  },
+  {
+    title: 'AI Agents',
+    subtitle: 'AI identity & governance',
+    iconType: 'sparkle',
+    actions: [
+      { label: 'Register agents', href: '/ai-agents/dashboard' },
+      { label: 'Manage agent identities', href: '/ai-agents/dashboard' },
+      { label: 'Review agent activity', href: '/ai-agents/dashboard' },
+      { label: 'Configure trust policies', href: '/ai-agents/dashboard' },
+    ],
+  },
+  {
+    title: 'Device Trust',
+    subtitle: 'IoT device security',
+    iconType: 'mobile',
+    actions: [
+      { label: 'Register devices', href: '/device-trust/dashboard' },
+      { label: 'Manage device identities', href: '/device-trust/dashboard' },
+      { label: 'Configure device policies', href: '/device-trust/dashboard' },
+      { label: 'Review device lifecycle', href: '/device-trust/dashboard' },
     ],
   },
   {
     title: 'Private CA',
     subtitle: 'Internal PKI',
+    iconType: 'hierarchy',
     actions: [
-      { label: 'Issue an internal certificate', href: '/private-ca/dashboard' },
+      { label: 'Issue internal certificate', href: '/private-ca/dashboard' },
       { label: 'Create issuing CA', href: '/private-ca/dashboard' },
-      { label: 'Manage CRL & OCSP', href: '/private-ca/dashboard' },
-      { label: 'Manage certificate templates', href: '/private-ca/certificate-templates' },
+      { label: 'Manage certificate profiles', href: '/private-ca/certificate-profiles' },
+      { label: 'Configure OCSP', href: '/private-ca/ocsps' },
+    ],
+  },
+  {
+    title: 'Software Trust',
+    subtitle: 'Code signing',
+    iconType: 'code',
+    actions: [
+      { label: 'Manage signing keys', href: '/software-trust/dashboard' },
+      { label: 'Configure signing policies', href: '/software-trust/dashboard' },
+      { label: 'Sign software', href: '/software-trust/dashboard' },
+      { label: 'Generate SBOM', href: '/software-trust/dashboard' },
+    ],
+  },
+  {
+    title: 'DNS Trust',
+    subtitle: 'DNS management',
+    iconType: 'globe',
+    actions: [
+      { label: 'Manage zones', href: '/dns/dashboard' },
+      { label: 'Update DNS records', href: '/dns/dashboard' },
+      { label: 'Configure traffic steering', href: '/dns/dashboard' },
+      { label: 'Review DNSSEC settings', href: '/dns/dashboard' },
+    ],
+  },
+  {
+    title: 'Content Trust',
+    subtitle: 'Document & content signing',
+    iconType: 'document',
+    actions: [
+      { label: 'Manage signing credentials', href: '/content-trust/dashboard' },
+      { label: 'Verify signed content', href: '/content-trust/dashboard' },
+      { label: 'Review signing activity', href: '/content-trust/dashboard' },
+      { label: 'Configure seal policies', href: '/content-trust/dashboard' },
+    ],
+  },
+  {
+    title: 'CertCentral',
+    subtitle: 'Public certificates',
+    iconType: 'shield',
+    actions: [
+      { label: 'Order public certificate', href: '/certcentral/dashboard' },
+      { label: 'Validate domains', href: '/certcentral/dashboard' },
+      { label: 'Manage organizations', href: '/certcentral/dashboard' },
+      { label: 'Expiring certificates', href: '/certcentral/inventory' },
     ],
   },
 ]
@@ -363,44 +415,39 @@ export default function Dashboard() {
 
   return (
     <Main>
-      {/* Hero */}
-      <HeroSection>
-        <HeroText>
-          <HeroLabel>Hi, John Smith</HeroLabel>
-          <HeroHeading>What would you like to do?</HeroHeading>
-          <HeroDesc>
-            Your DigiCert ONE workspace — manage certificates, policies, and trust across products.
-          </HeroDesc>
-        </HeroText>
-        <HeroCTAs>
-          <CTABtn href="/certcentral/inventory">View inventory</CTABtn>
-          <CTABtn href="/certcentral/dashboard" $primary>Order certificate</CTABtn>
-        </HeroCTAs>
-      </HeroSection>
+      {/* Greeting */}
+      <GreetingRow>
+        <GreetingText>
+          <GreetingTitle>Hello, John</GreetingTitle>
+          <GreetingSubtitle>Access your DigiCert trust solutions and discover what's new</GreetingSubtitle>
+        </GreetingText>
+        <PageSettingsBtn aria-label="Page settings">
+          <HamburgerIcon size={18} color="currentColor" />
+        </PageSettingsBtn>
+      </GreetingRow>
 
-      {/* Product actions */}
-      <SectionLabel>Browse actions by product</SectionLabel>
       <ContentGrid>
-        <div>
-          <ProductGrid>
-            {productCards.map((card) => (
-              <ProductCard key={card.title}>
-                <CardTitle>{card.title}</CardTitle>
-                <CardSubtitle>{card.subtitle}</CardSubtitle>
-                <ActionList>
-                  {card.actions.map((action) => (
-                    <li key={action.label}>
-                      <ActionLink href={action.href}>
-                        <span>{action.label}</span>
-                        <ChevronRightIcon size={16} color="currentColor" />
-                      </ActionLink>
-                    </li>
-                  ))}
-                </ActionList>
-              </ProductCard>
-            ))}
-          </ProductGrid>
-        </div>
+        {/* Product cards */}
+        <ProductGrid>
+          {productCards.map((card) => (
+            <ProductCard key={card.title}>
+              <CardHeader>
+                <CardIconWrap>{getIcon(card.iconType, 20, 'currentColor')}</CardIconWrap>
+                <CardTitleBlock>
+                  <CardTitle>{card.title}</CardTitle>
+                  <CardSubtitle>{card.subtitle}</CardSubtitle>
+                </CardTitleBlock>
+              </CardHeader>
+              <ActionList>
+                {card.actions.map((action) => (
+                  <li key={action.label}>
+                    <ActionLink href={action.href}>{action.label}</ActionLink>
+                  </li>
+                ))}
+              </ActionList>
+            </ProductCard>
+          ))}
+        </ProductGrid>
 
         {/* Right column */}
         <RightCol>
@@ -414,7 +461,7 @@ export default function Dashboard() {
               />
             </BlogImageWrap>
             <BlogBody>
-              <BlogBadge>Certificate Lifecycle</BlogBadge>
+              <BlogBadge>Certificate lifecycle</BlogBadge>
               <BlogMeta>
                 <span>Brian Trzupek · 5 min read</span>
                 <span>digicert.com/blog</span>
@@ -440,20 +487,20 @@ export default function Dashboard() {
           {!spotlightDismissed && (
             <SpotlightCard>
               <SpotlightHeader>
-                <SpotlightTag>Spotlight</SpotlightTag>
+                <SpotlightTag>Software Trust Manager</SpotlightTag>
                 <SpotlightDismiss
                   aria-label="Dismiss spotlight"
                   onClick={() => setSpotlightDismissed(true)}
                 >
-                  <CloseIcon size={16} color="currentColor" />
+                  <CloseIcon size={14} color="currentColor" />
                 </SpotlightDismiss>
               </SpotlightHeader>
-              <SpotlightTitle>Software Trust Manager</SpotlightTitle>
+              <SpotlightTitle>Centralize code-signing at scale</SpotlightTitle>
               <SpotlightDesc>
                 Centralize code-signing keys, enforce signing policy, and produce SBOMs across
                 your build pipelines.
               </SpotlightDesc>
-              <SpotlightLink href="/software-trust/dashboard">Learn more →</SpotlightLink>
+              <SpotlightLink href="/software-trust/dashboard">Explore STM →</SpotlightLink>
             </SpotlightCard>
           )}
         </RightCol>
