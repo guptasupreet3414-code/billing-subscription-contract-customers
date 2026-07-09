@@ -230,7 +230,23 @@ const SendBtn = styled.button`
   &:focus-visible { outline: 2px solid ${({ theme }) => theme.colors.blue300}; outline-offset: 2px; }
 `
 
-export default function ContactUsDrawer({ open, onClose }) {
+const BANNER_CONTENT = {
+  default: {
+    heading: 'Questions about this purchase?',
+    body: "Have questions about your order, renewal, billing, invoices, or your product? Send us a message below and we'll route it to the appropriate DigiCert team.",
+  },
+  'payment-details': {
+    heading: 'Questions about payment details?',
+    body: "Have questions about your payment methods, billing contacts, or charges? Send us a message below and we'll route it to the appropriate DigiCert team.",
+  },
+  receipts: {
+    heading: 'Questions about your invoices?',
+    body: "Have questions about your invoices, receipts, or billing history? Send us a message below and we'll route it to the appropriate DigiCert team.",
+  },
+}
+
+export default function ContactUsDrawer({ open, onClose, helpContext = 'default' }) {
+  const banner = BANNER_CONTENT[helpContext] || BANNER_CONTENT.default
   const firstFocusRef = useRef(null)
 
   useEffect(() => {
@@ -265,10 +281,8 @@ export default function ContactUsDrawer({ open, onClose }) {
 
         <DrawerBody>
           <HelpCallout>
-            <BannerHeading>Questions about this purchase?</BannerHeading>
-            <BannerText>
-              Have questions about your order, renewal, billing, invoices, or your product? Send us a message below and we'll route it to the appropriate DigiCert team.
-            </BannerText>
+            <BannerHeading>{banner.heading}</BannerHeading>
+            <BannerText>{banner.body}</BannerText>
             <BannerRule />
             <BannerText>Need to discuss a new purchase or upgrade instead?</BannerText>
             <ContactSalesLink

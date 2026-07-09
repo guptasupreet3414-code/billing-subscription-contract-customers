@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import { ChevronDownIcon, FilterIcon, DownloadIcon, AlertCircleFillIcon, InboxIcon, ChatBubbleIcon } from '../../components/Icons'
 import BillingEmptyState from '../../components/billing/BillingEmptyState'
 import ContactAccountManagerButton from '../../components/billing/ContactAccountManagerButton'
-import ContactManagerDrawer from '../../components/billing/ContactManagerDrawer'
+import ContactUsDrawer from '../../components/billing/ContactUsDrawer'
 
 const Main = styled.main`
   padding: 32px;
@@ -293,7 +293,7 @@ export default function Receipts({ scenario }) {
         </TitleBlock>
         <NeedHelpBtn type="button" onClick={() => setIsContactDrawerOpen(true)}>
           <ChatBubbleIcon size={15} color="currentColor" />
-          Contact account manager
+          Contact us
         </NeedHelpBtn>
       </PageHeader>
 
@@ -416,7 +416,7 @@ export default function Receipts({ scenario }) {
         <TableFooter>1 to {filteredRows.length} of 8,618</TableFooter>
       </TableWrap>
 
-      <ContactManagerDrawer
+      <ContactUsDrawer
         open={isContactDrawerOpen}
         onClose={() => setIsContactDrawerOpen(false)}
         helpContext="receipts"

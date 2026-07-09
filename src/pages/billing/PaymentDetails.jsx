@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import { PlusIcon, DotsVerticalIcon, InfoCircleIcon, CreditCardIcon, ChatBubbleIcon } from '../../components/Icons'
 import BillingEmptyState from '../../components/billing/BillingEmptyState'
 import ContactAccountManagerButton from '../../components/billing/ContactAccountManagerButton'
-import ContactManagerDrawer from '../../components/billing/ContactManagerDrawer'
+import ContactUsDrawer from '../../components/billing/ContactUsDrawer'
 
 const Main = styled.main`
   padding: 32px;
@@ -259,7 +259,7 @@ export default function PaymentDetails({ scenario }) {
         </TitleBlock>
         <NeedHelpBtn type="button" onClick={() => setIsContactDrawerOpen(true)}>
           <ChatBubbleIcon size={15} color="currentColor" />
-          Contact account manager
+          Contact us
         </NeedHelpBtn>
       </PageHeader>
 
@@ -335,7 +335,7 @@ export default function PaymentDetails({ scenario }) {
         </ContactCard>
       </SectionBlock>
 
-      <ContactManagerDrawer
+      <ContactUsDrawer
         open={isContactDrawerOpen}
         onClose={() => setIsContactDrawerOpen(false)}
         helpContext="payment-details"
