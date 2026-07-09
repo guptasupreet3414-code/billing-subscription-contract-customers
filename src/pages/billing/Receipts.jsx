@@ -1,27 +1,23 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
 import styled from 'styled-components'
-import { ChevronLeftIcon, ChevronDownIcon, FilterIcon, DownloadIcon, AlertCircleFillIcon, InboxIcon } from '../../components/Icons'
+import { ChevronDownIcon, FilterIcon, DownloadIcon, AlertCircleFillIcon, InboxIcon, ChatBubbleIcon } from '../../components/Icons'
 import BillingEmptyState from '../../components/billing/BillingEmptyState'
 import ContactAccountManagerButton from '../../components/billing/ContactAccountManagerButton'
+import ContactManagerDrawer from '../../components/billing/ContactManagerDrawer'
 
 const Main = styled.main`
   padding: 32px;
 `
 
-const BackLink = styled(Link)`
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 20px;
-  font-size: 13px;
-  font-weight: 500;
-  color: ${({ theme }) => theme.colors.neutral700};
-  text-decoration: none;
-
-  &:hover { color: ${({ theme }) => theme.colors.blue300}; }
-  &:focus-visible { outline: 2px solid ${({ theme }) => theme.colors.blue300}; outline-offset: 2px; }
+const PageHeader = styled.div`
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
 `
+
+const TitleBlock = styled.div``
 
 const PageTitle = styled.h1`
   margin: 0 0 6px;
@@ -31,9 +27,34 @@ const PageTitle = styled.h1`
 `
 
 const PageDescription = styled.p`
-  margin: 0 0 24px;
+  margin: 0;
   font-size: 14px;
   color: ${({ theme }) => theme.colors.neutral600};
+`
+
+const NeedHelpBtn = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 0;
+  border: none;
+  background: transparent;
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 13px;
+  font-weight: 500;
+  color: ${({ theme }) => theme.colors.blue300};
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  padding-top: 6px;
+  transition: color 0.15s;
+
+  &:hover { color: ${({ theme }) => theme.colors.blue500}; }
+  &:focus-visible {
+    outline: 2px solid ${({ theme }) => theme.colors.blue300};
+    outline-offset: 2px;
+    border-radius: 3px;
+  }
 `
 
 const SummaryRow = styled.div`
@@ -228,6 +249,7 @@ const mockRows = [
 export default function Receipts({ scenario }) {
   const [view, setView] = useState('All')
   const [viewOpen, setViewOpen] = useState(false)
+  const [isContactDrawerOpen, setIsContactDrawerOpen] = useState(false)
 
   useEffect(() => {
     document.title = 'Receipts and invoices — DigiCert ONE'
@@ -236,12 +258,8 @@ export default function Receipts({ scenario }) {
   if (scenario === 'enterprise') {
     return (
       <Main>
-        <BackLink to="/settings/billing/certcentral-acme-devops">
-          <ChevronLeftIcon size={14} color="currentColor" />
-          Back to CertCentral
-        </BackLink>
         <PageTitle>Receipts and invoices</PageTitle>
-        <PageDescription>Download receipts, invoices, and other billing documents for your account.</PageDescription>
+        <PageDescription style={{ marginBottom: 24 }}>Download receipts, invoices, and other billing documents for your account.</PageDescription>
         <BillingEmptyState
           icon={<InboxIcon size={40} color="currentColor" />}
           title="Receipts are not available here yet"
@@ -266,15 +284,18 @@ export default function Receipts({ scenario }) {
 
   return (
     <Main>
-      <BackLink to="/settings/billing/certcentral-acme-devops">
-        <ChevronLeftIcon size={14} color="currentColor" />
-        Back to CertCentral
-      </BackLink>
-
-      <PageTitle>Receipts and invoices</PageTitle>
-      <PageDescription>
-        Track your invoices, receipts, and refunds for all e-commerce products, self-service add-ons, and other usage.
-      </PageDescription>
+      <PageHeader>
+        <TitleBlock>
+          <PageTitle>Receipts and invoices</PageTitle>
+          <PageDescription>
+            Track your invoices, receipts, and refunds for all e-commerce products, self-service add-ons, and other usage.
+          </PageDescription>
+        </TitleBlock>
+        <NeedHelpBtn type="button" onClick={() => setIsContactDrawerOpen(true)}>
+          <ChatBubbleIcon size={15} color="currentColor" />
+          Contact account manager
+        </NeedHelpBtn>
+      </PageHeader>
 
       <SummaryRow>
         <SummaryCard $alert>
@@ -394,6 +415,12 @@ export default function Receipts({ scenario }) {
         </Table>
         <TableFooter>1 to {filteredRows.length} of 8,618</TableFooter>
       </TableWrap>
+
+      <ContactManagerDrawer
+        open={isContactDrawerOpen}
+        onClose={() => setIsContactDrawerOpen(false)}
+        helpContext="receipts"
+      />
     </Main>
   )
 }

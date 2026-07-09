@@ -1,26 +1,12 @@
-import { useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { useEffect, useState } from 'react'
 import styled from 'styled-components'
-import { ChevronLeftIcon, PlusIcon, DotsVerticalIcon, InfoCircleIcon, CreditCardIcon } from '../../components/Icons'
+import { PlusIcon, DotsVerticalIcon, InfoCircleIcon, CreditCardIcon, ChatBubbleIcon } from '../../components/Icons'
 import BillingEmptyState from '../../components/billing/BillingEmptyState'
 import ContactAccountManagerButton from '../../components/billing/ContactAccountManagerButton'
+import ContactManagerDrawer from '../../components/billing/ContactManagerDrawer'
 
 const Main = styled.main`
   padding: 32px;
-`
-
-const BackLink = styled(Link)`
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 20px;
-  font-size: 13px;
-  font-weight: 500;
-  color: ${({ theme }) => theme.colors.neutral700};
-  text-decoration: none;
-
-  &:hover { color: ${({ theme }) => theme.colors.blue300}; }
-  &:focus-visible { outline: 2px solid ${({ theme }) => theme.colors.blue300}; outline-offset: 2px; }
 `
 
 const PageHeader = styled.div`
@@ -47,18 +33,29 @@ const PageDescription = styled.p`
   max-width: 600px;
 `
 
-const NeedHelpLink = styled.a`
+const NeedHelpBtn = styled.button`
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  padding: 4px 0;
+  border: none;
+  background: transparent;
+  font-family: ${({ theme }) => theme.typography.fontFamily};
   font-size: 13px;
   font-weight: 500;
   color: ${({ theme }) => theme.colors.blue300};
-  text-decoration: none;
+  cursor: pointer;
   white-space: nowrap;
+  flex-shrink: 0;
   padding-top: 6px;
+  transition: color 0.15s;
 
-  &:hover { text-decoration: underline; }
+  &:hover { color: ${({ theme }) => theme.colors.blue500}; }
+  &:focus-visible {
+    outline: 2px solid ${({ theme }) => theme.colors.blue300};
+    outline-offset: 2px;
+    border-radius: 3px;
+  }
 `
 
 const SectionBlock = styled.div`
@@ -227,6 +224,8 @@ const VatRow = styled.div`
 `
 
 export default function PaymentDetails({ scenario }) {
+  const [isContactDrawerOpen, setIsContactDrawerOpen] = useState(false)
+
   useEffect(() => {
     document.title = 'Payment details — DigiCert ONE'
   }, [])
@@ -234,10 +233,6 @@ export default function PaymentDetails({ scenario }) {
   if (scenario === 'enterprise') {
     return (
       <Main>
-        <BackLink to="/settings/billing/certcentral-acme-devops">
-          <ChevronLeftIcon size={14} color="currentColor" />
-          Back to CertCentral
-        </BackLink>
         <PageTitle>Payment details</PageTitle>
         <PageDescription style={{ marginBottom: 24 }}>
           View how your account is billed and who to contact about payment information.
@@ -255,11 +250,6 @@ export default function PaymentDetails({ scenario }) {
 
   return (
     <Main>
-      <BackLink to="/settings/billing/certcentral-acme-devops">
-        <ChevronLeftIcon size={14} color="currentColor" />
-        Back to CertCentral
-      </BackLink>
-
       <PageHeader>
         <TitleBlock>
           <PageTitle>Payment details</PageTitle>
@@ -267,10 +257,10 @@ export default function PaymentDetails({ scenario }) {
             Payments for e-commerce products, self-service add-ons, and other usage are made using your default payment method.
           </PageDescription>
         </TitleBlock>
-        <NeedHelpLink href="#">
-          <InfoCircleIcon size={14} color="currentColor" />
-          Need help?
-        </NeedHelpLink>
+        <NeedHelpBtn type="button" onClick={() => setIsContactDrawerOpen(true)}>
+          <ChatBubbleIcon size={15} color="currentColor" />
+          Contact account manager
+        </NeedHelpBtn>
       </PageHeader>
 
       <SectionBlock>
@@ -344,6 +334,12 @@ export default function PaymentDetails({ scenario }) {
           </ContactField>
         </ContactCard>
       </SectionBlock>
+
+      <ContactManagerDrawer
+        open={isContactDrawerOpen}
+        onClose={() => setIsContactDrawerOpen(false)}
+        helpContext="payment-details"
+      />
     </Main>
   )
 }

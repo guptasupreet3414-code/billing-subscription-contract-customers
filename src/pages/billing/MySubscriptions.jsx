@@ -1,15 +1,23 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { getFixedSubscriptions, getSummary, getBillingTypeSummary } from '../../data/billingData'
 import SubscriptionCard from '../../components/billing/SubscriptionCard'
+import ContactManagerDrawer from '../../components/billing/ContactManagerDrawer'
+import { ChatBubbleIcon } from '../../components/Icons'
 
 const Main = styled.main`
   padding: 32px;
 `
 
 const PageHeader = styled.div`
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
   margin-bottom: 24px;
 `
+
+const PageTitleBlock = styled.div``
 
 const PageTitle = styled.h1`
   margin: 0 0 8px;
@@ -23,6 +31,30 @@ const PageDescription = styled.p`
   font-size: 14px;
   color: ${({ theme }) => theme.colors.neutral700};
   max-width: 640px;
+`
+
+const NeedHelpBtn = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 0;
+  border: none;
+  background: transparent;
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 13px;
+  font-weight: 500;
+  color: ${({ theme }) => theme.colors.blue300};
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: color 0.15s;
+
+  &:hover { color: ${({ theme }) => theme.colors.blue500}; }
+  &:focus-visible {
+    outline: 2px solid ${({ theme }) => theme.colors.blue300};
+    outline-offset: 2px;
+    border-radius: 3px;
+  }
 `
 
 /* ── Summary cards ── */
@@ -86,6 +118,8 @@ const ProductGrid = styled.div`
 `
 
 export default function MySubscriptions() {
+  const [isContactDrawerOpen, setIsContactDrawerOpen] = useState(false)
+
   useEffect(() => {
     document.title = 'My subscriptions — DigiCert ONE'
   }, [])
@@ -93,21 +127,28 @@ export default function MySubscriptions() {
   const subscriptions = getFixedSubscriptions()
   const summary = getSummary(subscriptions)
   const billingType = getBillingTypeSummary(subscriptions)
+  const linkedEnterpriseCount = subscriptions.filter(s => s.id.startsWith('certcentral-') && s.subscriptionTypes.includes('enterprise')).length
 
   return (
     <Main>
       <PageHeader>
-        <PageTitle>My subscriptions</PageTitle>
-        <PageDescription>
-          View your active product subscriptions, entitlement usage, and renewal information.
-        </PageDescription>
+        <PageTitleBlock>
+          <PageTitle>My subscriptions</PageTitle>
+          <PageDescription>
+            View your active product subscriptions, entitlement usage, and renewal information.
+          </PageDescription>
+        </PageTitleBlock>
+        <NeedHelpBtn type="button" onClick={() => setIsContactDrawerOpen(true)}>
+          <ChatBubbleIcon size={15} color="currentColor" />
+          Contact account manager
+        </NeedHelpBtn>
       </PageHeader>
 
       <SummaryGrid>
         <SummaryCard>
           <SummaryLabel>Active subscriptions</SummaryLabel>
           <SummaryValue>{summary.productCount + 1} products</SummaryValue>
-          <SummarySub>{summary.certCentralCount} CertCentral account{summary.certCentralCount !== 1 ? 's' : ''} linked</SummarySub>
+          <SummarySub>Includes {linkedEnterpriseCount} linked CertCentral account{linkedEnterpriseCount !== 1 ? 's' : ''}</SummarySub>
         </SummaryCard>
 
         <SummaryCard>
@@ -131,7 +172,7 @@ export default function MySubscriptions() {
         </SummaryCard>
 
         <SummaryCard>
-          <SummaryLabel>Billing type</SummaryLabel>
+          <SummaryLabel>Subscription type</SummaryLabel>
           <SummaryValue>{billingType.label}</SummaryValue>
           <SummarySub>{billingType.sub}</SummarySub>
         </SummaryCard>
@@ -143,6 +184,11 @@ export default function MySubscriptions() {
           <SubscriptionCard key={subscription.id} subscription={subscription} />
         ))}
       </ProductGrid>
+
+      <ContactManagerDrawer
+        open={isContactDrawerOpen}
+        onClose={() => setIsContactDrawerOpen(false)}
+      />
     </Main>
   )
 }

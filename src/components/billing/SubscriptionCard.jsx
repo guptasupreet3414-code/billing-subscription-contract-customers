@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
-import { getIcon } from '../Icons'
+import { getIcon, DotsVerticalIcon } from '../Icons'
 import { subscriptionTypeConfig } from '../../data/billingData'
 import UsageBar from './UsageBar'
 
@@ -73,6 +73,8 @@ const CardTitle = styled.h3`
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  flex-shrink: 1;
+  min-width: 0;
 `
 
 const SubtitleText = styled.p`
@@ -83,15 +85,128 @@ const SubtitleText = styled.p`
 
 const RenewalPill = styled.span`
   flex-shrink: 0;
-  padding: 4px 10px;
+  padding: 3px 9px;
   border-radius: 999px;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 500;
-  line-height: 18px;
+  line-height: 16px;
   white-space: nowrap;
   background: rgba(39, 168, 114, 0.10);
   color: #1F8F60;
 `
+
+const CardTitleRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+`
+
+const CardMenuWrap = styled.div`
+  position: relative;
+  flex-shrink: 0;
+`
+
+const CardMenuBtn = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: ${({ theme }) => theme.colors.blue300};
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+  transition: background 0.12s;
+
+  &:hover { background: rgba(1,116,195,0.06); }
+  &:focus-visible { outline: 2px solid ${({ theme }) => theme.colors.blue300}; outline-offset: 2px; }
+`
+
+const CardHeaderRight = styled.div`
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  flex-shrink: 0;
+`
+
+const CardMenuDropdown = styled.div`
+  position: absolute;
+  top: calc(100% + 5px);
+  right: 0;
+  min-width: 192px;
+  background: ${({ theme }) => theme.colors.white};
+  border: 1px solid ${({ theme }) => theme.colors.neutral200};
+  border-radius: ${({ theme }) => theme.borderRadius.md};
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  z-index: 50;
+  overflow: hidden;
+`
+
+const CardMenuItem = styled.button`
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 9px 14px;
+  border: none;
+  background: transparent;
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 13px;
+  color: ${({ $destructive, theme }) => $destructive ? '#DC2626' : theme.colors.neutral800};
+  cursor: pointer;
+  transition: background 0.1s;
+
+  &:hover { background: ${({ theme }) => theme.colors.neutral50}; }
+`
+
+function CardActionMenu({ items }) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef(null)
+
+  useEffect(() => {
+    if (!open) return
+    const handler = (e) => {
+      if (ref.current && !ref.current.contains(e.target)) setOpen(false)
+    }
+    const keyHandler = (e) => { if (e.key === 'Escape') setOpen(false) }
+    document.addEventListener('mousedown', handler)
+    document.addEventListener('keydown', keyHandler)
+    return () => {
+      document.removeEventListener('mousedown', handler)
+      document.removeEventListener('keydown', keyHandler)
+    }
+  }, [open])
+
+  return (
+    <CardMenuWrap ref={ref}>
+      <CardMenuBtn
+        type="button"
+        onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpen(v => !v) }}
+        aria-label="More actions"
+        aria-expanded={open}
+      >
+        <DotsVerticalIcon size={14} color="currentColor" />
+      </CardMenuBtn>
+      {open && (
+        <CardMenuDropdown onClick={(e) => e.stopPropagation()}>
+          {items.map(item => (
+            <CardMenuItem
+              key={item.label}
+              type="button"
+              $destructive={item.destructive}
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpen(false) }}
+            >
+              {item.label}
+            </CardMenuItem>
+          ))}
+        </CardMenuDropdown>
+      )}
+    </CardMenuWrap>
+  )
+}
 
 // ── Segmented control (for mixed CertCentral card) ─────────────────────────────
 
@@ -247,20 +362,31 @@ function MixedInstanceCard({ subscription }) {
   const visibleEnts = instance.entitlements.slice(0, 3)
   const extraCount = instance.entitlements.length - visibleEnts.length
 
+  const mixedMenuItems = [
+    { label: 'Open CertCentral' },
+    { label: 'Documentation' },
+  ]
+
   return (
     <Card to={`/settings/billing/${subscription.id}`}>
       <CardHeader>
         <HeaderLeft>
           <IconBadge>{getIcon(subscription.iconType, 20, 'currentColor')}</IconBadge>
           <TitleBlock>
-            <CardTitle>{subscription.name}</CardTitle>
+            <CardTitleRow>
+              <CardTitle>{subscription.name}</CardTitle>
+              <RenewalPill>Renews {subscription.renewalDate}</RenewalPill>
+            </CardTitleRow>
             <SubtitleText>
               {subscription.subscriptionTypes.map((t) => subscriptionTypeConfig[t].label).join(' · ')}
+              {subscription.accountId && <AccountNameSpan> | {subscription.accountId}</AccountNameSpan>}
               {subscription.accountName && <AccountNameSpan> | {subscription.accountName}</AccountNameSpan>}
             </SubtitleText>
           </TitleBlock>
         </HeaderLeft>
-        <RenewalPill>Renews {subscription.renewalDate}</RenewalPill>
+        <CardHeaderRight>
+          <CardActionMenu items={mixedMenuItems} />
+        </CardHeaderRight>
       </CardHeader>
 
       <SegmentedContainer onClick={(e) => e.preventDefault()}>
@@ -283,14 +409,15 @@ function MixedInstanceCard({ subscription }) {
             : <NoUsageBlock>Usage data not available yet.</NoUsageBlock>
           }
           <BottomRow>
-            <ManagedByText>Managed by your Account Manager</ManagedByText>
             {extraCount > 0 && <MoreLink>+{extraCount} more</MoreLink>}
+            <ManagedByText>Managed by your Account Manager</ManagedByText>
           </BottomRow>
         </>
       ) : (
         <>
           <EntitlementRows entitlements={instance.entitlements} maxVisible={3} />
           <BottomRow>
+            <span />
             <ManagedByText>Self-service subscription</ManagedByText>
           </BottomRow>
         </>
@@ -309,6 +436,8 @@ export default function SubscriptionCard({ subscription }) {
   const { id, name, iconType, renewalDate, entitlements } = subscription
   const isEnterprise = subscription.subscriptionTypes.includes('enterprise')
   const isEcommerce = subscription.subscriptionTypes.includes('ecommerce')
+  const isEcommerceOnly = isEcommerce && !isEnterprise
+  const isCertCentral = id.startsWith('certcentral-')
   const visibleEntitlements = entitlements.slice(0, 3)
   const extraCount = entitlements.length - visibleEntitlements.length
 
@@ -318,20 +447,38 @@ export default function SubscriptionCard({ subscription }) {
     ? 'Self-service subscription'
     : null
 
+  const productOpenName = isCertCentral ? 'CertCentral' : name
+  const cardMenuItems = isEcommerceOnly && isCertCentral
+    ? [
+        { label: 'Open CertCentral' },
+        { label: 'Documentation' },
+        { label: 'Cancel subscription', destructive: true },
+      ]
+    : [
+        { label: `Open ${productOpenName}` },
+        { label: 'Documentation' },
+      ]
+
   return (
     <Card to={`/settings/billing/${id}`}>
       <CardHeader>
         <HeaderLeft>
           <IconBadge>{getIcon(iconType, 20, 'currentColor')}</IconBadge>
           <TitleBlock>
-            <CardTitle>{name}</CardTitle>
+            <CardTitleRow>
+              <CardTitle>{name}</CardTitle>
+              <RenewalPill>Renews {renewalDate}</RenewalPill>
+            </CardTitleRow>
             <SubtitleText>
               {singleInstanceSubtitle(subscription)}
+              {subscription.accountId && <AccountNameSpan> | {subscription.accountId}</AccountNameSpan>}
               {subscription.accountName && <AccountNameSpan> | {subscription.accountName}</AccountNameSpan>}
             </SubtitleText>
           </TitleBlock>
         </HeaderLeft>
-        <RenewalPill>Renews {renewalDate}</RenewalPill>
+        <CardHeaderRight>
+          <CardActionMenu items={cardMenuItems} />
+        </CardHeaderRight>
       </CardHeader>
 
       {visibleEntitlements.length > 0 ? (
@@ -342,8 +489,8 @@ export default function SubscriptionCard({ subscription }) {
 
       {bottomText && (
         <BottomRow>
+          {extraCount > 0 ? <MoreLink>+{extraCount} more</MoreLink> : <span />}
           <ManagedByText>{bottomText}</ManagedByText>
-          {extraCount > 0 && <MoreLink>+{extraCount} more</MoreLink>}
         </BottomRow>
       )}
     </Card>

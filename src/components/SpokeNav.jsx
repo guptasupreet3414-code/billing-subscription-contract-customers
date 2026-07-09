@@ -137,17 +137,22 @@ const SectionBtn = styled.button`
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  padding: 6px 12px 6px 16px;
+  padding: ${({ $isNavParent }) => ($isNavParent ? '7px 12px 7px 20px' : '6px 12px 6px 16px')};
   border: none;
   background: transparent;
   cursor: pointer;
   font-family: ${({ theme }) => theme.typography.fontFamily};
-  font-size: 11px;
-  font-weight: 600;
+  font-size: ${({ $isNavParent }) => ($isNavParent ? '13px' : '11px')};
+  font-weight: ${({ $isNavParent }) => ($isNavParent ? '400' : '600')};
   color: ${({ theme }) => theme.colors.neutral700};
-  transition: color 0.15s;
+  text-transform: none;
+  letter-spacing: normal;
+  transition: color 0.15s, background 0.12s;
 
-  &:hover { color: ${({ theme }) => theme.colors.neutral900}; }
+  &:hover {
+    color: ${({ theme }) => theme.colors.neutral900};
+    background: ${({ $isNavParent, theme }) => ($isNavParent ? theme.colors.neutral200 : 'transparent')};
+  }
   &:focus-visible {
     outline: 2px solid ${({ theme }) => theme.colors.blue300};
     outline-offset: -2px;
@@ -162,7 +167,7 @@ const SectionItems = styled.div`
 
 const NavItem = styled(NavLink)`
   display: block;
-  padding: 7px 12px 7px 20px;
+  padding: ${({ $indent }) => ($indent ? '7px 12px 7px 32px' : '7px 12px 7px 20px')};
   font-family: ${({ theme }) => theme.typography.fontFamily};
   font-size: 13px;
   color: ${({ theme }) => theme.colors.neutral700};
@@ -192,12 +197,14 @@ function NavSection({ section, index }) {
   const [expanded, setExpanded] = useState(section.defaultExpanded ?? index === 0)
   const location = useLocation()
   const hasTitle = !!section.title
+  const isNavParent = !!section.isNavParent
   const sectionId = `nav-section-${(section.title || String(index)).replace(/\s+/g, '-').toLowerCase()}`
 
   return (
     <SectionWrap>
       <SectionBtn
         $hasTitle={hasTitle}
+        $isNavParent={isNavParent}
         onClick={() => setExpanded((v) => !v)}
         aria-expanded={expanded}
         aria-controls={sectionId}
@@ -211,6 +218,7 @@ function NavSection({ section, index }) {
             key={item.route}
             to={item.route}
             end
+            $indent={isNavParent}
             aria-current={location.pathname === item.route ? 'page' : undefined}
           >
             {item.label}
@@ -227,10 +235,7 @@ export default function SpokeNav({ activeProductId, isSpokeOpen, onToggleSpoke, 
   if (activeProductId === 'settings-billing' && billingScenario === 'enterprise') {
     product = {
       ...product,
-      sections: product.sections.map((section) => ({
-        ...section,
-        items: section.items.filter((item) => item.route === '/settings/billing'),
-      })),
+      sections: product.sections.filter((section) => !section.isSelfService),
     }
   }
 

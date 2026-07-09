@@ -32,6 +32,14 @@ export const contractTypeConfig = {
     label: 'Negotiated pricing',
     tooltip: 'A contract with custom pricing negotiated by your account team. You pay per-unit pricing without a minimum spend commitment.',
   },
+  'peak-usage': {
+    label: 'Peak usage',
+    tooltip: 'Billing is based on the highest single-day certificate count recorded during your contract year. Usage is monitored continuously; your peak day drives renewal pricing.',
+  },
+  'drawdown': {
+    label: 'Drawdown',
+    tooltip: 'Purchase a fixed certificate pool upfront and draw from it as you issue certificates. Overage charges apply if the pool is exhausted before renewal.',
+  },
 }
 
 export const accountManager = {
@@ -76,6 +84,7 @@ const enterpriseProducts = [
       { name: 'Code signing certificates', purchased: 50, allocated: 50, consumed: 42, remaining: 8 },
       { name: 'Signing keys', purchased: 20, allocated: 18, consumed: 15, remaining: 5 },
       { name: 'Signing events', purchased: 10000, allocated: 10000, consumed: 7400, remaining: 2600 },
+      { name: 'HSM partitions', purchased: 4, allocated: 4, consumed: 3, remaining: 1 },
     ],
   },
   {
@@ -93,23 +102,6 @@ const enterpriseProducts = [
       { name: 'Managed certificates', purchased: 2000, allocated: 2000, consumed: 1120, remaining: 880 },
       { name: 'Seats', purchased: 75, allocated: 75, consumed: 25, remaining: 50 },
       { name: 'Discovery scans / month', purchased: 100, allocated: 100, consumed: 64, remaining: 36 },
-    ],
-  },
-  {
-    id: 'keylocker',
-    name: 'KeyLocker',
-    iconType: 'key',
-    contractId: 'CTR-2024-KL-00045',
-    contractTerm: 'Sep 2, 2025 – Sep 1, 2026',
-    contractOwner: 'DevOps Engineering',
-    renewalDate: 'Sep 1, 2026',
-    environment: 'Production',
-    status: 'approaching-limit',
-    primaryEntitlement: { label: 'Signing keys', consumed: 18, total: 20 },
-    entitlements: [
-      { name: 'Signing keys', purchased: 20, allocated: 20, consumed: 18, remaining: 2 },
-      { name: 'HSM partitions', purchased: 4, allocated: 4, consumed: 3, remaining: 1 },
-      { name: 'Signing events / month', purchased: 5000, allocated: 5000, consumed: 4100, remaining: 900 },
     ],
   },
   {
@@ -216,12 +208,13 @@ const enterpriseProducts = [
 const certCentralAccounts = [
   {
     accountId: 'acme-global-security',
+    displayAccountId: '1001445',
     accountName: 'ACME Global Security',
     enterpriseInstance: {
       instanceId: 'acme-global-enterprise',
       instanceLabel: 'Enterprise',
       subscriptionType: 'enterprise',
-      contractType: 'committed-value',
+      contractType: 'peak-usage',
       contractId: 'CTR-2024-CC-00012',
       contractTerm: 'Jun 7, 2025 – Jun 6, 2026',
       contractOwner: 'IT Security Team',
@@ -236,6 +229,48 @@ const certCentralAccounts = [
         { name: 'Document signing certificates', purchased: 12, allocated: 12, consumed: 5, remaining: 7 },
         { name: 'Common mark certificates', purchased: 5, allocated: 5, consumed: 1, remaining: 4 },
       ],
+      peakUsageData: {
+        periodPeakDate: 'Aug 14, 2025',
+        monthLabels: ['Jun 25','Jul 25','Aug 25','Sep 25','Oct 25','Nov 25','Dec 25','Jan 26','Feb 26','Mar 26','Apr 26','May 26','Jun 26'],
+        series: [
+          {
+            name: 'SSL/TLS certificates',
+            color: '#4B91D6',
+            currentActive: 108,
+            periodPeak: 128,
+            periodPeakDate: 'Aug 14, 2025',
+            monthly: [90, 110, 128, 122, 115, 108, 100, 96, 92, 98, 104, 110, 108],
+            monthlyCost: [72000, 88000, 102400, 97600, 92000, 86400, 80000, 76800, 73600, 78400, 83200, 88000, 86400],
+          },
+          {
+            name: 'Code signing',
+            color: '#F59E0B',
+            currentActive: 16,
+            periodPeak: 22,
+            periodPeakDate: 'Sep 3, 2025',
+            monthly: [10, 14, 18, 22, 20, 18, 16, 15, 14, 15, 16, 16, 16],
+            monthlyCost: [6000, 8400, 10800, 13200, 12000, 10800, 9600, 9000, 8400, 9000, 9600, 9600, 9600],
+          },
+          {
+            name: 'S/MIME certificates',
+            color: '#10B981',
+            currentActive: 140,
+            periodPeak: 180,
+            periodPeakDate: 'Oct 12, 2025',
+            monthly: [120, 138, 155, 168, 180, 174, 162, 152, 148, 152, 158, 145, 140],
+            monthlyCost: [24000, 27600, 31000, 33600, 36000, 34800, 32400, 30400, 29600, 30400, 31600, 29000, 28000],
+          },
+          {
+            name: 'Document signing',
+            color: '#8B5CF6',
+            currentActive: 5,
+            periodPeak: 8,
+            periodPeakDate: 'Nov 5, 2025',
+            monthly: [2, 3, 4, 5, 7, 8, 7, 6, 5, 5, 5, 5, 5],
+            monthlyCost: [1000, 1500, 2000, 2500, 3500, 4000, 3500, 3000, 2500, 2500, 2500, 2500, 2500],
+          },
+        ],
+      },
     },
     ecommerceInstance: {
       instanceId: 'acme-global-ecommerce',
@@ -312,6 +347,7 @@ const certCentralAccounts = [
   },
   {
     accountId: 'acme-marketing',
+    displayAccountId: '2003891',
     accountName: 'ACME Marketing',
     enterpriseInstance: {
       instanceId: 'acme-marketing-enterprise',
@@ -386,6 +422,7 @@ const certCentralAccounts = [
   },
   {
     accountId: 'acme-devops',
+    displayAccountId: '3007234',
     accountName: 'ACME DevOps',
     enterpriseInstance: {
       instanceId: 'acme-devops-enterprise',
@@ -450,6 +487,30 @@ const certCentralAccounts = [
       ],
     },
   },
+  {
+    accountId: 'acme-enterprise',
+    displayAccountId: '5001298',
+    accountName: 'ACME Enterprise',
+    enterpriseInstance: {
+      instanceId: 'acme-enterprise-enterprise',
+      instanceLabel: 'Enterprise',
+      subscriptionType: 'enterprise',
+      contractType: 'drawdown',
+      contractId: 'CTR-2024-CC-00214',
+      contractTerm: 'Nov 1, 2025 – Oct 31, 2026',
+      contractOwner: 'Enterprise IT',
+      renewalDate: 'Oct 31, 2026',
+      environment: 'Production',
+      status: 'healthy',
+      primaryEntitlement: { label: 'SSL/TLS certificates', consumed: 55, total: 120 },
+      entitlements: [
+        { name: 'SSL/TLS certificates', purchased: 120, allocated: 120, consumed: 55, remaining: 65 },
+        { name: 'Code signing certificates', purchased: 40, allocated: 40, consumed: 18, remaining: 22 },
+        { name: 'S/MIME certificates', purchased: 300, allocated: 300, consumed: 210, remaining: 90 },
+        { name: 'Document signing certificates', purchased: 20, allocated: 20, consumed: 7, remaining: 13 },
+      ],
+    },
+  },
 ]
 
 const statusPriority = ['over-entitlement', 'approaching-limit', 'no-data', 'healthy']
@@ -493,6 +554,7 @@ function buildCertCentralCard(account, types) {
     id: `certcentral-${account.accountId}`,
     name: 'CertCentral',
     iconType: 'shield',
+    accountId: account.displayAccountId,
     accountName: account.accountName,
     subscriptionTypes,
     renewalDate: renewalDates.length === 1 ? renewalDates[0] : 'Varies by instance',
@@ -519,6 +581,7 @@ export function getFixedSubscriptions() {
     buildCertCentralCard(certCentralAccounts[0], ['enterprise']),
     buildCertCentralCard(certCentralAccounts[1], ['enterprise']),
     buildCertCentralCard(certCentralAccounts[2], ['ecommerce']),
+    buildCertCentralCard(certCentralAccounts[3], ['enterprise']),
   ]
   return [...enterpriseSubscriptions, ...certCentralCards]
 }

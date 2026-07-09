@@ -12,6 +12,7 @@ import MySubscriptions from './pages/billing/MySubscriptions'
 import SubscriptionDetail from './pages/billing/SubscriptionDetail'
 import Receipts from './pages/billing/Receipts'
 import PaymentDetails from './pages/billing/PaymentDetails'
+import AllProducts from './pages/billing/AllProducts'
 import { allRoutes } from './data/navigation'
 
 function ScrollToTop({ containerRef }) {
@@ -218,6 +219,7 @@ export default function App() {
               else if (r === '/settings/billing/payment-details') element = <PaymentDetails scenario={billingScenario} />
               return <Route key={r} path={r} element={element} />
             })}
+          <Route path="/settings/billing/all-products" element={<AllProducts />} />
           <Route path="/settings/billing/:subscriptionId" element={<SubscriptionDetail />} />
           <Route path="*" element={<StubPage />} />
         </Routes>

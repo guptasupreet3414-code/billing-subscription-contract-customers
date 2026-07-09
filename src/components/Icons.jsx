@@ -296,6 +296,25 @@ export const DollarIcon = ({ size = 20, color = 'currentColor' }) => (
   </svg>
 )
 
+export const ExternalLinkIcon = ({ size = 20, color = 'currentColor' }) => (
+  <svg width={size} height={size} viewBox="0 0 20 20" fill="none" aria-hidden="true">
+    <path d="M11 4h5v5M16 4l-8 8M8 6H4a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h9a1 1 0 0 0 1-1v-4" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+)
+
+export const BookOpenIcon = ({ size = 20, color = 'currentColor' }) => (
+  <svg width={size} height={size} viewBox="0 0 20 20" fill="none" aria-hidden="true">
+    <path d="M10 5C8.5 3.5 6 3 3 3v12c3 0 5.5.5 7 2 1.5-1.5 4-2 7-2V3c-3 0-5.5.5-7 2z" stroke={color} strokeWidth="1.5" strokeLinejoin="round" />
+    <path d="M10 5v12" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+  </svg>
+)
+
+export const ChatBubbleIcon = ({ size = 20, color = 'currentColor' }) => (
+  <svg width={size} height={size} viewBox="0 0 20 20" fill="none" aria-hidden="true">
+    <path d="M3 4a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H7l-4 3V4z" stroke={color} strokeWidth="1.5" strokeLinejoin="round" />
+  </svg>
+)
+
 export function getIcon(iconType, size = 20, color = 'white') {
   const props = { size, color }
   switch (iconType) {

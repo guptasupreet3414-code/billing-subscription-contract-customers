@@ -1,8 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import styled from 'styled-components'
-import { ChevronLeftIcon, ChevronUpIcon, ChevronDownIcon, InfoCircleIcon, EnvelopeIcon, PhoneIcon, CartOutlineIcon, CalendarIcon, LayersIcon, DollarIcon, getIcon } from '../../components/Icons'
-import { getFixedSubscriptions, accountManager, contractTypeConfig } from '../../data/billingData'
+import { ChevronLeftIcon, ChevronUpIcon, ChevronDownIcon, InfoCircleIcon, CartOutlineIcon, CalendarIcon, DollarIcon, ExternalLinkIcon, DotsVerticalIcon, ChatBubbleIcon, getIcon } from '../../components/Icons'
+import { getFixedSubscriptions, contractTypeConfig } from '../../data/billingData'
+import ContactManagerDrawer from '../../components/billing/ContactManagerDrawer'
+import ContactUsDrawer from '../../components/billing/ContactUsDrawer'
+import PeakUsageChart from '../../components/billing/PeakUsageChart'
 
 const Main = styled.main`
   padding: 32px;
@@ -75,6 +78,30 @@ const SummaryLine = styled.p`
   color: ${({ theme }) => theme.colors.neutral700};
 `
 
+const NeedHelpBtn = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 0;
+  border: none;
+  background: transparent;
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 13px;
+  font-weight: 500;
+  color: ${({ theme }) => theme.colors.blue300};
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: color 0.15s;
+
+  &:hover { color: ${({ theme }) => theme.colors.blue500}; }
+  &:focus-visible {
+    outline: 2px solid ${({ theme }) => theme.colors.blue300};
+    outline-offset: 2px;
+    border-radius: 3px;
+  }
+`
+
 const InstanceTabRow = styled.div`
   display: flex;
   gap: 4px;
@@ -107,9 +134,11 @@ const Section = styled.section`
 
 const SectionTitle = styled.h2`
   margin: 0 0 14px;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
-  color: ${({ theme }) => theme.colors.neutral600};
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: ${({ theme }) => theme.colors.neutral500};
 `
 
 // ── KPI cards ──────────────────────────────────────────────────────────────────
@@ -168,16 +197,94 @@ const KPISubValue = styled.p`
   color: ${({ theme }) => theme.colors.neutral500};
 `
 
-const ActiveBadge = styled.span`
+const HeaderRight = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-shrink: 0;
+`
+
+const HeaderBuyBtn = styled.button`
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 3px 10px;
-  border-radius: 999px;
-  font-size: 12px;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: ${({ theme }) => theme.borderRadius.md};
+  border: 1px solid transparent;
+  background: ${({ theme }) => theme.colors.blue300};
+  color: white;
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 13px;
   font-weight: 500;
-  background: rgba(39,168,114,0.10);
-  color: #1F8F60;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+
+  &:hover { background: ${({ theme }) => theme.colors.blue500}; }
+  &:focus-visible { outline: 2px solid ${({ theme }) => theme.colors.blue300}; outline-offset: 2px; }
+`
+
+const ActionMenuWrap = styled.div`
+  position: relative;
+`
+
+const ActionMenuBtn = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1.5px solid ${({ theme }) => theme.colors.blue300};
+  border-radius: ${({ theme }) => theme.borderRadius.md};
+  background: transparent;
+  color: ${({ theme }) => theme.colors.blue300};
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.12s;
+
+  &:hover { background: rgba(1,116,195,0.06); }
+  &:focus-visible { outline: 2px solid ${({ theme }) => theme.colors.blue300}; outline-offset: 2px; }
+`
+
+const ActionMenuDropdown = styled.div`
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 210px;
+  background: ${({ theme }) => theme.colors.white};
+  border: 1px solid ${({ theme }) => theme.colors.neutral200};
+  border-radius: ${({ theme }) => theme.borderRadius.md};
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  z-index: 50;
+  overflow: hidden;
+`
+
+const ActionMenuItem = styled.a`
+  display: block;
+  padding: 10px 16px;
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 13px;
+  color: ${({ $destructive, theme }) => $destructive ? '#DC2626' : theme.colors.neutral800};
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.1s;
+
+  &:hover { background: ${({ theme }) => theme.colors.neutral50}; }
+`
+
+const DualChartWrap = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+`
+
+const ChartBlock = styled.div``
+
+const ChartSubLabel = styled.div`
+  font-size: 14px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.neutral800};
+  margin-bottom: 10px;
 `
 
 const PlanInfoBtn = styled.button`
@@ -203,7 +310,7 @@ const PlanInfoTooltipBox = styled.div`
   position: absolute;
   top: calc(100% + 10px);
   left: -8px;
-  width: 320px;
+  width: 300px;
   padding: 14px 16px;
   border-radius: 8px;
   background: ${({ theme }) => theme.colors.neutral900};
@@ -229,71 +336,7 @@ const PlanInfoTooltipBox = styled.div`
   }
 `
 
-const TooltipKVBlock = styled.div`
-  margin: 0 0 10px;
-`
-
-const TooltipKVLabel = styled.span`
-  display: block;
-  font-size: 11px;
-  opacity: 0.7;
-`
-
-const TooltipKVValue = styled.span`
-  display: block;
-  font-size: 13px;
-  font-weight: 600;
-`
-
-const TooltipBtn = styled.button`
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  padding: 2px;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  color: ${({ theme }) => theme.colors.neutral400};
-  border-radius: 4px;
-
-  &:hover { color: ${({ theme }) => theme.colors.blue300}; }
-  &:focus-visible { outline: 2px solid ${({ theme }) => theme.colors.blue300}; outline-offset: 2px; }
-`
-
-const TooltipBox = styled.div`
-  position: absolute;
-  bottom: calc(100% + 8px);
-  left: 50%;
-  transform: translateX(-50%);
-  width: 260px;
-  padding: 10px 12px;
-  border-radius: 6px;
-  background: ${({ theme }) => theme.colors.neutral900};
-  color: white;
-  font-size: 12px;
-  font-weight: 400;
-  line-height: 1.5;
-  z-index: 10;
-  pointer-events: none;
-
-  &::after {
-    content: '';
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    border: 5px solid transparent;
-    border-top-color: ${({ theme }) => theme.colors.neutral900};
-  }
-`
-
 // ── Shared KPI helper cards ───────────────────────────────────────────────────
-
-const PlanTypeSecondary = styled.p`
-  margin: 0;
-  font-size: 13px;
-  color: ${({ theme }) => theme.colors.neutral600};
-`
 
 function PlanTypeCard({ instance, isCertCentral }) {
   const [tooltipOpen, setTooltipOpen] = useState(false)
@@ -310,12 +353,6 @@ function PlanTypeCard({ instance, isCertCentral }) {
 
   const isEnterprise = instance.subscriptionType === 'enterprise'
   const planLabel = isEnterprise ? 'Enterprise' : 'E-commerce'
-  const contractConfig = isEnterprise && instance.contractType ? contractTypeConfig[instance.contractType] : null
-  const secondaryLabel = contractConfig
-    ? `${contractConfig.label} contract`
-    : instance.billing
-    ? instance.billing.plan
-    : null
 
   let tooltipContent
   if (isEnterprise && !isCertCentral) {
@@ -326,30 +363,12 @@ function PlanTypeCard({ instance, isCertCentral }) {
         <p>Contact your account manager for contract-related questions.</p>
       </>
     )
-  } else if (isEnterprise && isCertCentral && instance.contractType === 'committed-value') {
+  } else if (isEnterprise && isCertCentral) {
     tooltipContent = (
       <>
         <p>This CertCentral account is managed through an enterprise agreement with DigiCert.</p>
-        <TooltipKVBlock>
-          <TooltipKVLabel>Contract type:</TooltipKVLabel>
-          <TooltipKVValue>Fixed value</TooltipKVValue>
-        </TooltipKVBlock>
-        <p>Your organization has committed to a fixed spend amount over the contract term and receives negotiated pricing in return.</p>
-        <p>Billing, renewals, and contract changes are managed through your DigiCert account team.</p>
-        <p>Contact your account manager for contract-related questions.</p>
-      </>
-    )
-  } else if (isEnterprise && isCertCentral && instance.contractType === 'negotiated-pricing') {
-    tooltipContent = (
-      <>
-        <p>This CertCentral account is managed through an enterprise agreement with DigiCert.</p>
-        <TooltipKVBlock>
-          <TooltipKVLabel>Contract type:</TooltipKVLabel>
-          <TooltipKVValue>Negotiated pricing</TooltipKVValue>
-        </TooltipKVBlock>
-        <p>Your organization has negotiated pricing for specific products. Purchases and usage are billed according to the agreed pricing terms.</p>
-        <p>Billing, renewals, and contract changes are managed through your DigiCert account team.</p>
-        <p>Contact your account manager for contract-related questions.</p>
+        <p>Billing, renewals, and any contract changes are handled directly by your DigiCert account team.</p>
+        <p>Contact your account manager for any questions.</p>
       </>
     )
   } else {
@@ -377,39 +396,6 @@ function PlanTypeCard({ instance, isCertCentral }) {
         </KPILabel>
       </KPICardHeader>
       <KPIValue>{planLabel}</KPIValue>
-      {secondaryLabel && <PlanTypeSecondary>{secondaryLabel}</PlanTypeSecondary>}
-    </KPICard>
-  )
-}
-
-function computeUsagePct(entitlements) {
-  if (!entitlements.length) return null
-  const totalAllocated = entitlements.reduce((s, e) => s + e.allocated, 0)
-  const totalConsumed = entitlements.reduce((s, e) => s + e.consumed, 0)
-  if (totalAllocated === 0) return null
-  return Math.round((totalConsumed / totalAllocated) * 100)
-}
-
-function UsageCard({ entitlements }) {
-  const usagePct = computeUsagePct(entitlements)
-  return (
-    <KPICard>
-      <KPICardHeader>
-        <KPILabel>Usage</KPILabel>
-        <LayersIcon size={15} color="#9CA3AF" />
-      </KPICardHeader>
-      {usagePct !== null ? (
-        <KPIValue>
-          {usagePct}%<KPIValueSmall>consumed</KPIValueSmall>
-        </KPIValue>
-      ) : (
-        <KPIValue>—</KPIValue>
-      )}
-      <KPISubValue>
-        {entitlements.length
-          ? `${entitlements.length} entitlement types`
-          : 'No usage data available'}
-      </KPISubValue>
     </KPICard>
   )
 }
@@ -430,12 +416,23 @@ function RenewalCard({ dateStr, sub }) {
         <CalendarIcon size={15} color="#9CA3AF" />
       </KPICardHeader>
       <KPIValue>{dateStr}</KPIValue>
-      <KPISubValue>{sub || `${days} days remaining`}</KPISubValue>
+      {sub && <KPISubValue>{sub}</KPISubValue>}
+      {!sub && <KPISubValue>{days} days remaining</KPISubValue>}
     </KPICard>
   )
 }
 
-// ── (ContractTypeCard merged into PlanTypeCard above) ─────────────────────────
+function ContractTermCard({ term }) {
+  return (
+    <KPICard>
+      <KPICardHeader>
+        <KPILabel>Contract term</KPILabel>
+        <CalendarIcon size={15} color="#9CA3AF" />
+      </KPICardHeader>
+      <KPIValue style={{ fontSize: 15, fontWeight: 600 }}>{term || '—'}</KPIValue>
+    </KPICard>
+  )
+}
 
 // ── Entitlements table ────────────────────────────────────────────────────────
 
@@ -489,13 +486,38 @@ const NoDataBox = styled.div`
   line-height: 20px;
 `
 
-function EntitlementsTable({ entitlements }) {
+function EntitlementsTable({ entitlements, contractType }) {
   if (entitlements.length === 0) {
     return (
       <NoDataBox>
         Usage data is not available for this product yet. Contact your account manager for the
         latest entitlement details.
       </NoDataBox>
+    )
+  }
+
+  if (contractType === 'drawdown') {
+    return (
+      <TableWrap>
+        <Table>
+          <thead>
+            <tr>
+              <Th style={{ width: '45%' }}>Entitlement</Th>
+              <Th $align="right">Purchased</Th>
+              <Th style={{ width: '20%' }}></Th>
+            </tr>
+          </thead>
+          <tbody>
+            {entitlements.map((ent) => (
+              <tr key={ent.name}>
+                <Td>{ent.name}</Td>
+                <Td $align="right">{ent.purchased.toLocaleString()}</Td>
+                <Td></Td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+      </TableWrap>
     )
   }
 
@@ -537,236 +559,185 @@ function EntitlementsTable({ entitlements }) {
   )
 }
 
-// ── Account team section (unified, contextual) ───────────────────────────────
+// ── Section header with toggle ────────────────────────────────────────────────
 
-const AccountTeamCard = styled.div`
-  padding: 24px;
-  border-radius: ${({ theme }) => theme.borderRadius.md};
-  background: ${({ theme }) => theme.colors.neutral50};
-  border: 1px solid ${({ theme }) => theme.colors.neutral200};
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-`
-
-const AccountTeamTop = styled.div`
+const SectionHeaderRow = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 14px;
+  margin-bottom: 14px;
 `
 
-const AvatarRow = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 14px;
+const ViewToggle = styled.div`
+  display: inline-flex;
+  border: 1px solid ${({ theme }) => theme.colors.neutral200};
+  border-radius: ${({ theme }) => theme.borderRadius.md};
+  overflow: hidden;
 `
 
-const Avatar = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: #D5E6F7;
-  color: ${({ theme }) => theme.colors.blue300};
-  font-size: 16px;
-  font-weight: 600;
-  flex-shrink: 0;
-`
-
-const AvatarInfo = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  flex: 1;
-`
-
-const AvatarName = styled.div`
-  font-size: 15px;
-  font-weight: 500;
-  color: ${({ theme }) => theme.colors.neutral900};
-`
-
-const AvatarMeta = styled.div`
+const ViewToggleBtn = styled.button`
+  padding: 5px 14px;
+  border: none;
+  border-right: 1px solid ${({ theme }) => theme.colors.neutral200};
+  background: ${({ $active, theme }) => ($active ? theme.colors.blue300 : theme.colors.white)};
+  color: ${({ $active }) => ($active ? '#fff' : 'inherit')};
+  font-family: ${({ theme }) => theme.typography.fontFamily};
   font-size: 12px;
-  color: ${({ theme }) => theme.colors.neutral600};
-`
-
-const ContactInline = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  font-size: 13px;
-`
-
-const ContactItem = styled.span`
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: ${({ theme }) => theme.colors.neutral600};
-`
-
-const ContactLink = styled.a`
-  color: ${({ theme }) => theme.colors.blue300};
-  text-decoration: none;
-  &:hover { text-decoration: underline; }
-`
-
-const ContactPhone = styled.span`
-  color: ${({ theme }) => theme.colors.neutral700};
-`
-
-const HelpCallout = styled.div`
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 14px 16px;
-  border-radius: ${({ theme }) => theme.borderRadius.md};
-  background: #EAF1FB;
-  font-size: 13px;
-  line-height: 1.5;
-  color: ${({ theme }) => theme.colors.neutral800};
-`
-
-const HelpCalloutIcon = styled.span`
-  display: flex;
-  flex-shrink: 0;
-  margin-top: 1px;
-  color: ${({ theme }) => theme.colors.blue300};
-`
-
-const FieldLabel = styled.label`
-  display: block;
-  font-size: 13px;
-  font-weight: 500;
-  color: ${({ theme }) => theme.colors.neutral700};
-  margin-bottom: 6px;
-`
-
-const FieldGroup = styled.div`
-  display: flex;
-  flex-direction: column;
-`
-
-const SubjectInput = styled.input`
-  width: 100%;
-  padding: 10px 12px;
-  border-radius: ${({ theme }) => theme.borderRadius.md};
-  border: 1px solid ${({ theme }) => theme.colors.neutral300};
-  font-family: ${({ theme }) => theme.typography.fontFamily};
-  font-size: 13px;
-  color: ${({ theme }) => theme.colors.neutral900};
-
-  &::placeholder { color: ${({ theme }) => theme.colors.neutral400}; }
-  &:focus { outline: none; border-color: ${({ theme }) => theme.colors.blue300}; box-shadow: 0 0 0 2px rgba(1,116,195,0.15); }
-`
-
-const MessageRow = styled.div`
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
-`
-
-const Textarea = styled.textarea`
-  width: 100%;
-  min-height: 80px;
-  padding: 10px 12px;
-  border-radius: ${({ theme }) => theme.borderRadius.md};
-  border: 1px solid ${({ theme }) => theme.colors.neutral300};
-  font-family: ${({ theme }) => theme.typography.fontFamily};
-  font-size: 13px;
-  color: ${({ theme }) => theme.colors.neutral900};
-  resize: vertical;
-
-  &::placeholder { color: ${({ theme }) => theme.colors.neutral400}; }
-  &:focus { outline: none; border-color: ${({ theme }) => theme.colors.blue300}; box-shadow: 0 0 0 2px rgba(1,116,195,0.15); }
-`
-
-const SendBtn = styled.button`
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 20px;
-  border-radius: ${({ theme }) => theme.borderRadius.md};
-  border: 1px solid transparent;
-  background: ${({ theme }) => theme.colors.blue300};
-  color: white;
-  font-family: ${({ theme }) => theme.typography.fontFamily};
-  font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  white-space: nowrap;
-  flex-shrink: 0;
-  transition: background 0.15s;
+  transition: background 0.12s, color 0.12s;
 
-  &:hover { background: ${({ theme }) => theme.colors.blue500}; }
-  &:focus-visible { outline: 2px solid ${({ theme }) => theme.colors.blue300}; outline-offset: 2px; }
+  &:last-child { border-right: none; }
+  &:hover:not([data-active='true']) { background: ${({ $active, theme }) => (!$active ? theme.colors.neutral50 : undefined)}; }
 `
 
-const FormFooter = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-`
+// ── Peak-usage model table ────────────────────────────────────────────────────
 
-const FormHelper = styled.p`
-  margin: 0;
-  font-size: 12px;
-  color: ${({ theme }) => theme.colors.neutral500};
-`
+function PeakUsageTable({ entitlements }) {
+  return (
+    <TableWrap>
+      <Table>
+        <thead>
+          <tr>
+            <Th style={{ width: '40%' }}>Entitlement</Th>
+            <Th $align="right">Purchased</Th>
+            <Th $align="right">Consumed</Th>
+            <Th $align="right">Remaining</Th>
+          </tr>
+        </thead>
+        <tbody>
+          {entitlements.map(ent => {
+            const tone = ent.remaining < 0 ? 'error' : undefined
+            return (
+              <tr key={ent.name}>
+                <Td>{ent.name}</Td>
+                <Td $align="right">{ent.purchased.toLocaleString()}</Td>
+                <Td $align="right">{ent.consumed.toLocaleString()}</Td>
+                <Td $align="right">
+                  <RemainingValue $tone={tone}>
+                    {ent.remaining < 0
+                      ? `Exceeded by ${Math.abs(ent.remaining).toLocaleString()}`
+                      : ent.remaining.toLocaleString()}
+                  </RemainingValue>
+                </Td>
+              </tr>
+            )
+          })}
+        </tbody>
+      </Table>
+    </TableWrap>
+  )
+}
 
-function AccountTeamSection({ isCertCentral }) {
-  const initials = accountManager.name.split(' ').map((w) => w[0]).join('')
+function PeakUsageSection({ instance }) {
+  const [viewMode, setViewMode] = useState('table')
+  const { peakUsageData } = instance
 
-  const helpText = isCertCentral
-    ? 'Need more licenses, additional capacity, contract changes, billing help, or renewal assistance? Your DigiCert account manager can help.'
-    : 'Have questions about this product, need help with configuration, or want to discuss your entitlements? Your DigiCert account manager can help.'
+  const costSeries = peakUsageData.series.map(s => ({
+    ...s,
+    monthly: s.monthlyCost,
+  }))
 
   return (
     <Section>
-      <SectionTitle>Your DigiCert account manager</SectionTitle>
-      <AccountTeamCard>
-        <AccountTeamTop>
-          <AvatarRow>
-            <Avatar>{initials}</Avatar>
-            <AvatarInfo>
-              <AvatarName>{accountManager.name}</AvatarName>
-              <AvatarMeta>{accountManager.title}</AvatarMeta>
-            </AvatarInfo>
-          </AvatarRow>
-          <ContactInline>
-            <ContactItem>
-              <EnvelopeIcon size={14} color="currentColor" />
-              <ContactLink href={`mailto:${accountManager.email}`}>{accountManager.email}</ContactLink>
-            </ContactItem>
-            <ContactItem>
-              <PhoneIcon size={14} color="currentColor" />
-              <ContactPhone>{accountManager.phone}</ContactPhone>
-            </ContactItem>
-          </ContactInline>
-        </AccountTeamTop>
+      <SectionHeaderRow>
+        <SectionTitle style={{ margin: 0 }}>Consumption</SectionTitle>
+        <ViewToggle>
+          <ViewToggleBtn $active={viewMode === 'table'} onClick={() => setViewMode('table')}>Table</ViewToggleBtn>
+          <ViewToggleBtn $active={viewMode === 'chart'} onClick={() => setViewMode('chart')}>Chart</ViewToggleBtn>
+        </ViewToggle>
+      </SectionHeaderRow>
+      {viewMode === 'table'
+        ? <PeakUsageTable entitlements={instance.entitlements} />
+        : (
+          <DualChartWrap>
+            <ChartBlock>
+              <ChartSubLabel>Consumption (USD)</ChartSubLabel>
+              <PeakUsageChart series={costSeries} monthLabels={peakUsageData.monthLabels} yFormat="$" />
+            </ChartBlock>
+            <ChartBlock>
+              <ChartSubLabel>Consumption Quantities</ChartSubLabel>
+              <PeakUsageChart series={peakUsageData.series} monthLabels={peakUsageData.monthLabels} />
+            </ChartBlock>
+          </DualChartWrap>
+        )
+      }
+    </Section>
+  )
+}
 
-        <HelpCallout>
-          <HelpCalloutIcon><InfoCircleIcon size={16} color="currentColor" /></HelpCalloutIcon>
-          <span>{helpText}</span>
-        </HelpCallout>
+// ── Negotiated-pricing: Manage in CertCentral ─────────────────────────────────
 
-        <FieldGroup>
-          <FieldLabel htmlFor="contact-subject">Subject</FieldLabel>
-          <SubjectInput id="contact-subject" type="text" placeholder="e.g. Request additional SSL/TLS licenses" />
-        </FieldGroup>
-        <FieldGroup>
-          <FieldLabel htmlFor="contact-message">Message</FieldLabel>
-          <Textarea id="contact-message" placeholder="Describe what you need help with..." rows={3} />
-        </FieldGroup>
-        <FormFooter>
-          <FormHelper>Your message will be sent directly to {accountManager.name}.</FormHelper>
-          <SendBtn type="button">Send message</SendBtn>
-        </FormFooter>
-      </AccountTeamCard>
+const ManageCertCentralCard = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 18px 22px;
+  border-radius: ${({ theme }) => theme.borderRadius.md};
+  border: 1px solid ${({ theme }) => theme.colors.neutral200};
+  background: ${({ theme }) => theme.colors.white};
+  flex-wrap: wrap;
+`
+
+const ManageCertCentralText = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+`
+
+const ManageCertCentralTitle = styled.div`
+  font-size: 14px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.neutral900};
+`
+
+const ManageCertCentralDesc = styled.div`
+  font-size: 13px;
+  color: ${({ theme }) => theme.colors.neutral600};
+`
+
+const OpenCertCentralBtn = styled.a`
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 18px;
+  border-radius: ${({ theme }) => theme.borderRadius.md};
+  border: 1px solid ${({ theme }) => theme.colors.blue300};
+  background: ${({ theme }) => theme.colors.white};
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 13px;
+  font-weight: 500;
+  color: ${({ theme }) => theme.colors.blue300};
+  text-decoration: none;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background 0.12s;
+
+  &:hover { background: ${({ theme }) => theme.colors.neutral50}; }
+  &:focus-visible { outline: 2px solid ${({ theme }) => theme.colors.blue300}; outline-offset: 2px; }
+`
+
+function ManageCertCentralSection() {
+  return (
+    <Section>
+      <ManageCertCentralCard>
+        <ManageCertCentralText>
+          <ManageCertCentralTitle>Manage finances and funds</ManageCertCentralTitle>
+          <ManageCertCentralDesc>
+            View purchase history, balance, account pricing, deposit funds, and pay invoices in CertCentral.
+          </ManageCertCentralDesc>
+        </ManageCertCentralText>
+        <OpenCertCentralBtn
+          href="https://www.digicert.com/certcentral/finances/purchase-history"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Manage finances
+          <ExternalLinkIcon size={14} color="currentColor" />
+        </OpenCertCentralBtn>
+      </ManageCertCentralCard>
     </Section>
   )
 }
@@ -778,8 +749,8 @@ function ContractInfoSection({ instance, isCertCentral }) {
     <Section>
       <KPIGrid $cols={3}>
         <PlanTypeCard instance={instance} isCertCentral={isCertCentral} />
-        <RenewalCard dateStr={instance.renewalDate} sub={instance.contractTerm} />
-        <UsageCard entitlements={instance.entitlements} />
+        <RenewalCard dateStr={instance.renewalDate} />
+        <ContractTermCard term={instance.contractTerm} />
       </KPIGrid>
     </Section>
   )
@@ -787,85 +758,28 @@ function ContractInfoSection({ instance, isCertCentral }) {
 
 // ── E-commerce section ────────────────────────────────────────────────────────
 
-const ActionsRow = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 16px;
-`
-
-const BuyBtn = styled.button`
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 20px;
-  border-radius: ${({ theme }) => theme.borderRadius.md};
-  border: 1px solid transparent;
-  background: ${({ theme }) => theme.colors.blue300};
-  color: white;
-  font-family: ${({ theme }) => theme.typography.fontFamily};
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background 0.15s;
-
-  &:hover { background: ${({ theme }) => theme.colors.blue500}; }
-  &:focus-visible { outline: 2px solid ${({ theme }) => theme.colors.blue300}; outline-offset: 2px; }
-`
-
-const OutlineLink = styled(Link)`
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 16px;
-  border-radius: ${({ theme }) => theme.borderRadius.md};
-  border: 1px solid ${({ theme }) => theme.colors.neutral300};
-  background: ${({ theme }) => theme.colors.white};
-  color: ${({ theme }) => theme.colors.neutral800};
-  font-family: ${({ theme }) => theme.typography.fontFamily};
-  font-size: 14px;
-  font-weight: 500;
-  text-decoration: none;
-  transition: border-color 0.15s ease, color 0.15s ease;
-
-  &:hover {
-    border-color: ${({ theme }) => theme.colors.blue300};
-    color: ${({ theme }) => theme.colors.blue300};
-  }
-`
 
 function EcommerceBillingSection({ instance, isCertCentral }) {
-  const [priceAmount, pricePeriod] = instance.billing.price.split(' / ')
+  const lastMonthAmount = instance.receipts?.[0]?.amount ?? instance.billing.price.split(' / ')[0]
 
   return (
     <Section>
-      <KPIGrid $cols={4}>
+      <KPIGrid $cols={3}>
         <PlanTypeCard instance={instance} isCertCentral={isCertCentral} />
 
         <KPICard>
           <KPICardHeader>
-            <KPILabel>Monthly cost</KPILabel>
+            <KPILabel>Last 30 days</KPILabel>
             <DollarIcon size={15} color="#9CA3AF" />
           </KPICardHeader>
-          <KPIValue $blue>
-            {priceAmount}<KPIValueSmall>/ {pricePeriod}</KPIValueSmall>
+          <KPIValue>
+            {lastMonthAmount}
           </KPIValue>
-          <KPISubValue>{instance.billing.plan}</KPISubValue>
+          <KPISubValue>Last month's spend</KPISubValue>
         </KPICard>
 
         <RenewalCard dateStr={instance.billing.nextChargeDate} sub="Auto-renew enabled" />
-        <UsageCard entitlements={instance.entitlements} />
       </KPIGrid>
-
-      <ActionsRow>
-        <BuyBtn type="button">
-          <CartOutlineIcon size={16} color="currentColor" />
-          Buy certificates
-        </BuyBtn>
-        <OutlineLink to="/settings/billing/payment-details">Manage payment details</OutlineLink>
-        <OutlineLink to="/settings/billing/receipts">View receipts</OutlineLink>
-      </ActionsRow>
     </Section>
   )
 }
@@ -1032,6 +946,10 @@ function ProductsSection({ categories }) {
 export default function SubscriptionDetail() {
   const { subscriptionId } = useParams()
   const [activeInstanceId, setActiveInstanceId] = useState(null)
+  const [isContactDrawerOpen, setIsContactDrawerOpen] = useState(false)
+  const [isContactUsDrawerOpen, setIsContactUsDrawerOpen] = useState(false)
+  const [actionMenuOpen, setActionMenuOpen] = useState(false)
+  const actionMenuRef = useRef(null)
 
   const subscription = getFixedSubscriptions().find((s) => s.id === subscriptionId)
   const isCertCentral = subscriptionId?.startsWith('certcentral-') ?? false
@@ -1043,6 +961,20 @@ export default function SubscriptionDetail() {
   useEffect(() => {
     setActiveInstanceId(subscription?.instances[0]?.instanceId ?? null)
   }, [subscriptionId])
+
+  useEffect(() => {
+    if (!actionMenuOpen) return
+    const handler = (e) => {
+      if (actionMenuRef.current && !actionMenuRef.current.contains(e.target)) setActionMenuOpen(false)
+    }
+    const keyHandler = (e) => { if (e.key === 'Escape') setActionMenuOpen(false) }
+    document.addEventListener('mousedown', handler)
+    document.addEventListener('keydown', keyHandler)
+    return () => {
+      document.removeEventListener('mousedown', handler)
+      document.removeEventListener('keydown', keyHandler)
+    }
+  }, [actionMenuOpen])
 
   if (!subscription) {
     return (
@@ -1058,6 +990,21 @@ export default function SubscriptionDetail() {
 
   const activeInstance = subscription.instances.find((i) => i.instanceId === activeInstanceId) || subscription.instances[0]
 
+  const isEcommerceActive = isCertCentral && activeInstance.subscriptionType === 'ecommerce'
+  const productOpenName = isCertCentral ? 'CertCentral' : subscription.name
+  const detailMenuItems = isEcommerceActive
+    ? [
+        { label: 'Open CertCentral' },
+        { label: 'Documentation' },
+        { label: 'Product overview' },
+        { label: 'Cancel subscription', destructive: true },
+      ]
+    : [
+        { label: `Open ${productOpenName}` },
+        { label: 'Product overview' },
+        { label: 'Documentation' },
+      ]
+
   return (
     <Main>
       <BackLink to="/settings/billing">
@@ -1071,13 +1018,60 @@ export default function SubscriptionDetail() {
           <TitleBlock>
             <PageTitleRow>
               <PageTitle>{subscription.name}</PageTitle>
-              <ActiveBadge>Active</ActiveBadge>
             </PageTitleRow>
             {subscription.accountName && (
-              <SummaryLine>{subscription.accountName}</SummaryLine>
+              <SummaryLine>
+                <strong>Account name:</strong> {subscription.accountName}
+                {subscription.accountId && (
+                  <> | <strong>Account ID:</strong> {subscription.accountId}</>
+                )}
+              </SummaryLine>
             )}
           </TitleBlock>
         </HeaderLeft>
+        <HeaderRight>
+          {isEcommerceActive ? (
+            <NeedHelpBtn type="button" onClick={() => setIsContactUsDrawerOpen(true)}>
+              <ChatBubbleIcon size={15} color="currentColor" />
+              Contact us
+            </NeedHelpBtn>
+          ) : (
+            <NeedHelpBtn type="button" onClick={() => setIsContactDrawerOpen(true)}>
+              <ChatBubbleIcon size={15} color="currentColor" />
+              Contact account manager
+            </NeedHelpBtn>
+          )}
+          {isEcommerceActive && (
+            <HeaderBuyBtn type="button">
+              <CartOutlineIcon size={14} color="currentColor" />
+              Buy certificates
+            </HeaderBuyBtn>
+          )}
+          <ActionMenuWrap ref={actionMenuRef}>
+            <ActionMenuBtn
+              type="button"
+              onClick={() => setActionMenuOpen(v => !v)}
+              aria-label="More actions"
+              aria-expanded={actionMenuOpen}
+            >
+              <DotsVerticalIcon size={15} color="currentColor" />
+            </ActionMenuBtn>
+            {actionMenuOpen && (
+              <ActionMenuDropdown>
+                {detailMenuItems.map(item => (
+                  <ActionMenuItem
+                    key={item.label}
+                    $destructive={item.destructive}
+                    href="#"
+                    onClick={() => setActionMenuOpen(false)}
+                  >
+                    {item.label}
+                  </ActionMenuItem>
+                ))}
+              </ActionMenuDropdown>
+            )}
+          </ActionMenuWrap>
+        </HeaderRight>
       </HeaderRow>
 
       {subscription.instances.length > 1 && (
@@ -1100,11 +1094,17 @@ export default function SubscriptionDetail() {
       {activeInstance.subscriptionType === 'enterprise' ? (
         <>
           <ContractInfoSection instance={activeInstance} isCertCentral={isCertCentral} />
-          <Section>
-            <SectionTitle>Entitlements and usage</SectionTitle>
-            <EntitlementsTable entitlements={activeInstance.entitlements} />
-          </Section>
-          <AccountTeamSection isCertCentral={isCertCentral} />
+          {isCertCentral && activeInstance.contractType === 'peak-usage' ? (
+            <PeakUsageSection instance={activeInstance} />
+          ) : (
+            <Section>
+              <SectionTitle>Entitlements and usage</SectionTitle>
+              <EntitlementsTable entitlements={activeInstance.entitlements} contractType={activeInstance.contractType} />
+            </Section>
+          )}
+          {isCertCentral && (
+            <ManageCertCentralSection />
+          )}
         </>
       ) : (
         <>
@@ -1113,6 +1113,14 @@ export default function SubscriptionDetail() {
         </>
       )}
 
+      <ContactManagerDrawer
+        open={isContactDrawerOpen}
+        onClose={() => setIsContactDrawerOpen(false)}
+      />
+      <ContactUsDrawer
+        open={isContactUsDrawerOpen}
+        onClose={() => setIsContactUsDrawerOpen(false)}
+      />
     </Main>
   )
 }

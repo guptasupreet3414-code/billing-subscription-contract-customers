@@ -278,16 +278,43 @@ export const productSubNavs = {
   },
   'settings-billing': {
     id: 'settings-billing',
-    label: 'Billing',
+    label: 'Billing and subscriptions',
     route: '/settings/billing',
     ariaLabel: 'Billing navigation',
-    sections: [{
-      title: '',
-      defaultExpanded: true,
-      items: [
-        { label: 'My subscriptions', route: '/settings/billing' },
-      ],
-    }],
+    sections: [
+      {
+        title: '',
+        defaultExpanded: true,
+        items: [
+          { label: 'My subscriptions', route: '/settings/billing' },
+        ],
+      },
+      {
+        title: 'Self-service',
+        isSelfService: true,
+        isNavParent: true,
+        defaultExpanded: true,
+        items: [
+          { label: 'Receipts and invoices', route: '/settings/billing/receipts' },
+          { label: 'Payment details', route: '/settings/billing/payment-details' },
+        ],
+      },
+      {
+        title: 'DigiCert products',
+        isNavParent: true,
+        defaultExpanded: true,
+        items: [
+          { label: 'All products', route: '/settings/billing/all-products' },
+          { label: 'CertCentral', route: '/certcentral' },
+          { label: 'Content Trust', route: '/content-trust' },
+          { label: 'Device Trust', route: '/device-trust' },
+          { label: 'DigiCert DNS', route: '/dns' },
+          { label: 'Private CA', route: '/private-ca' },
+          { label: 'Software Trust', route: '/software-trust' },
+          { label: 'Trust Lifecycle', route: '/trust-lifecycle' },
+        ],
+      },
+    ],
   },
   'settings-account': {
     id: 'settings-account',
@@ -446,6 +473,7 @@ export const routeLabels = {
   '/settings/billing': 'My subscriptions',
   '/settings/billing/receipts': 'Receipts',
   '/settings/billing/payment-details': 'Payment details',
+  '/settings/billing/all-products': 'Explore DigiCert products',
   '/settings/account': 'Account settings',
   '/settings/product': 'Product settings',
   '/settings/integrations': 'Integrations',
@@ -563,6 +591,7 @@ export const allRoutes = [
   '/settings/billing',
   '/settings/billing/receipts',
   '/settings/billing/payment-details',
+  '/settings/billing/all-products',
   '/settings/account',
   '/settings/product',
   '/settings/integrations',
