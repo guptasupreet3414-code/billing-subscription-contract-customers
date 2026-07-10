@@ -1,9 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import styled from 'styled-components'
-import { PlusIcon, DotsVerticalIcon, InfoCircleIcon, CreditCardIcon, ChatBubbleIcon } from '../../components/Icons'
+import { PlusIcon, DotsVerticalIcon, InfoCircleIcon, CreditCardIcon } from '../../components/Icons'
 import BillingEmptyState from '../../components/billing/BillingEmptyState'
 import ContactAccountManagerButton from '../../components/billing/ContactAccountManagerButton'
-import ContactUsDrawer from '../../components/billing/ContactUsDrawer'
 
 const Main = styled.main`
   padding: 32px;
@@ -33,24 +32,21 @@ const PageDescription = styled.p`
   max-width: 600px;
 `
 
-const NeedHelpBtn = styled.button`
+const NeedHelpLink = styled.a`
   display: inline-flex;
   align-items: center;
   gap: 6px;
   padding: 4px 0;
-  border: none;
-  background: transparent;
-  font-family: ${({ theme }) => theme.typography.fontFamily};
   font-size: 13px;
   font-weight: 500;
   color: ${({ theme }) => theme.colors.blue300};
-  cursor: pointer;
+  text-decoration: none;
   white-space: nowrap;
   flex-shrink: 0;
   padding-top: 6px;
   transition: color 0.15s;
 
-  &:hover { color: ${({ theme }) => theme.colors.blue500}; }
+  &:hover { color: ${({ theme }) => theme.colors.blue500}; text-decoration: underline; }
   &:focus-visible {
     outline: 2px solid ${({ theme }) => theme.colors.blue300};
     outline-offset: 2px;
@@ -224,8 +220,6 @@ const VatRow = styled.div`
 `
 
 export default function PaymentDetails({ scenario }) {
-  const [isContactDrawerOpen, setIsContactDrawerOpen] = useState(false)
-
   useEffect(() => {
     document.title = 'Payment details — DigiCert ONE'
   }, [])
@@ -257,10 +251,10 @@ export default function PaymentDetails({ scenario }) {
             Payments for e-commerce products, self-service add-ons, and other usage are made using your default payment method.
           </PageDescription>
         </TitleBlock>
-        <NeedHelpBtn type="button" onClick={() => setIsContactDrawerOpen(true)}>
-          <ChatBubbleIcon size={15} color="currentColor" />
-          Contact us
-        </NeedHelpBtn>
+        <NeedHelpLink href="#">
+          <InfoCircleIcon size={15} color="currentColor" />
+          Need help?
+        </NeedHelpLink>
       </PageHeader>
 
       <SectionBlock>
@@ -335,11 +329,6 @@ export default function PaymentDetails({ scenario }) {
         </ContactCard>
       </SectionBlock>
 
-      <ContactUsDrawer
-        open={isContactDrawerOpen}
-        onClose={() => setIsContactDrawerOpen(false)}
-        helpContext="payment-details"
-      />
     </Main>
   )
 }

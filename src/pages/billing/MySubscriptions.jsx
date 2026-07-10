@@ -60,11 +60,11 @@ const NeedHelpBtn = styled.button`
 /* ── Summary cards ── */
 const SummaryGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 16px;
   margin-bottom: 32px;
 
-  @media (max-width: 1023px) {
+  @media (max-width: 900px) {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
@@ -158,16 +158,6 @@ export default function MySubscriptions() {
             {summary.renewalDatesCount > 1
               ? 'Renewal dates vary by product'
               : 'All products renew on this date'}
-          </SummarySub>
-        </SummaryCard>
-
-        <SummaryCard>
-          <SummaryLabel>Usage status</SummaryLabel>
-          <SummaryValue>
-            {summary.needsAttention > 0 ? `${summary.needsAttention} need attention` : 'All healthy'}
-          </SummaryValue>
-          <SummarySub>
-            {summary.approaching} approaching limit · {summary.over} over entitlement
           </SummarySub>
         </SummaryCard>
 

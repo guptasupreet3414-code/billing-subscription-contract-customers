@@ -34,14 +34,14 @@ const Card = styled(Link)`
 
 const CardHeader = styled.div`
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 12px;
 `
 
 const HeaderLeft = styled.div`
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 12px;
   min-width: 0;
 `
@@ -91,8 +91,39 @@ const RenewalPill = styled.span`
   font-weight: 500;
   line-height: 16px;
   white-space: nowrap;
-  background: rgba(39, 168, 114, 0.10);
-  color: #1F8F60;
+  background: #1C7852;
+  color: #ffffff;
+`
+
+const MetaSection = styled.div`
+  display: grid;
+  grid-template-columns: repeat(${({ $cols }) => $cols}, 1fr);
+  gap: 10px;
+  padding: 10px 0 2px;
+`
+
+const MetaItem = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+`
+
+const MetaLabel = styled.span`
+  font-size: 10px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.neutral500};
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+`
+
+const MetaValue = styled.span`
+  font-size: 12px;
+  font-weight: 500;
+  color: ${({ theme }) => theme.colors.neutral800};
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `
 
 const CardTitleRow = styled.div`
@@ -353,6 +384,26 @@ function EntitlementRows({ entitlements, maxVisible = 3 }) {
   )
 }
 
+// ── Metadata row helper ────────────────────────────────────────────────────────
+
+function buildMetaItems(subscription) {
+  const isCertCentral = subscription.id.startsWith('certcentral-')
+  if (isCertCentral) {
+    const hasEnt = subscription.subscriptionTypes.includes('enterprise')
+    const hasEcom = subscription.subscriptionTypes.includes('ecommerce')
+    const tierLabel = hasEnt && hasEcom ? 'Enterprise + E-commerce' : hasEnt ? 'Enterprise' : 'E-commerce'
+    return [
+      { label: 'Tier', value: tierLabel },
+      { label: 'Account name', value: subscription.accountName },
+      { label: 'Account ID', value: subscription.accountId },
+    ]
+  }
+  const items = [{ label: 'Tier', value: 'Enterprise' }]
+  if (subscription.plan) items.push({ label: 'Plan', value: subscription.plan })
+  if (subscription.autoRenewal !== undefined) items.push({ label: 'Auto-renewal', value: subscription.autoRenewal ? 'On' : 'Off' })
+  return items
+}
+
 // ── Mixed CertCentral card (enterprise + ecommerce tabs) ──────────────────────
 
 function MixedInstanceCard({ subscription }) {
@@ -367,6 +418,8 @@ function MixedInstanceCard({ subscription }) {
     { label: 'Documentation' },
   ]
 
+  const metaItems = buildMetaItems(subscription)
+
   return (
     <Card to={`/settings/billing/${subscription.id}`}>
       <CardHeader>
@@ -377,17 +430,20 @@ function MixedInstanceCard({ subscription }) {
               <CardTitle>{subscription.name}</CardTitle>
               <RenewalPill>Renews {subscription.renewalDate}</RenewalPill>
             </CardTitleRow>
-            <SubtitleText>
-              {subscription.subscriptionTypes.map((t) => subscriptionTypeConfig[t].label).join(' · ')}
-              {subscription.accountId && <AccountNameSpan> | {subscription.accountId}</AccountNameSpan>}
-              {subscription.accountName && <AccountNameSpan> | {subscription.accountName}</AccountNameSpan>}
-            </SubtitleText>
           </TitleBlock>
         </HeaderLeft>
         <CardHeaderRight>
           <CardActionMenu items={mixedMenuItems} />
         </CardHeaderRight>
       </CardHeader>
+      <MetaSection $cols={metaItems.length}>
+        {metaItems.map(item => (
+          <MetaItem key={item.label}>
+            <MetaLabel>{item.label}</MetaLabel>
+            <MetaValue>{item.value}</MetaValue>
+          </MetaItem>
+        ))}
+      </MetaSection>
 
       <SegmentedContainer onClick={(e) => e.preventDefault()}>
         {subscription.instances.map((inst) => (
@@ -459,6 +515,8 @@ export default function SubscriptionCard({ subscription }) {
         { label: 'Documentation' },
       ]
 
+  const metaItems = buildMetaItems(subscription)
+
   return (
     <Card to={`/settings/billing/${id}`}>
       <CardHeader>
@@ -469,17 +527,20 @@ export default function SubscriptionCard({ subscription }) {
               <CardTitle>{name}</CardTitle>
               <RenewalPill>Renews {renewalDate}</RenewalPill>
             </CardTitleRow>
-            <SubtitleText>
-              {singleInstanceSubtitle(subscription)}
-              {subscription.accountId && <AccountNameSpan> | {subscription.accountId}</AccountNameSpan>}
-              {subscription.accountName && <AccountNameSpan> | {subscription.accountName}</AccountNameSpan>}
-            </SubtitleText>
           </TitleBlock>
         </HeaderLeft>
         <CardHeaderRight>
           <CardActionMenu items={cardMenuItems} />
         </CardHeaderRight>
       </CardHeader>
+      <MetaSection $cols={metaItems.length}>
+        {metaItems.map(item => (
+          <MetaItem key={item.label}>
+            <MetaLabel>{item.label}</MetaLabel>
+            <MetaValue>{item.value}</MetaValue>
+          </MetaItem>
+        ))}
+      </MetaSection>
 
       {visibleEntitlements.length > 0 ? (
         <EntitlementRows entitlements={entitlements} maxVisible={3} />

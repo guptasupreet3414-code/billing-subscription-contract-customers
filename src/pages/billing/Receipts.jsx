@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react'
 import styled from 'styled-components'
-import { ChevronDownIcon, FilterIcon, DownloadIcon, AlertCircleFillIcon, InboxIcon, ChatBubbleIcon } from '../../components/Icons'
+import { ChevronDownIcon, FilterIcon, DownloadIcon, AlertCircleFillIcon, InboxIcon } from '../../components/Icons'
 import BillingEmptyState from '../../components/billing/BillingEmptyState'
 import ContactAccountManagerButton from '../../components/billing/ContactAccountManagerButton'
-import ContactUsDrawer from '../../components/billing/ContactUsDrawer'
 
 const Main = styled.main`
   padding: 32px;
@@ -32,30 +31,6 @@ const PageDescription = styled.p`
   color: ${({ theme }) => theme.colors.neutral600};
 `
 
-const NeedHelpBtn = styled.button`
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 0;
-  border: none;
-  background: transparent;
-  font-family: ${({ theme }) => theme.typography.fontFamily};
-  font-size: 13px;
-  font-weight: 500;
-  color: ${({ theme }) => theme.colors.blue300};
-  cursor: pointer;
-  white-space: nowrap;
-  flex-shrink: 0;
-  padding-top: 6px;
-  transition: color 0.15s;
-
-  &:hover { color: ${({ theme }) => theme.colors.blue500}; }
-  &:focus-visible {
-    outline: 2px solid ${({ theme }) => theme.colors.blue300};
-    outline-offset: 2px;
-    border-radius: 3px;
-  }
-`
 
 const SummaryRow = styled.div`
   display: flex;
@@ -249,7 +224,6 @@ const mockRows = [
 export default function Receipts({ scenario }) {
   const [view, setView] = useState('All')
   const [viewOpen, setViewOpen] = useState(false)
-  const [isContactDrawerOpen, setIsContactDrawerOpen] = useState(false)
 
   useEffect(() => {
     document.title = 'Receipts and invoices — DigiCert ONE'
@@ -291,10 +265,6 @@ export default function Receipts({ scenario }) {
             Track your invoices, receipts, and refunds for all e-commerce products, self-service add-ons, and other usage.
           </PageDescription>
         </TitleBlock>
-        <NeedHelpBtn type="button" onClick={() => setIsContactDrawerOpen(true)}>
-          <ChatBubbleIcon size={15} color="currentColor" />
-          Contact us
-        </NeedHelpBtn>
       </PageHeader>
 
       <SummaryRow>
@@ -416,11 +386,6 @@ export default function Receipts({ scenario }) {
         <TableFooter>1 to {filteredRows.length} of 8,618</TableFooter>
       </TableWrap>
 
-      <ContactUsDrawer
-        open={isContactDrawerOpen}
-        onClose={() => setIsContactDrawerOpen(false)}
-        helpContext="receipts"
-      />
     </Main>
   )
 }

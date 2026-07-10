@@ -315,6 +315,14 @@ export const ChatBubbleIcon = ({ size = 20, color = 'currentColor' }) => (
   </svg>
 )
 
+export const ChipIcon = ({ size = 20, color = 'currentColor' }) => (
+  <svg width={size} height={size} viewBox="0 0 20 20" fill="none" aria-hidden="true">
+    <rect x="5" y="5" width="10" height="10" rx="1" stroke={color} strokeWidth="1.5" />
+    <rect x="7.5" y="7.5" width="5" height="5" rx="0.5" stroke={color} strokeWidth="1.5" />
+    <path d="M8 2v3M12 2v3M8 15v3M12 15v3M2 8h3M2 12h3M15 8h3M15 12h3" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+  </svg>
+)
+
 export function getIcon(iconType, size = 20, color = 'white') {
   const props = { size, color }
   switch (iconType) {
@@ -331,6 +339,7 @@ export function getIcon(iconType, size = 20, color = 'white') {
     case 'envelope': return <EnvelopeIcon {...props} />
     case 'key': return <KeyIcon {...props} />
     case 'atom': return <AtomIcon {...props} />
+    case 'chip': return <ChipIcon {...props} />
     default: return <DashboardIcon {...props} />
   }
 }

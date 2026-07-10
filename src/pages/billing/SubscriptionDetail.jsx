@@ -338,7 +338,7 @@ const PlanInfoTooltipBox = styled.div`
 
 // ── Shared KPI helper cards ───────────────────────────────────────────────────
 
-function PlanTypeCard({ instance, isCertCentral }) {
+function PlanTypeCard({ instance, isCertCentral, plan }) {
   const [tooltipOpen, setTooltipOpen] = useState(false)
   const wrapRef = useRef(null)
 
@@ -384,7 +384,7 @@ function PlanTypeCard({ instance, isCertCentral }) {
     <KPICard>
       <KPICardHeader>
         <KPILabel style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-          Plan type
+          Tier
           <PlanInfoBtnWrap ref={wrapRef}>
             <PlanInfoBtn type="button" onClick={() => setTooltipOpen((v) => !v)}>
               <InfoCircleIcon size={13} color="currentColor" />
@@ -396,6 +396,7 @@ function PlanTypeCard({ instance, isCertCentral }) {
         </KPILabel>
       </KPICardHeader>
       <KPIValue>{planLabel}</KPIValue>
+      {plan && <KPISubValue>{plan}</KPISubValue>}
     </KPICard>
   )
 }
@@ -422,7 +423,7 @@ function RenewalCard({ dateStr, sub }) {
   )
 }
 
-function ContractTermCard({ term }) {
+function ContractTermCard({ term, autoRenewal }) {
   return (
     <KPICard>
       <KPICardHeader>
@@ -430,6 +431,9 @@ function ContractTermCard({ term }) {
         <CalendarIcon size={15} color="#9CA3AF" />
       </KPICardHeader>
       <KPIValue style={{ fontSize: 15, fontWeight: 600 }}>{term || '—'}</KPIValue>
+      {autoRenewal !== undefined && (
+        <KPISubValue>{autoRenewal ? 'Auto-renew enabled' : 'Auto-renew disabled'}</KPISubValue>
+      )}
     </KPICard>
   )
 }
@@ -593,16 +597,18 @@ const ViewToggleBtn = styled.button`
 
 // ── Peak-usage model table ────────────────────────────────────────────────────
 
-function PeakUsageTable({ entitlements }) {
+function PeakUsageTable({ entitlements, purchasedOnly }) {
   return (
     <TableWrap>
       <Table>
         <thead>
           <tr>
             <Th style={{ width: '40%' }}>Entitlement</Th>
+            {purchasedOnly && <Th />}
             <Th $align="right">Purchased</Th>
-            <Th $align="right">Consumed</Th>
-            <Th $align="right">Remaining</Th>
+            {!purchasedOnly && <Th $align="right">Consumed</Th>}
+            {!purchasedOnly && <Th $align="right">Remaining</Th>}
+            {purchasedOnly && <Th />}
           </tr>
         </thead>
         <tbody>
@@ -611,15 +617,19 @@ function PeakUsageTable({ entitlements }) {
             return (
               <tr key={ent.name}>
                 <Td>{ent.name}</Td>
+                {purchasedOnly && <Td />}
                 <Td $align="right">{ent.purchased.toLocaleString()}</Td>
-                <Td $align="right">{ent.consumed.toLocaleString()}</Td>
-                <Td $align="right">
-                  <RemainingValue $tone={tone}>
-                    {ent.remaining < 0
-                      ? `Exceeded by ${Math.abs(ent.remaining).toLocaleString()}`
-                      : ent.remaining.toLocaleString()}
-                  </RemainingValue>
-                </Td>
+                {!purchasedOnly && <Td $align="right">{ent.consumed.toLocaleString()}</Td>}
+                {!purchasedOnly && (
+                  <Td $align="right">
+                    <RemainingValue $tone={tone}>
+                      {ent.remaining < 0
+                        ? `Exceeded by ${Math.abs(ent.remaining).toLocaleString()}`
+                        : ent.remaining.toLocaleString()}
+                    </RemainingValue>
+                  </Td>
+                )}
+                {purchasedOnly && <Td />}
               </tr>
             )
           })}
@@ -629,7 +639,7 @@ function PeakUsageTable({ entitlements }) {
   )
 }
 
-function PeakUsageSection({ instance }) {
+function PeakUsageSection({ instance, purchasedOnly }) {
   const [viewMode, setViewMode] = useState('table')
   const { peakUsageData } = instance
 
@@ -648,7 +658,7 @@ function PeakUsageSection({ instance }) {
         </ViewToggle>
       </SectionHeaderRow>
       {viewMode === 'table'
-        ? <PeakUsageTable entitlements={instance.entitlements} />
+        ? <PeakUsageTable entitlements={instance.entitlements} purchasedOnly={purchasedOnly} />
         : (
           <DualChartWrap>
             <ChartBlock>
@@ -748,9 +758,9 @@ function ContractInfoSection({ instance, isCertCentral }) {
   return (
     <Section>
       <KPIGrid $cols={3}>
-        <PlanTypeCard instance={instance} isCertCentral={isCertCentral} />
+        <PlanTypeCard instance={instance} isCertCentral={isCertCentral} plan={instance.plan} />
         <RenewalCard dateStr={instance.renewalDate} />
-        <ContractTermCard term={instance.contractTerm} />
+        <ContractTermCard term={instance.contractTerm} autoRenewal={instance.autoRenewal} />
       </KPIGrid>
     </Section>
   )
@@ -1095,14 +1105,14 @@ export default function SubscriptionDetail() {
         <>
           <ContractInfoSection instance={activeInstance} isCertCentral={isCertCentral} />
           {isCertCentral && activeInstance.contractType === 'peak-usage' ? (
-            <PeakUsageSection instance={activeInstance} />
+            <PeakUsageSection instance={activeInstance} purchasedOnly={subscription.accountId === '1001445'} />
           ) : (
             <Section>
               <SectionTitle>Entitlements and usage</SectionTitle>
               <EntitlementsTable entitlements={activeInstance.entitlements} contractType={activeInstance.contractType} />
             </Section>
           )}
-          {isCertCentral && (
+          {isCertCentral && subscription.accountId !== '1001445' && subscription.accountId !== '2003891' && (
             <ManageCertCentralSection />
           )}
         </>
