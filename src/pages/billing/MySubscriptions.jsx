@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import styled from 'styled-components'
-import { getFixedSubscriptions } from '../../data/billingData'
+import { ENVIRONMENTS, getMultiEnvSubscriptions } from '../../data/billingData'
 import SubscriptionCard from '../../components/billing/SubscriptionCard'
 import ContactManagerDrawer from '../../components/billing/ContactManagerDrawer'
-import { ChatBubbleIcon } from '../../components/Icons'
+import { ChatBubbleIcon, ChevronDownIcon } from '../../components/Icons'
 
 const Main = styled.main`
   padding: 32px;
@@ -119,14 +120,108 @@ const ProductGrid = styled.div`
   }
 `
 
+/* ── Filter bar ── */
+const FilterBar = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+`
+
+const FilterDropdownBtn = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: ${({ theme }) => theme.borderRadius.md};
+  border: 1px solid ${({ theme }) => theme.colors.neutral300};
+  background: ${({ theme }) => theme.colors.white};
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 13px;
+  font-weight: 500;
+  color: ${({ theme }) => theme.colors.neutral800};
+  cursor: pointer;
+
+  &:hover { background: ${({ theme }) => theme.colors.neutral50}; }
+  &:focus-visible { outline: 2px solid ${({ theme }) => theme.colors.blue300}; outline-offset: 2px; }
+`
+
+const FilterDropdownList = styled.div`
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  min-width: 220px;
+  background: white;
+  border: 1px solid ${({ theme }) => theme.colors.neutral200};
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  overflow: hidden;
+`
+
+const FilterDropdownItem = styled.button`
+  display: block;
+  width: 100%;
+  padding: 9px 16px;
+  text-align: left;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  font-family: inherit;
+  background: ${({ $active, theme }) => ($active ? '#EAF1FB' : theme.colors.white)};
+  color: ${({ $active, theme }) => ($active ? theme.colors.blue300 : theme.colors.neutral800)};
+  font-weight: ${({ $active }) => ($active ? 500 : 400)};
+
+  &:hover { background: ${({ $active, theme }) => ($active ? '#EAF1FB' : theme.colors.neutral50)}; }
+`
+
 export default function MySubscriptions() {
   const [isContactDrawerOpen, setIsContactDrawerOpen] = useState(false)
+  const [searchParams, setSearchParams] = useSearchParams()
+  const envFilter = searchParams.get('env') || 'all'
+  const productFilter = searchParams.get('product') || 'all'
+  const [envDropdownOpen, setEnvDropdownOpen] = useState(false)
+  const [productDropdownOpen, setProductDropdownOpen] = useState(false)
+  const envDropdownRef = useRef(null)
+  const productDropdownRef = useRef(null)
 
   useEffect(() => {
     document.title = 'My subscriptions — DigiCert ONE'
   }, [])
 
-  const subscriptions = getFixedSubscriptions()
+  useEffect(() => {
+    if (!envDropdownOpen) return
+    const handler = (e) => {
+      if (envDropdownRef.current && !envDropdownRef.current.contains(e.target)) setEnvDropdownOpen(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [envDropdownOpen])
+
+  useEffect(() => {
+    if (!productDropdownOpen) return
+    const handler = (e) => {
+      if (productDropdownRef.current && !productDropdownRef.current.contains(e.target)) setProductDropdownOpen(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [productDropdownOpen])
+
+  const allSubscriptions = getMultiEnvSubscriptions()
+  const uniqueProducts = [...new Map(allSubscriptions.map(s => [s.name, { id: s.name, name: s.name }])).values()]
+
+  const filteredSubscriptions = allSubscriptions.filter(s => {
+    if (envFilter !== 'all' && s.envId !== envFilter) return false
+    if (productFilter !== 'all' && s.name !== productFilter) return false
+    return true
+  })
+
+  const selectedEnvName = envFilter === 'all'
+    ? 'All environments'
+    : ENVIRONMENTS.find(e => e.id === envFilter)?.name ?? envFilter
+  const selectedProductName = productFilter === 'all'
+    ? 'All products'
+    : productFilter
 
   return (
     <Main>
@@ -143,9 +238,76 @@ export default function MySubscriptions() {
         </NeedHelpBtn>
       </PageHeader>
 
+      <FilterBar>
+        <div style={{ position: 'relative' }} ref={envDropdownRef}>
+          <FilterDropdownBtn
+            type="button"
+            onClick={() => setEnvDropdownOpen(v => !v)}
+            aria-haspopup="listbox"
+            aria-expanded={envDropdownOpen}
+          >
+            {selectedEnvName}
+            <ChevronDownIcon size={13} color="currentColor" />
+          </FilterDropdownBtn>
+          {envDropdownOpen && (
+            <FilterDropdownList>
+              {[{ id: 'all', name: 'All environments' }, ...ENVIRONMENTS].map(env => (
+                <FilterDropdownItem
+                  key={env.id}
+                  type="button"
+                  $active={envFilter === env.id}
+                  onClick={() => {
+                    setSearchParams(prev => {
+                      const next = new URLSearchParams(prev)
+                      env.id === 'all' ? next.delete('env') : next.set('env', env.id)
+                      return next
+                    }, { replace: true })
+                    setEnvDropdownOpen(false)
+                  }}
+                >
+                  {env.name}
+                </FilterDropdownItem>
+              ))}
+            </FilterDropdownList>
+          )}
+        </div>
+        <div style={{ position: 'relative' }} ref={productDropdownRef}>
+          <FilterDropdownBtn
+            type="button"
+            onClick={() => setProductDropdownOpen(v => !v)}
+            aria-haspopup="listbox"
+            aria-expanded={productDropdownOpen}
+          >
+            {selectedProductName}
+            <ChevronDownIcon size={13} color="currentColor" />
+          </FilterDropdownBtn>
+          {productDropdownOpen && (
+            <FilterDropdownList>
+              {[{ id: 'all', name: 'All products' }, ...uniqueProducts].map(product => (
+                <FilterDropdownItem
+                  key={product.id}
+                  type="button"
+                  $active={productFilter === product.id}
+                  onClick={() => {
+                    setSearchParams(prev => {
+                      const next = new URLSearchParams(prev)
+                      product.id === 'all' ? next.delete('product') : next.set('product', product.id)
+                      return next
+                    }, { replace: true })
+                    setProductDropdownOpen(false)
+                  }}
+                >
+                  {product.name}
+                </FilterDropdownItem>
+              ))}
+            </FilterDropdownList>
+          )}
+        </div>
+      </FilterBar>
+
       <ProductGrid>
-        {subscriptions.map((subscription) => (
-          <SubscriptionCard key={subscription.id} subscription={subscription} />
+        {filteredSubscriptions.map((subscription) => (
+          <SubscriptionCard key={`${subscription.id}-${subscription.envId}`} subscription={subscription} />
         ))}
       </ProductGrid>
 

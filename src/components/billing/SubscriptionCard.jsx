@@ -517,7 +517,7 @@ export default function SubscriptionCard({ subscription }) {
   const metaItems = buildMetaItems(subscription)
 
   return (
-    <Card to={`/settings/billing/${id}`}>
+    <Card to={`/settings/billing/${id}${subscription.envId ? `?env=${subscription.envId}` : ''}`}>
       <CardHeader>
         <HeaderLeft>
           <IconBadge>{getIcon(iconType, 20, 'currentColor')}</IconBadge>
@@ -526,6 +526,7 @@ export default function SubscriptionCard({ subscription }) {
               <CardTitle>{name}</CardTitle>
               {isEcommerceOnly && renewalDate && <RenewalPill>Renews {renewalDate}</RenewalPill>}
             </CardTitleRow>
+            {subscription.envId && <SubtitleText>{subscription.envName}</SubtitleText>}
           </TitleBlock>
         </HeaderLeft>
         <CardHeaderRight>

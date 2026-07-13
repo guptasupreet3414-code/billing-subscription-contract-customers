@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useParams, useSearchParams } from 'react-router-dom'
 import styled from 'styled-components'
 import { ChevronLeftIcon, ChevronUpIcon, ChevronDownIcon, InfoCircleIcon, CartOutlineIcon, CalendarIcon, DollarIcon, ExternalLinkIcon, DotsVerticalIcon, ChatBubbleIcon, getIcon } from '../../components/Icons'
-import { getFixedSubscriptions, contractTypeConfig } from '../../data/billingData'
+import { getFixedSubscriptions, getMultiEnvSubscriptions, contractTypeConfig } from '../../data/billingData'
 import ContactManagerDrawer from '../../components/billing/ContactManagerDrawer'
 import ContactUsDrawer from '../../components/billing/ContactUsDrawer'
 import PeakUsageChart from '../../components/billing/PeakUsageChart'
@@ -1098,8 +1098,12 @@ export default function SubscriptionDetail() {
   const [actionMenuOpen, setActionMenuOpen] = useState(false)
   const actionMenuRef = useRef(null)
 
-  const subscription = getFixedSubscriptions().find((s) => s.id === subscriptionId)
-  const isCertCentral = subscriptionId?.startsWith('certcentral-') ?? false
+  const [searchParams] = useSearchParams()
+  const envId = searchParams.get('env')
+  const subscription = envId
+    ? getMultiEnvSubscriptions().find(s => s.id === subscriptionId && s.envId === envId)
+    : getFixedSubscriptions().find(s => s.id === subscriptionId)
+  const isCertCentral = subscriptionId === 'certcentral' || (subscriptionId?.startsWith('certcentral-') ?? false)
 
   useEffect(() => {
     document.title = subscription ? `${subscription.name} — DigiCert ONE` : 'Subscription — DigiCert ONE'
@@ -1126,7 +1130,7 @@ export default function SubscriptionDetail() {
   if (!subscription) {
     return (
       <Main>
-        <BackLink to="/settings/billing">
+        <BackLink to={-1}>
           <ChevronLeftIcon size={14} color="currentColor" />
           Back to subscriptions
         </BackLink>
@@ -1154,7 +1158,7 @@ export default function SubscriptionDetail() {
 
   return (
     <Main>
-      <BackLink to="/settings/billing">
+      <BackLink to={-1}>
         <ChevronLeftIcon size={14} color="currentColor" />
         Back to subscriptions
       </BackLink>
@@ -1166,9 +1170,15 @@ export default function SubscriptionDetail() {
             <PageTitleRow>
               <PageTitle>{subscription.name}</PageTitle>
             </PageTitleRow>
-            {subscription.accountName && (
+            {(subscription.envName || subscription.accountName) && (
               <SummaryLine>
-                <strong>Account name:</strong> {subscription.accountName}
+                {subscription.envName && (
+                  <><strong>Environment:</strong> {subscription.envName}</>
+                )}
+                {subscription.envName && subscription.accountName && <> | </>}
+                {subscription.accountName && (
+                  <><strong>Account name:</strong> {subscription.accountName}</>
+                )}
                 {subscription.accountId && (
                   <> | <strong>Account ID:</strong> {subscription.accountId}</>
                 )}
@@ -1251,7 +1261,7 @@ export default function SubscriptionDetail() {
               <EntitlementsTable entitlements={activeInstance.entitlements} contractType={activeInstance.contractType} />
             </Section>
           )}
-          {isCertCentral && subscription.accountId !== '1001445' && subscription.accountId !== '2003891' && (
+          {isCertCentral && subscription.accountId !== '1001445' && subscription.accountId !== '2003891' && !subscription.envId && (
             <ManageCertCentralSection />
           )}
         </>
