@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import styled from 'styled-components'
-import { getFixedSubscriptions, getSummary, getBillingTypeSummary } from '../../data/billingData'
+import { getFixedSubscriptions } from '../../data/billingData'
 import SubscriptionCard from '../../components/billing/SubscriptionCard'
 import ContactManagerDrawer from '../../components/billing/ContactManagerDrawer'
 import { ChatBubbleIcon } from '../../components/Icons'
@@ -110,10 +110,12 @@ const SectionTitle = styled.h2`
 const ProductGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-rows: minmax(358px, auto);
   gap: 16px;
 
   @media (max-width: 900px) {
     grid-template-columns: 1fr;
+    grid-auto-rows: auto;
   }
 `
 
@@ -125,9 +127,6 @@ export default function MySubscriptions() {
   }, [])
 
   const subscriptions = getFixedSubscriptions()
-  const summary = getSummary(subscriptions)
-  const billingType = getBillingTypeSummary(subscriptions)
-  const linkedEnterpriseCount = subscriptions.filter(s => s.id.startsWith('certcentral-') && s.subscriptionTypes.includes('enterprise')).length
 
   return (
     <Main>
@@ -144,31 +143,6 @@ export default function MySubscriptions() {
         </NeedHelpBtn>
       </PageHeader>
 
-      <SummaryGrid>
-        <SummaryCard>
-          <SummaryLabel>Active subscriptions</SummaryLabel>
-          <SummaryValue>{summary.productCount + 1} products</SummaryValue>
-          <SummarySub>Includes {linkedEnterpriseCount} linked CertCentral account{linkedEnterpriseCount !== 1 ? 's' : ''}</SummarySub>
-        </SummaryCard>
-
-        <SummaryCard>
-          <SummaryLabel>Next renewal</SummaryLabel>
-          <SummaryValue>{summary.earliestRenewal}</SummaryValue>
-          <SummarySub>
-            {summary.renewalDatesCount > 1
-              ? 'Renewal dates vary by product'
-              : 'All products renew on this date'}
-          </SummarySub>
-        </SummaryCard>
-
-        <SummaryCard>
-          <SummaryLabel>Subscription type</SummaryLabel>
-          <SummaryValue>{billingType.label}</SummaryValue>
-          <SummarySub>{billingType.sub}</SummarySub>
-        </SummaryCard>
-      </SummaryGrid>
-
-      <SectionTitle>Product subscriptions</SectionTitle>
       <ProductGrid>
         {subscriptions.map((subscription) => (
           <SubscriptionCard key={subscription.id} subscription={subscription} />

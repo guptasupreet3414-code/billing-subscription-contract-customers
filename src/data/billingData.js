@@ -56,8 +56,7 @@ const enterpriseProducts = [
     id: 'trust-lifecycle',
     name: 'Trust Lifecycle',
     iconType: 'cycle',
-    plan: 'Essential',
-    autoRenewal: true,
+    plan: 'Advanced',
     contractId: 'CTR-2024-TL-00098',
     contractTerm: 'Sep 2, 2025 – Sep 1, 2026',
     contractOwner: 'PKI Operations',
@@ -73,18 +72,30 @@ const enterpriseProducts = [
     id: 'software-trust',
     name: 'Software Trust',
     iconType: 'code',
+    tier: 'Enterprise',
+    plan: 'Premium',
+    autoRenewal: true,
     contractId: 'CTR-2024-ST-00187',
     contractTerm: 'Jun 7, 2025 – Jun 6, 2026',
     contractOwner: 'DevOps Engineering',
     renewalDate: 'Jun 6, 2026',
     environment: 'Production',
     status: 'healthy',
-    primaryEntitlement: { label: 'Signatures', consumed: 42, total: 50 },
+    primaryEntitlement: { label: 'Signatures', consumed: 124210, total: 250000 },
     entitlements: [
-      { name: 'Signatures', purchased: 50, allocated: 50, consumed: 42, remaining: 8 },
-      { name: 'Test signatures', purchased: 200, allocated: 200, consumed: 120, remaining: 80 },
-      { name: 'Repositories', purchased: 25, allocated: 25, consumed: 18, remaining: 7 },
-      { name: 'HSM keypairs', purchased: 4, allocated: 4, consumed: 3, remaining: 1 },
+      { name: 'Signatures', purchased: 250000, allocated: 250000, consumed: 124210, remaining: 125790 },
+      { name: 'HSM keypairs', purchased: 4, allocated: 4, consumed: 2, remaining: 2 },
+    ],
+    purchasedControls: [
+      { name: 'Signatures', purchased: 250000, used: 124210, remaining: 125790 },
+      { name: 'HSM keypair (add-on)', purchased: 4, used: 2, remaining: 2 },
+    ],
+    includedResources: [
+      { name: 'Repositories', includedWithPlan: 'Up to 100', available: 100, used: 76, remaining: 24 },
+      { name: 'Test signatures', includedWithPlan: '2,500,000', available: 2500000, used: 812430, remaining: 1687570 },
+      { name: 'Active releases per repository', includedWithPlan: '10 most recent releases', available: 10, used: 7, remaining: 3 },
+      { name: 'Users per keypair/certificate', includedWithPlan: 'Up to 10', available: 10, used: 6, remaining: 4 },
+      { name: 'HSM keypairs (baseline)', includedWithPlan: '6', available: 6, used: 4, remaining: 2 },
     ],
   },
   {
@@ -213,11 +224,11 @@ const certCentralAccounts = [
       status: 'over-entitlement',
       primaryEntitlement: { label: 'SSL/TLS certificates', consumed: 108, total: 100 },
       entitlements: [
-        { name: 'SSL/TLS certificates', purchased: 100, allocated: 100, consumed: 108, remaining: -8 },
-        { name: 'Code signing certificates', purchased: 24, allocated: 24, consumed: 16, remaining: 8 },
-        { name: 'S/MIME certificates', purchased: 200, allocated: 200, consumed: 140, remaining: 60 },
-        { name: 'Document signing certificates', purchased: 12, allocated: 12, consumed: 5, remaining: 7 },
-        { name: 'Common mark certificates', purchased: 5, allocated: 5, consumed: 1, remaining: 4 },
+        { name: 'SSL/TLS certificates', purchased: 100, allocated: 100, consumed: 108, remaining: -8, periodPeak: 128, purchasedUSD: '$80,000' },
+        { name: 'Code signing certificates', purchased: 24, allocated: 24, consumed: 16, remaining: 8, periodPeak: 22, purchasedUSD: '$9,600' },
+        { name: 'S/MIME certificates', purchased: 200, allocated: 200, consumed: 140, remaining: 60, periodPeak: 180, purchasedUSD: '$24,000' },
+        { name: 'Document signing certificates', purchased: 12, allocated: 12, consumed: 5, remaining: 7, periodPeak: 8, purchasedUSD: '$2,400' },
+        { name: 'Common mark certificates', purchased: 5, allocated: 5, consumed: 1, remaining: 4, periodPeak: 2, purchasedUSD: '$1,500' },
       ],
       peakUsageData: {
         periodPeakDate: 'Aug 14, 2025',
@@ -523,6 +534,7 @@ function wrapEnterpriseProduct(product) {
     primaryEntitlement: rest.primaryEntitlement,
     entitlements: rest.entitlements,
     plan: rest.plan,
+    tier: rest.tier,
     autoRenewal: rest.autoRenewal,
     instances: [{ instanceId: id, instanceLabel: name, subscriptionType: 'enterprise', ...rest }],
   }
@@ -568,6 +580,8 @@ const enterpriseSubscriptions = enterpriseProducts.map(wrapEnterpriseProduct)
 //                 account 3 both — to demonstrate the mixed layout
 // Fixed subscription set used by MySubscriptions:
 // all enterprise products + 3 CertCentral cards (fixed value, negotiated pricing, ecommerce).
+const REMOVED_PRODUCT_IDS = new Set(['device-trust', 'dns', 'valimail', 'iot-trust'])
+
 export function getFixedSubscriptions() {
   const certCentralCards = [
     buildCertCentralCard(certCentralAccounts[0], ['enterprise']),
@@ -576,7 +590,7 @@ export function getFixedSubscriptions() {
     buildCertCentralCard(certCentralAccounts[3], ['enterprise']),
   ]
   const before = enterpriseSubscriptions.slice(0, 3)   // trust-lifecycle, software-trust, private-ca
-  const after = enterpriseSubscriptions.slice(3)        // content-trust, device-trust, dns, valimail, iot-trust
+  const after = enterpriseSubscriptions.slice(3).filter(s => !REMOVED_PRODUCT_IDS.has(s.id))
   return [...before, ...certCentralCards, ...after]
 }
 

@@ -136,8 +136,6 @@ const SectionTitle = styled.h2`
   margin: 0 0 14px;
   font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
   color: ${({ theme }) => theme.colors.neutral500};
 `
 
@@ -352,7 +350,7 @@ function PlanTypeCard({ instance, isCertCentral, plan }) {
   }, [tooltipOpen])
 
   const isEnterprise = instance.subscriptionType === 'enterprise'
-  const planLabel = isEnterprise ? 'Enterprise' : 'E-commerce'
+  const tierLabel = instance.tier || (isEnterprise ? 'Enterprise' : 'E-commerce')
 
   let tooltipContent
   if (isEnterprise && !isCertCentral) {
@@ -395,7 +393,7 @@ function PlanTypeCard({ instance, isCertCentral, plan }) {
           </PlanInfoBtnWrap>
         </KPILabel>
       </KPICardHeader>
-      <KPIValue>{planLabel}</KPIValue>
+      <KPIValue>{tierLabel}</KPIValue>
       {plan && <KPISubValue>{plan}</KPISubValue>}
     </KPICard>
   )
@@ -423,7 +421,7 @@ function RenewalCard({ dateStr, sub }) {
   )
 }
 
-function ContractTermCard({ term, autoRenewal }) {
+function ContractTermCard({ term }) {
   return (
     <KPICard>
       <KPICardHeader>
@@ -431,9 +429,6 @@ function ContractTermCard({ term, autoRenewal }) {
         <CalendarIcon size={15} color="#9CA3AF" />
       </KPICardHeader>
       <KPIValue style={{ fontSize: 15, fontWeight: 600 }}>{term || '—'}</KPIValue>
-      {autoRenewal !== undefined && (
-        <KPISubValue>{autoRenewal ? 'Auto-renew enabled' : 'Auto-renew disabled'}</KPISubValue>
-      )}
     </KPICard>
   )
 }
@@ -603,12 +598,12 @@ function PeakUsageTable({ entitlements, purchasedOnly }) {
       <Table>
         <thead>
           <tr>
-            <Th style={{ width: '40%' }}>Entitlement</Th>
-            {purchasedOnly && <Th />}
+            <Th>Entitlement</Th>
+            {purchasedOnly && <Th $align="right">Current active</Th>}
             <Th $align="right">Purchased</Th>
             {!purchasedOnly && <Th $align="right">Consumed</Th>}
             {!purchasedOnly && <Th $align="right">Remaining</Th>}
-            {purchasedOnly && <Th />}
+            {purchasedOnly && <Th $align="right">Period peak</Th>}
           </tr>
         </thead>
         <tbody>
@@ -617,7 +612,7 @@ function PeakUsageTable({ entitlements, purchasedOnly }) {
             return (
               <tr key={ent.name}>
                 <Td>{ent.name}</Td>
-                {purchasedOnly && <Td />}
+                {purchasedOnly && <Td $align="right">{ent.consumed?.toLocaleString() ?? '—'}</Td>}
                 <Td $align="right">{ent.purchased.toLocaleString()}</Td>
                 {!purchasedOnly && <Td $align="right">{ent.consumed.toLocaleString()}</Td>}
                 {!purchasedOnly && (
@@ -629,10 +624,66 @@ function PeakUsageTable({ entitlements, purchasedOnly }) {
                     </RemainingValue>
                   </Td>
                 )}
-                {purchasedOnly && <Td />}
+                {purchasedOnly && <Td $align="right">{ent.periodPeak?.toLocaleString() ?? '—'}</Td>}
               </tr>
             )
           })}
+        </tbody>
+      </Table>
+    </TableWrap>
+  )
+}
+
+function PeakUsageUSDTable({ series }) {
+  return (
+    <TableWrap>
+      <Table>
+        <thead>
+          <tr>
+            <Th style={{ width: '40%' }}>Certificate type</Th>
+            <Th $align="right">Current month ($)</Th>
+            <Th $align="right">Period peak ($)</Th>
+            <Th $align="right">Peak date</Th>
+          </tr>
+        </thead>
+        <tbody>
+          {series.map(s => {
+            const currentCost = s.monthlyCost[s.monthlyCost.length - 1] ?? 0
+            const peakCost = Math.max(...s.monthlyCost)
+            return (
+              <tr key={s.name}>
+                <Td>{s.name}</Td>
+                <Td $align="right">${currentCost.toLocaleString()}</Td>
+                <Td $align="right">${peakCost.toLocaleString()}</Td>
+                <Td $align="right">{s.periodPeakDate}</Td>
+              </tr>
+            )
+          })}
+        </tbody>
+      </Table>
+    </TableWrap>
+  )
+}
+
+function PeakUsageMergedTable({ entitlements }) {
+  return (
+    <TableWrap>
+      <Table>
+        <thead>
+          <tr>
+            <Th>Entitlement</Th>
+            <Th $align="right">Purchased (Quantities)</Th>
+            <Th $align="right">Purchased (USD)</Th>
+          </tr>
+        </thead>
+        <tbody>
+          {entitlements.map(ent => (
+            <tr key={ent.name}>
+              <Td>{ent.name}</Td>
+              <Td $align="right">{ent.purchased.toLocaleString()}</Td>
+              <Td $align="right">{ent.purchasedUSD ?? '—'}</Td>
+            </tr>
+          ))}
         </tbody>
       </Table>
     </TableWrap>
@@ -651,14 +702,18 @@ function PeakUsageSection({ instance, purchasedOnly }) {
   return (
     <Section>
       <SectionHeaderRow>
-        <SectionTitle style={{ margin: 0 }}>Consumption</SectionTitle>
+        <SectionTitle style={{ margin: 0 }}>
+          {purchasedOnly ? 'Entitlements and usage' : 'Consumption'}
+        </SectionTitle>
         <ViewToggle>
           <ViewToggleBtn $active={viewMode === 'table'} onClick={() => setViewMode('table')}>Table</ViewToggleBtn>
           <ViewToggleBtn $active={viewMode === 'chart'} onClick={() => setViewMode('chart')}>Chart</ViewToggleBtn>
         </ViewToggle>
       </SectionHeaderRow>
       {viewMode === 'table'
-        ? <PeakUsageTable entitlements={instance.entitlements} purchasedOnly={purchasedOnly} />
+        ? purchasedOnly
+          ? <PeakUsageMergedTable entitlements={instance.entitlements} />
+          : <PeakUsageTable entitlements={instance.entitlements} purchasedOnly={false} />
         : (
           <DualChartWrap>
             <ChartBlock>
@@ -666,7 +721,7 @@ function PeakUsageSection({ instance, purchasedOnly }) {
               <PeakUsageChart series={costSeries} monthLabels={peakUsageData.monthLabels} yFormat="$" />
             </ChartBlock>
             <ChartBlock>
-              <ChartSubLabel>Consumption Quantities</ChartSubLabel>
+              <ChartSubLabel>Consumption quantities</ChartSubLabel>
               <PeakUsageChart series={peakUsageData.series} monthLabels={peakUsageData.monthLabels} />
             </ChartBlock>
           </DualChartWrap>
@@ -729,6 +784,89 @@ const OpenCertCentralBtn = styled.a`
   &:focus-visible { outline: 2px solid ${({ theme }) => theme.colors.blue300}; outline-offset: 2px; }
 `
 
+// ── Software Trust: purchased controls + included resources tables ─────────────
+
+const SectionDesc = styled.p`
+  margin: 0 0 14px;
+  font-size: 13px;
+  color: ${({ theme }) => theme.colors.neutral600};
+`
+
+function SoftwareTrustSection({ instance }) {
+  const { purchasedControls = [], includedResources = [] } = instance
+
+  return (
+    <>
+      <Section>
+        <SectionTitle>Entitlements and usage</SectionTitle>
+        <TableWrap>
+          <Table>
+            <thead>
+              <tr>
+                <Th style={{ width: '40%' }}>Entitlement</Th>
+                <Th $align="right">Allocated</Th>
+                <Th $align="right">Used</Th>
+                <Th $align="right">Remaining</Th>
+              </tr>
+            </thead>
+            <tbody>
+              {purchasedControls.map(ctrl => {
+                const pct = ctrl.purchased > 0 ? ctrl.used / ctrl.purchased : 0
+                const tone = ctrl.remaining < 0 ? 'error' : pct >= 0.8 ? 'warning' : undefined
+                return (
+                  <tr key={ctrl.name}>
+                    <Td>{ctrl.name}</Td>
+                    <Td $align="right">{ctrl.purchased.toLocaleString()}</Td>
+                    <Td $align="right">{ctrl.used.toLocaleString()}</Td>
+                    <Td $align="right">
+                      <RemainingValue $tone={tone}>{ctrl.remaining.toLocaleString()}</RemainingValue>
+                    </Td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </Table>
+        </TableWrap>
+      </Section>
+
+      <Section>
+        <SectionTitle>Included resources</SectionTitle>
+        <SectionDesc>Resource quotas included with your plan. Quotas increase automatically when you upgrade your plan.</SectionDesc>
+        <TableWrap>
+          <Table>
+            <thead>
+              <tr>
+                <Th style={{ width: '35%' }}>Entitlement</Th>
+                <Th>Included with plan</Th>
+                <Th $align="right">Allocated</Th>
+                <Th $align="right">Used</Th>
+                <Th $align="right">Remaining</Th>
+              </tr>
+            </thead>
+            <tbody>
+              {includedResources.map(res => {
+                const pct = res.available > 0 ? res.used / res.available : 0
+                const tone = res.remaining < 0 ? 'error' : pct >= 0.8 ? 'warning' : undefined
+                return (
+                  <tr key={res.name}>
+                    <Td>{res.name}</Td>
+                    <Td>{res.includedWithPlan}</Td>
+                    <Td $align="right">{typeof res.available === 'number' ? res.available.toLocaleString() : res.available}</Td>
+                    <Td $align="right">{res.used.toLocaleString()}</Td>
+                    <Td $align="right">
+                      <RemainingValue $tone={tone}>{res.remaining.toLocaleString()}</RemainingValue>
+                    </Td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </Table>
+        </TableWrap>
+      </Section>
+    </>
+  )
+}
+
 function ManageCertCentralSection() {
   return (
     <Section>
@@ -757,10 +895,9 @@ function ManageCertCentralSection() {
 function ContractInfoSection({ instance, isCertCentral }) {
   return (
     <Section>
-      <KPIGrid $cols={3}>
+      <KPIGrid $cols={2}>
         <PlanTypeCard instance={instance} isCertCentral={isCertCentral} plan={instance.plan} />
-        <RenewalCard dateStr={instance.renewalDate} />
-        <ContractTermCard term={instance.contractTerm} autoRenewal={instance.autoRenewal} />
+        <ContractTermCard term={instance.contractTerm} />
       </KPIGrid>
     </Section>
   )
@@ -769,15 +906,15 @@ function ContractInfoSection({ instance, isCertCentral }) {
 // ── E-commerce section ────────────────────────────────────────────────────────
 
 
-function EcommerceBillingSection({ instance, isCertCentral }) {
+function EcommerceBillingSection({ instance, isCertCentral, showLastMonth = true }) {
   const lastMonthAmount = instance.receipts?.[0]?.amount ?? instance.billing.price.split(' / ')[0]
 
   return (
     <Section>
-      <KPIGrid $cols={3}>
+      <KPIGrid $cols={showLastMonth ? 3 : 2}>
         <PlanTypeCard instance={instance} isCertCentral={isCertCentral} />
 
-        <KPICard>
+        {showLastMonth && <KPICard>
           <KPICardHeader>
             <KPILabel>Last 30 days</KPILabel>
             <DollarIcon size={15} color="#9CA3AF" />
@@ -786,7 +923,7 @@ function EcommerceBillingSection({ instance, isCertCentral }) {
             {lastMonthAmount}
           </KPIValue>
           <KPISubValue>Last month's spend</KPISubValue>
-        </KPICard>
+        </KPICard>}
 
         <RenewalCard dateStr={instance.billing.nextChargeDate} sub="Auto-renew enabled" />
       </KPIGrid>
@@ -1104,7 +1241,9 @@ export default function SubscriptionDetail() {
       {activeInstance.subscriptionType === 'enterprise' ? (
         <>
           <ContractInfoSection instance={activeInstance} isCertCentral={isCertCentral} />
-          {isCertCentral && activeInstance.contractType === 'peak-usage' ? (
+          {subscription.id === 'software-trust' ? (
+            <SoftwareTrustSection instance={activeInstance} />
+          ) : isCertCentral && activeInstance.contractType === 'peak-usage' ? (
             <PeakUsageSection instance={activeInstance} purchasedOnly={subscription.accountId === '1001445'} />
           ) : (
             <Section>
@@ -1118,7 +1257,11 @@ export default function SubscriptionDetail() {
         </>
       ) : (
         <>
-          <EcommerceBillingSection instance={activeInstance} isCertCentral={isCertCentral} />
+          <EcommerceBillingSection
+            instance={activeInstance}
+            isCertCentral={isCertCentral}
+            showLastMonth={subscription.accountId !== '3007234'}
+          />
           <ProductsSection categories={activeInstance.productCategories} />
         </>
       )}

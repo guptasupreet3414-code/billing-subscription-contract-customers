@@ -84,8 +84,6 @@ const TooltipTitle = styled.div`
   margin-bottom: 5px;
   color: #E5E7EB;
   font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
 `
 
 const TooltipRow = styled.div`

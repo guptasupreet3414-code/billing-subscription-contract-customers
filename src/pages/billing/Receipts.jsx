@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import styled from 'styled-components'
-import { ChevronDownIcon, FilterIcon, DownloadIcon, AlertCircleFillIcon, InboxIcon } from '../../components/Icons'
+import { ChevronDownIcon, FilterIcon, DownloadIcon, AlertCircleFillIcon, InboxIcon, InfoCircleIcon } from '../../components/Icons'
 import BillingEmptyState from '../../components/billing/BillingEmptyState'
 import ContactAccountManagerButton from '../../components/billing/ContactAccountManagerButton'
 
@@ -207,6 +207,26 @@ const TableFooter = styled.div`
   background: ${({ theme }) => theme.colors.neutral50};
 `
 
+const ScopeBanner = styled.div`
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 16px;
+  margin-bottom: 24px;
+  background: ${({ theme }) => theme.colors.blue50 || '#EAF4FC'};
+  border: 1px solid ${({ theme }) => theme.colors.blue200 || '#90CAF9'};
+  border-radius: ${({ theme }) => theme.borderRadius.md};
+  font-size: 13px;
+  color: ${({ theme }) => theme.colors.neutral800};
+  line-height: 1.5;
+`
+
+const ScopeBannerIcon = styled.span`
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: ${({ theme }) => theme.colors.blue300};
+`
+
 const VIEW_OPTIONS = ['All', 'Invoices', 'Receipts', 'Refunds']
 
 const mockRows = [
@@ -258,6 +278,15 @@ export default function Receipts({ scenario }) {
 
   return (
     <Main>
+      <ScopeBanner>
+        <ScopeBannerIcon>
+          <InfoCircleIcon size={16} color="currentColor" />
+        </ScopeBannerIcon>
+        <span>
+          Receipts and invoices apply to <strong>self-service (e-commerce) subscriptions only</strong>.
+          Enterprise contract billing documents are managed separately — contact your account manager for enterprise invoices or billing records.
+        </span>
+      </ScopeBanner>
       <PageHeader>
         <TitleBlock>
           <PageTitle>Receipts and invoices</PageTitle>

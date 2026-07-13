@@ -11,7 +11,6 @@ export const secondaryProducts = [
   { id: 'dns', label: 'DNS', route: '/dns', ariaLabel: 'DNS Trust', iconType: 'globe' },
   { id: 'content-trust', label: 'Content Trust', route: '/content-trust', ariaLabel: 'Content Trust', iconType: 'document' },
   { id: 'device-trust', label: 'Device Trust', route: '/device-trust', ariaLabel: 'Device Trust', iconType: 'mobile' },
-  { id: 'iot-trust', label: 'IoT Trust', route: '/iot-trust', ariaLabel: 'IoT Trust', iconType: 'chip' },
   { id: 'valimail', label: 'Valimail', route: '/valimail', ariaLabel: 'Valimail', iconType: 'envelope' },
 ]
 
@@ -309,7 +308,6 @@ export const productSubNavs = {
           { label: 'Content Trust', route: '/content-trust' },
           { label: 'Device Trust', route: '/device-trust' },
           { label: 'DigiCert DNS', route: '/dns' },
-          { label: 'IoT Trust', route: '/iot-trust' },
           { label: 'Private CA', route: '/private-ca' },
           { label: 'Software Trust', route: '/software-trust' },
           { label: 'Trust Lifecycle', route: '/trust-lifecycle' },

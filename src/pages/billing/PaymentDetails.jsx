@@ -219,6 +219,26 @@ const VatRow = styled.div`
   margin-bottom: 3px;
 `
 
+const ScopeBanner = styled.div`
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 16px;
+  margin-bottom: 28px;
+  background: ${({ theme }) => theme.colors.blue50 || '#EAF4FC'};
+  border: 1px solid ${({ theme }) => theme.colors.blue200 || '#90CAF9'};
+  border-radius: ${({ theme }) => theme.borderRadius.md};
+  font-size: 13px;
+  color: ${({ theme }) => theme.colors.neutral800};
+  line-height: 1.5;
+`
+
+const ScopeBannerIcon = styled.span`
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: ${({ theme }) => theme.colors.blue300};
+`
+
 export default function PaymentDetails({ scenario }) {
   useEffect(() => {
     document.title = 'Payment details — DigiCert ONE'
@@ -244,6 +264,15 @@ export default function PaymentDetails({ scenario }) {
 
   return (
     <Main>
+      <ScopeBanner>
+        <ScopeBannerIcon>
+          <InfoCircleIcon size={16} color="currentColor" />
+        </ScopeBannerIcon>
+        <span>
+          Payment details apply to <strong>self-service (e-commerce) subscriptions only</strong>.
+          Enterprise contract billing is managed separately — contact your account manager for invoices or payment changes related to enterprise products.
+        </span>
+      </ScopeBanner>
       <PageHeader>
         <TitleBlock>
           <PageTitle>Payment details</PageTitle>

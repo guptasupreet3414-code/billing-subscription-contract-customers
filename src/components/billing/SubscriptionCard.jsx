@@ -113,8 +113,6 @@ const MetaLabel = styled.span`
   font-size: 10px;
   font-weight: 600;
   color: ${({ theme }) => theme.colors.neutral500};
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
 `
 
 const MetaValue = styled.span`
@@ -398,7 +396,8 @@ function buildMetaItems(subscription) {
       { label: 'Account ID', value: subscription.accountId },
     ]
   }
-  const items = [{ label: 'Tier', value: 'Enterprise' }]
+  const tierValue = subscription.tier || 'Enterprise'
+  const items = [{ label: 'Tier', value: tierValue }]
   if (subscription.plan) items.push({ label: 'Plan', value: subscription.plan })
   if (subscription.autoRenewal !== undefined) items.push({ label: 'Auto-renewal', value: subscription.autoRenewal ? 'On' : 'Off' })
   return items
@@ -525,7 +524,7 @@ export default function SubscriptionCard({ subscription }) {
           <TitleBlock>
             <CardTitleRow>
               <CardTitle>{name}</CardTitle>
-              <RenewalPill>Renews {renewalDate}</RenewalPill>
+              {isEcommerceOnly && renewalDate && <RenewalPill>Renews {renewalDate}</RenewalPill>}
             </CardTitleRow>
           </TitleBlock>
         </HeaderLeft>
