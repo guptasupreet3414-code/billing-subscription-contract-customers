@@ -676,9 +676,18 @@ const SCALE_FACTORS = {
 
 export function getMultiEnvSubscriptions() {
   const allBaseSubs = getFixedSubscriptions()
-  const certCentralCards = allBaseSubs.filter(s => s.id.startsWith('certcentral-'))
   const baseSubscriptions = allBaseSubs.filter(s => !s.id.startsWith('certcentral-'))
+  const devOpsCard = allBaseSubs.find(s => s.id === 'certcentral-acme-devops')
   const result = []
+
+  // Single CertCentral e-commerce card, available across all environments
+  if (devOpsCard) {
+    result.push({
+      ...devOpsCard,
+      envIds: ENVIRONMENTS.map(e => e.id),
+      envNames: ENVIRONMENTS.map(e => e.name),
+    })
+  }
 
   for (const env of ENVIRONMENTS) {
     const scale = SCALE_FACTORS[env.id]
@@ -686,38 +695,8 @@ export function getMultiEnvSubscriptions() {
 
     for (const productId of productIds) {
       if (productId === 'certcentral') {
-        // Retain all original CertCentral account cards, scaled per environment
-        for (const card of certCentralCards) {
-          const scaledInstances = card.instances.map(inst => ({
-            ...inst,
-            entitlements: inst.entitlements
-              ? inst.entitlements.map(ent => ({
-                  ...ent,
-                  consumed: Math.round((ent.consumed ?? 0) * scale),
-                  remaining: (ent.purchased ?? ent.allocated ?? 0) - Math.round((ent.consumed ?? 0) * scale),
-                }))
-              : inst.entitlements,
-            primaryEntitlement: inst.primaryEntitlement
-              ? { ...inst.primaryEntitlement, consumed: Math.round(inst.primaryEntitlement.consumed * scale) }
-              : inst.primaryEntitlement,
-          }))
-          result.push({
-            ...card,
-            envId: env.id,
-            envName: env.name,
-            primaryEntitlement: card.primaryEntitlement
-              ? { ...card.primaryEntitlement, consumed: Math.round(card.primaryEntitlement.consumed * scale) }
-              : card.primaryEntitlement,
-            entitlements: card.entitlements
-              ? card.entitlements.map(ent => ({
-                  ...ent,
-                  consumed: Math.round((ent.consumed ?? 0) * scale),
-                  remaining: (ent.purchased ?? ent.allocated ?? 0) - Math.round((ent.consumed ?? 0) * scale),
-                }))
-              : card.entitlements,
-            instances: scaledInstances,
-          })
-        }
+        // CertCentral e-commerce card is already added above as a single cross-env card
+        continue
       } else {
         const base = baseSubscriptions.find(s => s.id === productId)
         if (!base) continue

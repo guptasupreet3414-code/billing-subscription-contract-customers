@@ -526,7 +526,13 @@ export default function SubscriptionCard({ subscription }) {
               <CardTitle>{name}</CardTitle>
               {isEcommerceOnly && renewalDate && <RenewalPill>Renews {renewalDate}</RenewalPill>}
             </CardTitleRow>
-            {subscription.envId && <SubtitleText>{subscription.envName}</SubtitleText>}
+            {(subscription.envNames || subscription.envId) && (
+              <SubtitleText>
+                {subscription.envNames
+                  ? subscription.envNames.join(', ')
+                  : subscription.envName}
+              </SubtitleText>
+            )}
           </TitleBlock>
         </HeaderLeft>
         <CardHeaderRight>

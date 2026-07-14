@@ -211,9 +211,21 @@ export default function MySubscriptions() {
   const uniqueProducts = [...new Map(allSubscriptions.map(s => [s.name, { id: s.name, name: s.name }])).values()]
 
   const filteredSubscriptions = allSubscriptions.filter(s => {
-    if (envFilter !== 'all' && s.envId !== envFilter) return false
+    if (envFilter !== 'all') {
+      const passesEnv = s.envIds ? s.envIds.includes(envFilter) : s.envId === envFilter
+      if (!passesEnv) return false
+    }
     if (productFilter !== 'all' && s.name !== productFilter) return false
     return true
+  })
+
+  // For cross-env cards (envIds), collapse to the active env when a specific env is selected
+  const displaySubscriptions = filteredSubscriptions.map(s => {
+    if (s.envIds && envFilter !== 'all') {
+      const envName = ENVIRONMENTS.find(e => e.id === envFilter)?.name ?? envFilter
+      return { ...s, envId: envFilter, envName, envIds: undefined, envNames: undefined }
+    }
+    return s
   })
 
   const selectedEnvName = envFilter === 'all'
@@ -306,8 +318,8 @@ export default function MySubscriptions() {
       </FilterBar>
 
       <ProductGrid>
-        {filteredSubscriptions.map((subscription) => (
-          <SubscriptionCard key={`${subscription.id}-${subscription.envId}`} subscription={subscription} />
+        {displaySubscriptions.map((subscription) => (
+          <SubscriptionCard key={`${subscription.id}-${subscription.envId ?? 'global'}`} subscription={subscription} />
         ))}
       </ProductGrid>
 

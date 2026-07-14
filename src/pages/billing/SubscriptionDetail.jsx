@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import styled from 'styled-components'
 import { ChevronLeftIcon, ChevronUpIcon, ChevronDownIcon, InfoCircleIcon, CartOutlineIcon, CalendarIcon, DollarIcon, ExternalLinkIcon, DotsVerticalIcon, ChatBubbleIcon, getIcon } from '../../components/Icons'
-import { getFixedSubscriptions, getMultiEnvSubscriptions, contractTypeConfig } from '../../data/billingData'
+import { getFixedSubscriptions, getMultiEnvSubscriptions, ENVIRONMENTS, contractTypeConfig } from '../../data/billingData'
 import ContactManagerDrawer from '../../components/billing/ContactManagerDrawer'
 import ContactUsDrawer from '../../components/billing/ContactUsDrawer'
 import PeakUsageChart from '../../components/billing/PeakUsageChart'
@@ -1101,8 +1101,25 @@ export default function SubscriptionDetail() {
   const [searchParams] = useSearchParams()
   const envId = searchParams.get('env')
   const subscription = envId
-    ? getMultiEnvSubscriptions().find(s => s.id === subscriptionId && s.envId === envId)
-    : getFixedSubscriptions().find(s => s.id === subscriptionId)
+    ? (getMultiEnvSubscriptions().find(s => s.id === subscriptionId && s.envId === envId)
+       ?? getMultiEnvSubscriptions().find(s => s.id === subscriptionId && s.envIds?.includes(envId)))
+    : getMultiEnvSubscriptions().find(s => s.id === subscriptionId && s.envIds != null)
+      ?? getFixedSubscriptions().find(s => s.id === subscriptionId)
+
+  // Resolve which environment label(s) to show in the header
+  const effectiveEnvDisplay = (() => {
+    if (!subscription) return null
+    if (envId && subscription.envIds) {
+      return { label: 'Environment', value: ENVIRONMENTS.find(e => e.id === envId)?.name ?? envId }
+    }
+    if (subscription.envNames) {
+      return { label: 'Available in', value: subscription.envNames.join(', ') }
+    }
+    if (subscription.envName) {
+      return { label: 'Environment', value: subscription.envName }
+    }
+    return null
+  })()
   const isCertCentral = subscriptionId === 'certcentral' || (subscriptionId?.startsWith('certcentral-') ?? false)
 
   useEffect(() => {
@@ -1170,12 +1187,12 @@ export default function SubscriptionDetail() {
             <PageTitleRow>
               <PageTitle>{subscription.name}</PageTitle>
             </PageTitleRow>
-            {(subscription.envName || subscription.accountName) && (
+            {(effectiveEnvDisplay || subscription.accountName) && (
               <SummaryLine>
-                {subscription.envName && (
-                  <><strong>Environment:</strong> {subscription.envName}</>
+                {effectiveEnvDisplay && (
+                  <><strong>{effectiveEnvDisplay.label}:</strong> {effectiveEnvDisplay.value}</>
                 )}
-                {subscription.envName && subscription.accountName && <> | </>}
+                {effectiveEnvDisplay && subscription.accountName && <> | </>}
                 {subscription.accountName && (
                   <><strong>Account name:</strong> {subscription.accountName}</>
                 )}
