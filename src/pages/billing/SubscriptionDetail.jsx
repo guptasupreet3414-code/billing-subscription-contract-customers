@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useParams, useSearchParams } from 'react-router-dom'
 import styled from 'styled-components'
 import { ChevronLeftIcon, ChevronUpIcon, ChevronDownIcon, InfoCircleIcon, CartOutlineIcon, CalendarIcon, DollarIcon, ExternalLinkIcon, DotsVerticalIcon, ChatBubbleIcon, getIcon } from '../../components/Icons'
-import { getFixedSubscriptions, contractTypeConfig } from '../../data/billingData'
+import { getFixedSubscriptions, getMultiEnvSubscriptions, ENVIRONMENTS, contractTypeConfig } from '../../data/billingData'
 import ContactManagerDrawer from '../../components/billing/ContactManagerDrawer'
 import ContactUsDrawer from '../../components/billing/ContactUsDrawer'
 import PeakUsageChart from '../../components/billing/PeakUsageChart'
@@ -885,7 +885,7 @@ function ManageCertCentralSection() {
           </ManageCertCentralDesc>
         </ManageCertCentralText>
         <OpenCertCentralBtn
-          href="https://www.digicert.com/certcentral/finances/purchase-history"
+          href="/certcentral-finances.html"
           target="_blank"
           rel="noopener noreferrer"
         >
@@ -1105,8 +1105,29 @@ export default function SubscriptionDetail() {
   const [actionMenuOpen, setActionMenuOpen] = useState(false)
   const actionMenuRef = useRef(null)
 
-  const subscription = getFixedSubscriptions().find((s) => s.id === subscriptionId)
-  const isCertCentral = subscriptionId?.startsWith('certcentral-') ?? false
+  const [searchParams] = useSearchParams()
+  const envId = searchParams.get('env')
+  const subscription = envId
+    ? (getMultiEnvSubscriptions().find(s => s.id === subscriptionId && s.envId === envId)
+       ?? getMultiEnvSubscriptions().find(s => s.id === subscriptionId && s.envIds?.includes(envId)))
+    : getMultiEnvSubscriptions().find(s => s.id === subscriptionId && s.envIds != null)
+      ?? getFixedSubscriptions().find(s => s.id === subscriptionId)
+
+  const effectiveEnvDisplay = (() => {
+    if (!subscription) return null
+    if (envId && subscription.envIds) {
+      return { label: 'Environment', value: ENVIRONMENTS.find(e => e.id === envId)?.name ?? envId }
+    }
+    if (subscription.envNames) {
+      return { label: 'Available in', value: subscription.envNames.join(', ') }
+    }
+    if (subscription.envName) {
+      return { label: 'Environment', value: subscription.envName }
+    }
+    return null
+  })()
+
+  const isCertCentral = subscriptionId === 'certcentral' || (subscriptionId?.startsWith('certcentral-') ?? false)
 
   useEffect(() => {
     document.title = subscription ? `${subscription.name} — DigiCert ONE` : 'Subscription — DigiCert ONE'
@@ -1133,7 +1154,7 @@ export default function SubscriptionDetail() {
   if (!subscription) {
     return (
       <Main>
-        <BackLink to="/settings/billing">
+        <BackLink to={-1}>
           <ChevronLeftIcon size={14} color="currentColor" />
           Back to subscriptions
         </BackLink>
@@ -1173,9 +1194,15 @@ export default function SubscriptionDetail() {
             <PageTitleRow>
               <PageTitle>{subscription.name}</PageTitle>
             </PageTitleRow>
-            {subscription.accountName && (
+            {(effectiveEnvDisplay || subscription.accountName) && (
               <SummaryLine>
-                <strong>Account name:</strong> {subscription.accountName}
+                {effectiveEnvDisplay && (
+                  <><strong>{effectiveEnvDisplay.label}:</strong> {effectiveEnvDisplay.value}</>
+                )}
+                {effectiveEnvDisplay && subscription.accountName && <> | </>}
+                {subscription.accountName && (
+                  <><strong>Account name:</strong> {subscription.accountName}</>
+                )}
                 {subscription.accountId && (
                   <> | <strong>Account ID:</strong> {subscription.accountId}</>
                 )}

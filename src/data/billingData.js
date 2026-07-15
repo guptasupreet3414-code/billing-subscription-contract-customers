@@ -647,3 +647,113 @@ export function getBillingTypeSummary(subs) {
   }
   return { label: 'Enterprise contract', sub: 'Managed by your account team' }
 }
+
+// ── Multi-environment support ─────────────────────────────────────────────────
+
+export const ENVIRONMENTS = [
+  { id: 'us-prod',  name: 'Acme — US production' },
+  { id: 'us-stage', name: 'Acme — US stage'       },
+  { id: 'eu-prod',  name: 'Acme — EU production'  },
+  { id: 'eu-stage', name: 'Acme — EU stage'       },
+  { id: 'in-prod',  name: 'Acme — IN'             },
+]
+
+const ENV_PRODUCTS = {
+  'us-prod':  ['trust-lifecycle', 'software-trust', 'private-ca', 'certcentral-acme-global-security', 'certcentral-acme-marketing', 'certcentral-acme-enterprise'],
+  'us-stage': ['trust-lifecycle', 'software-trust', 'certcentral-acme-global-security', 'certcentral-acme-marketing'],
+  'eu-prod':  ['trust-lifecycle', 'private-ca', 'certcentral-acme-global-security', 'certcentral-acme-enterprise'],
+  'eu-stage': ['software-trust', 'certcentral-acme-marketing'],
+  'in-prod':  ['software-trust', 'certcentral-acme-enterprise'],
+}
+
+const SCALE_FACTORS = {
+  'us-prod':  1.00,
+  'us-stage': 0.25,
+  'eu-prod':  0.65,
+  'eu-stage': 0.15,
+  'in-prod':  0.40,
+}
+
+export function getMultiEnvSubscriptions() {
+  const allBaseSubs = getFixedSubscriptions()
+  const nonCertCentralCards = allBaseSubs.filter(s => !s.id.startsWith('certcentral-'))
+  const certCentralCards = allBaseSubs.filter(s => s.id.startsWith('certcentral-'))
+  const devOpsCard = certCentralCards.find(s => s.id === 'certcentral-acme-devops')
+  const enterpriseCertCentralCards = certCentralCards.filter(s => s.id !== 'certcentral-acme-devops')
+  const result = []
+
+  if (devOpsCard) {
+    result.push({
+      ...devOpsCard,
+      envIds: ENVIRONMENTS.map(e => e.id),
+      envNames: ENVIRONMENTS.map(e => e.name),
+    })
+  }
+
+  for (const env of ENVIRONMENTS) {
+    const scale = SCALE_FACTORS[env.id]
+    const productIds = ENV_PRODUCTS[env.id]
+
+    for (const productId of productIds) {
+      const base = [...nonCertCentralCards, ...enterpriseCertCentralCards].find(s => s.id === productId)
+      if (!base) continue
+
+      const scaleVal = (v) => Math.round(v * scale)
+
+      const scaledEntitlements = base.entitlements.map(ent => ({
+        ...ent,
+        consumed: scaleVal(ent.consumed),
+        remaining: ent.allocated - scaleVal(ent.consumed),
+      }))
+
+      const scaledPrimaryEntitlement = {
+        ...base.primaryEntitlement,
+        consumed: scaleVal(base.primaryEntitlement.consumed),
+      }
+
+      const scaledInstances = base.instances.map(inst => {
+        const scaledInst = {
+          ...inst,
+          entitlements: inst.entitlements
+            ? inst.entitlements.map(ent => ({
+                ...ent,
+                consumed: scaleVal(ent.consumed),
+                remaining: ent.allocated - scaleVal(ent.consumed),
+              }))
+            : inst.entitlements,
+          primaryEntitlement: inst.primaryEntitlement
+            ? { ...inst.primaryEntitlement, consumed: scaleVal(inst.primaryEntitlement.consumed) }
+            : inst.primaryEntitlement,
+        }
+        if (inst.purchasedControls) {
+          scaledInst.purchasedControls = inst.purchasedControls.map(ctrl => ({
+            ...ctrl,
+            used: scaleVal(ctrl.used),
+            remaining: ctrl.purchased - scaleVal(ctrl.used),
+          }))
+        }
+        if (inst.includedResources) {
+          scaledInst.includedResources = inst.includedResources.map(res => ({
+            ...res,
+            used: scaleVal(res.used),
+            remaining: typeof res.available === 'number'
+              ? res.available - scaleVal(res.used)
+              : res.remaining,
+          }))
+        }
+        return scaledInst
+      })
+
+      result.push({
+        ...base,
+        envId: env.id,
+        envName: env.name,
+        entitlements: scaledEntitlements,
+        primaryEntitlement: scaledPrimaryEntitlement,
+        instances: scaledInstances,
+      })
+    }
+  }
+
+  return result
+}
