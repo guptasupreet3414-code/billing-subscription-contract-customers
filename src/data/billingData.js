@@ -224,11 +224,11 @@ const certCentralAccounts = [
       status: 'over-entitlement',
       primaryEntitlement: { label: 'SSL/TLS certificates', consumed: 108, total: 100 },
       entitlements: [
-        { name: 'SSL/TLS certificates', purchased: 100, allocated: 100, consumed: 108, remaining: -8, periodPeak: 128, purchasedUSD: '$80,000' },
-        { name: 'Code signing certificates', purchased: 24, allocated: 24, consumed: 16, remaining: 8, periodPeak: 22, purchasedUSD: '$9,600' },
-        { name: 'S/MIME certificates', purchased: 200, allocated: 200, consumed: 140, remaining: 60, periodPeak: 180, purchasedUSD: '$24,000' },
-        { name: 'Document signing certificates', purchased: 12, allocated: 12, consumed: 5, remaining: 7, periodPeak: 8, purchasedUSD: '$2,400' },
-        { name: 'Common mark certificates', purchased: 5, allocated: 5, consumed: 1, remaining: 4, periodPeak: 2, purchasedUSD: '$1,500' },
+        { name: 'SSL/TLS certificates', purchased: 100, allocated: 100, consumed: 108, remaining: -8, periodPeak: 128, periodPeakDate: 'Aug 14, 2025', purchasedUSD: '$80,000' },
+        { name: 'Code signing certificates', purchased: 24, allocated: 24, consumed: 16, remaining: 8, periodPeak: 22, periodPeakDate: 'Sep 3, 2025', purchasedUSD: '$9,600' },
+        { name: 'S/MIME certificates', purchased: 200, allocated: 200, consumed: 140, remaining: 60, periodPeak: 180, periodPeakDate: 'Oct 12, 2025', purchasedUSD: '$24,000' },
+        { name: 'Document signing certificates', purchased: 12, allocated: 12, consumed: 5, remaining: 7, periodPeak: 8, periodPeakDate: 'Nov 5, 2025', purchasedUSD: '$2,400' },
+        { name: 'Common mark certificates', purchased: 5, allocated: 5, consumed: 1, remaining: 4, periodPeak: 2, periodPeakDate: '—', purchasedUSD: '$1,500' },
       ],
       peakUsageData: {
         periodPeakDate: 'Aug 14, 2025',
