@@ -304,6 +304,48 @@ const PlanInfoBtnWrap = styled.div`
   display: inline-flex;
 `
 
+const EntitlementTooltip = styled.span`
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 260px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  background: ${({ theme }) => theme.colors.neutral900};
+  color: white;
+  font-size: 12px;
+  line-height: 1.5;
+  z-index: 20;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s;
+  white-space: normal;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: ${({ theme }) => theme.colors.neutral900};
+  }
+`
+
+const EntitlementInfoWrap = styled.span`
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  margin-left: 4px;
+  color: ${({ theme }) => theme.colors.neutral400};
+  cursor: default;
+
+  &:hover ${EntitlementTooltip} {
+    opacity: 1;
+  }
+`
+
 const PlanInfoTooltipBox = styled.div`
   position: absolute;
   top: calc(100% + 10px);
@@ -838,7 +880,19 @@ function SoftwareTrustSection({ instance }) {
                 const tone = ctrl.remaining < 0 ? 'error' : pct >= 0.8 ? 'warning' : undefined
                 return (
                   <tr key={ctrl.name}>
-                    <Td>{ctrl.name}</Td>
+                    <Td>
+                      <span style={{ display: 'inline-flex', alignItems: 'center' }}>
+                        {ctrl.name}
+                        {ctrl.planIncluded != null && (
+                          <EntitlementInfoWrap>
+                            <InfoCircleIcon size={13} color="currentColor" />
+                            <EntitlementTooltip>
+                              Includes {ctrl.planIncluded} keypairs with your current plan + {ctrl.purchased - ctrl.planIncluded} purchased keypairs.
+                            </EntitlementTooltip>
+                          </EntitlementInfoWrap>
+                        )}
+                      </span>
+                    </Td>
                     <Td $align="right">{ctrl.purchased.toLocaleString()}</Td>
                     <Td $align="right">{ctrl.used.toLocaleString()}</Td>
                     <Td $align="right">
