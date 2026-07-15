@@ -659,11 +659,11 @@ export const ENVIRONMENTS = [
 ]
 
 const ENV_PRODUCTS = {
-  'us-prod':  ['trust-lifecycle', 'software-trust', 'private-ca', 'certcentral'],
-  'us-stage': ['trust-lifecycle', 'software-trust', 'certcentral'],
-  'eu-prod':  ['trust-lifecycle', 'private-ca', 'certcentral'],
-  'eu-stage': ['software-trust', 'certcentral'],
-  'in-prod':  ['software-trust', 'certcentral'],
+  'us-prod':  ['trust-lifecycle', 'software-trust', 'private-ca', 'certcentral-acme-global-security', 'certcentral-acme-marketing', 'certcentral-acme-enterprise'],
+  'us-stage': ['trust-lifecycle', 'software-trust', 'certcentral-acme-global-security', 'certcentral-acme-marketing'],
+  'eu-prod':  ['trust-lifecycle', 'private-ca', 'certcentral-acme-global-security', 'certcentral-acme-enterprise'],
+  'eu-stage': ['software-trust', 'certcentral-acme-marketing'],
+  'in-prod':  ['software-trust', 'certcentral-acme-enterprise'],
 }
 
 const SCALE_FACTORS = {
@@ -676,11 +676,13 @@ const SCALE_FACTORS = {
 
 export function getMultiEnvSubscriptions() {
   const allBaseSubs = getFixedSubscriptions()
-  const baseSubscriptions = allBaseSubs.filter(s => !s.id.startsWith('certcentral-'))
-  const devOpsCard = allBaseSubs.find(s => s.id === 'certcentral-acme-devops')
+  const nonCertCentralCards = allBaseSubs.filter(s => !s.id.startsWith('certcentral-'))
+  const certCentralCards = allBaseSubs.filter(s => s.id.startsWith('certcentral-'))
+  const devOpsCard = certCentralCards.find(s => s.id === 'certcentral-acme-devops')
+  const enterpriseCertCentralCards = certCentralCards.filter(s => s.id !== 'certcentral-acme-devops')
   const result = []
 
-  // Single CertCentral e-commerce card, available across all environments
+  // ACME DevOps (e-commerce): single card available across all environments
   if (devOpsCard) {
     result.push({
       ...devOpsCard,
@@ -694,11 +696,8 @@ export function getMultiEnvSubscriptions() {
     const productIds = ENV_PRODUCTS[env.id]
 
     for (const productId of productIds) {
-      if (productId === 'certcentral') {
-        // CertCentral e-commerce card is already added above as a single cross-env card
-        continue
-      } else {
-        const base = baseSubscriptions.find(s => s.id === productId)
+      {
+        const base = [...nonCertCentralCards, ...enterpriseCertCentralCards].find(s => s.id === productId)
         if (!base) continue
 
         const scaleVal = (v) => Math.round(v * scale)

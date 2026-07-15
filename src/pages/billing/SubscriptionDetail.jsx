@@ -710,11 +710,20 @@ function PeakUsageSection({ instance, purchasedOnly }) {
           <ViewToggleBtn $active={viewMode === 'chart'} onClick={() => setViewMode('chart')}>Chart</ViewToggleBtn>
         </ViewToggle>
       </SectionHeaderRow>
-      {viewMode === 'table'
-        ? purchasedOnly
-          ? <PeakUsageMergedTable entitlements={instance.entitlements} />
-          : <PeakUsageTable entitlements={instance.entitlements} purchasedOnly={false} />
-        : (
+      {viewMode === 'table' ? (
+        purchasedOnly ? (
+          <>
+            <ChartSubLabel style={{ marginBottom: 10 }}>Consumption quantities</ChartSubLabel>
+            <PeakUsageTable entitlements={instance.entitlements} purchasedOnly={true} />
+            <div style={{ marginTop: 24 }}>
+              <ChartSubLabel style={{ marginBottom: 10 }}>Consumption (USD)</ChartSubLabel>
+              <PeakUsageUSDTable series={peakUsageData.series} />
+            </div>
+          </>
+        ) : (
+          <PeakUsageTable entitlements={instance.entitlements} purchasedOnly={false} />
+        )
+      ) : (
           <DualChartWrap>
             <ChartBlock>
               <ChartSubLabel>Consumption (USD)</ChartSubLabel>
@@ -836,8 +845,7 @@ function SoftwareTrustSection({ instance }) {
           <Table>
             <thead>
               <tr>
-                <Th style={{ width: '35%' }}>Entitlement</Th>
-                <Th>Included with plan</Th>
+                <Th style={{ width: '40%' }}>Entitlement</Th>
                 <Th $align="right">Allocated</Th>
                 <Th $align="right">Used</Th>
                 <Th $align="right">Remaining</Th>
@@ -850,7 +858,6 @@ function SoftwareTrustSection({ instance }) {
                 return (
                   <tr key={res.name}>
                     <Td>{res.name}</Td>
-                    <Td>{res.includedWithPlan}</Td>
                     <Td $align="right">{typeof res.available === 'number' ? res.available.toLocaleString() : res.available}</Td>
                     <Td $align="right">{res.used.toLocaleString()}</Td>
                     <Td $align="right">
@@ -1278,7 +1285,7 @@ export default function SubscriptionDetail() {
               <EntitlementsTable entitlements={activeInstance.entitlements} contractType={activeInstance.contractType} />
             </Section>
           )}
-          {isCertCentral && subscription.accountId !== '1001445' && subscription.accountId !== '2003891' && !subscription.envId && (
+          {isCertCentral && subscription.accountId !== '1001445' && subscription.accountId !== '2003891' && (
             <ManageCertCentralSection />
           )}
         </>
