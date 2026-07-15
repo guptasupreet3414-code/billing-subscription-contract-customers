@@ -599,11 +599,19 @@ function PeakUsageTable({ entitlements, purchasedOnly }) {
         <thead>
           <tr>
             <Th>Entitlement</Th>
-            {purchasedOnly && <Th $align="right">Current active</Th>}
-            <Th $align="right">Purchased</Th>
-            {!purchasedOnly && <Th $align="right">Consumed</Th>}
-            {!purchasedOnly && <Th $align="right">Remaining</Th>}
-            {purchasedOnly && <Th $align="right">Period peak</Th>}
+            {purchasedOnly ? (
+              <>
+                <Th $align="right">Current active</Th>
+                <Th $align="right">Period peak</Th>
+                <Th $align="right">Peak date</Th>
+              </>
+            ) : (
+              <>
+                <Th $align="right">Purchased</Th>
+                <Th $align="right">Consumed</Th>
+                <Th $align="right">Remaining</Th>
+              </>
+            )}
           </tr>
         </thead>
         <tbody>
@@ -612,19 +620,25 @@ function PeakUsageTable({ entitlements, purchasedOnly }) {
             return (
               <tr key={ent.name}>
                 <Td>{ent.name}</Td>
-                {purchasedOnly && <Td $align="right">{ent.consumed?.toLocaleString() ?? '—'}</Td>}
-                <Td $align="right">{ent.purchased.toLocaleString()}</Td>
-                {!purchasedOnly && <Td $align="right">{ent.consumed.toLocaleString()}</Td>}
-                {!purchasedOnly && (
-                  <Td $align="right">
-                    <RemainingValue $tone={tone}>
-                      {ent.remaining < 0
-                        ? `Exceeded by ${Math.abs(ent.remaining).toLocaleString()}`
-                        : ent.remaining.toLocaleString()}
-                    </RemainingValue>
-                  </Td>
+                {purchasedOnly ? (
+                  <>
+                    <Td $align="right">{ent.consumed?.toLocaleString() ?? '—'}</Td>
+                    <Td $align="right">{ent.periodPeak?.toLocaleString() ?? '—'}</Td>
+                    <Td $align="right">{ent.periodPeakDate ?? '—'}</Td>
+                  </>
+                ) : (
+                  <>
+                    <Td $align="right">{ent.purchased.toLocaleString()}</Td>
+                    <Td $align="right">{ent.consumed.toLocaleString()}</Td>
+                    <Td $align="right">
+                      <RemainingValue $tone={tone}>
+                        {ent.remaining < 0
+                          ? `Exceeded by ${Math.abs(ent.remaining).toLocaleString()}`
+                          : ent.remaining.toLocaleString()}
+                      </RemainingValue>
+                    </Td>
+                  </>
                 )}
-                {purchasedOnly && <Td $align="right">{ent.periodPeak?.toLocaleString() ?? '—'}</Td>}
               </tr>
             )
           })}
@@ -713,7 +727,7 @@ function PeakUsageSection({ instance, purchasedOnly }) {
       {viewMode === 'table' ? (
         purchasedOnly ? (
           <>
-            <ChartSubLabel style={{ marginBottom: 10 }}>Consumption quantities</ChartSubLabel>
+            <ChartSubLabel style={{ marginBottom: 10 }}>Consumption (Quantities)</ChartSubLabel>
             <PeakUsageTable entitlements={instance.entitlements} purchasedOnly={true} />
             <div style={{ marginTop: 24 }}>
               <ChartSubLabel style={{ marginBottom: 10 }}>Consumption (USD)</ChartSubLabel>
