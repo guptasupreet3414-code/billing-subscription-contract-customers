@@ -334,6 +334,42 @@ const PlanInfoTooltipBox = styled.div`
   }
 `
 
+const EntitlementInfoWrap = styled.span`
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+
+  &:hover .ent-tooltip { display: block; }
+`
+
+const EntitlementTooltip = styled.span`
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 0;
+  width: 280px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  background: ${({ theme }) => theme.colors.neutral900};
+  color: white;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.5;
+  z-index: 20;
+  white-space: normal;
+  pointer-events: none;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 10px;
+    border: 5px solid transparent;
+    border-top-color: ${({ theme }) => theme.colors.neutral900};
+  }
+`
+
 // ── Shared KPI helper cards ───────────────────────────────────────────────────
 
 function PlanTypeCard({ instance, isCertCentral, plan }) {
@@ -836,9 +872,22 @@ function SoftwareTrustSection({ instance }) {
               {purchasedControls.map(ctrl => {
                 const pct = ctrl.purchased > 0 ? ctrl.used / ctrl.purchased : 0
                 const tone = ctrl.remaining < 0 ? 'error' : pct >= 0.8 ? 'warning' : undefined
+                const hasBreakdown = ctrl.planIncluded != null && ctrl.addOnPurchased != null
                 return (
                   <tr key={ctrl.name}>
-                    <Td>{ctrl.name}</Td>
+                    <Td>
+                      {hasBreakdown ? (
+                        <EntitlementInfoWrap>
+                          {ctrl.name}
+                          <PlanInfoBtn as="span" style={{ cursor: 'default' }}>
+                            <InfoCircleIcon size={13} color="currentColor" />
+                          </PlanInfoBtn>
+                          <EntitlementTooltip className="ent-tooltip">
+                            Includes {ctrl.planIncluded} keypairs with your current plan + {ctrl.addOnPurchased} purchased keypairs.
+                          </EntitlementTooltip>
+                        </EntitlementInfoWrap>
+                      ) : ctrl.name}
+                    </Td>
                     <Td $align="right">{ctrl.purchased.toLocaleString()}</Td>
                     <Td $align="right">{ctrl.used.toLocaleString()}</Td>
                     <Td $align="right">
