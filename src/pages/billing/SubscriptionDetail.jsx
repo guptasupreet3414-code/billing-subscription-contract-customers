@@ -307,9 +307,8 @@ const PlanInfoBtnWrap = styled.div`
 const EntitlementTooltip = styled.span`
   position: absolute;
   bottom: calc(100% + 8px);
-  left: 50%;
-  transform: translateX(-50%);
-  width: 260px;
+  left: -8px;
+  width: 280px;
   padding: 10px 12px;
   border-radius: 6px;
   background: ${({ theme }) => theme.colors.neutral900};
@@ -326,8 +325,7 @@ const EntitlementTooltip = styled.span`
     content: '';
     position: absolute;
     top: 100%;
-    left: 50%;
-    transform: translateX(-50%);
+    left: 14px;
     border: 5px solid transparent;
     border-top-color: ${({ theme }) => theme.colors.neutral900};
   }
@@ -338,7 +336,7 @@ const EntitlementInfoWrap = styled.span`
   display: inline-flex;
   align-items: center;
   margin-left: 4px;
-  color: ${({ theme }) => theme.colors.neutral400};
+  color: ${({ theme }) => theme.colors.blue300};
   cursor: default;
 
   &:hover ${EntitlementTooltip} {
