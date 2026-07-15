@@ -885,7 +885,7 @@ function ManageCertCentralSection() {
           </ManageCertCentralDesc>
         </ManageCertCentralText>
         <OpenCertCentralBtn
-          href="https://www.digicert.com/certcentral/finances/purchase-history"
+          href="/certcentral-finances.html"
           target="_blank"
           rel="noopener noreferrer"
         >
