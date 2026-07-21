@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
-import { EnvelopeIcon, ExternalLinkIcon, LifeRingIcon } from '../Icons'
+import { EnvelopeIcon, ExternalLinkIcon, LifeRingIcon, PhoneIcon } from '../Icons'
 import { accountManager } from '../../data/billingData'
 import { PrototypeToggle } from '../../context/PrototypeContext'
 
@@ -530,46 +530,38 @@ const SalesInfoRow = styled.div`
 
 /* ── Sub-drawer: CertCentral support ── */
 
-function CertCentralSupportDrawer({ open, onClose }) {
+function CertCentralSupportDrawer({ open, onClose, onCloseAll }) {
   const firstFocusRef = useRef(null)
 
   useEffect(() => {
-    const handleKey = (e) => {
-      if (e.key === 'Escape' && open) onClose()
-    }
+    const handleKey = (e) => { if (e.key === 'Escape' && open) onClose() }
     document.addEventListener('keydown', handleKey)
     return () => document.removeEventListener('keydown', handleKey)
   }, [open, onClose])
 
   useEffect(() => {
-    if (open && firstFocusRef.current) {
-      setTimeout(() => firstFocusRef.current?.focus(), 260)
-    }
+    if (open && firstFocusRef.current) setTimeout(() => firstFocusRef.current?.focus(), 260)
   }, [open])
 
   return (
-    <DrawerPanel
-      $open={open}
-      $zIndex={1103}
-      role="dialog"
-      aria-modal="true"
-      aria-label="CertCentral support"
-    >
+    <DrawerPanel $open={open} $zIndex={1103} role="dialog" aria-modal="true" aria-label="CertCentral support">
       <DrawerHeader>
-        <BackBtn type="button" onClick={onClose} ref={firstFocusRef}>
-          ← Back
-        </BackBtn>
-        <CloseBtn type="button" onClick={onClose} aria-label="Close drawer">
-          ×
-        </CloseBtn>
+        <DrawerTitleRow>
+          <LifeRingIcon size={18} color="currentColor" />
+          <DrawerTitle>Need help?</DrawerTitle>
+        </DrawerTitleRow>
+        <CloseBtn type="button" onClick={onCloseAll} aria-label="Close drawer" ref={firstFocusRef}>×</CloseBtn>
       </DrawerHeader>
 
       <DrawerBody>
-        <div>
-          <p style={{ margin: '0 0 2px', fontSize: '13px', color: '#6b7280' }}>Current plan</p>
-          <p style={{ margin: '0', fontSize: '18px', fontWeight: '500', color: '#111827' }}>
-            Standard plus <PlanBadge>24x5 support</PlanBadge>
-          </p>
+        <BackBtn type="button" onClick={onClose}>← Back</BackBtn>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          <p style={{ margin: 0, fontSize: '13px', color: '#6b7280' }}>Current plan</p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <p style={{ margin: 0, fontSize: '20px', fontWeight: '600', color: '#111827' }}>Standard plus</p>
+            <PlanBadge>24x5 support</PlanBadge>
+          </div>
         </div>
 
         <SupportSubDivider />
@@ -580,28 +572,26 @@ function CertCentralSupportDrawer({ open, onClose }) {
           <SupportChatBtn type="button">Support chat</SupportChatBtn>
           <SupportInfoList>
             <SupportInfoRow>
-              <SupportInfoIcon>📞</SupportInfoIcon>
+              <PhoneIcon size={14} color="currentColor" />
               <span>+1 800 579 2848</span>
             </SupportInfoRow>
             <SupportInfoRow>
-              <SupportInfoIcon>📞</SupportInfoIcon>
+              <PhoneIcon size={14} color="currentColor" />
               <span>+1 801 769 0749</span>
             </SupportInfoRow>
-            <SupportInfoRow>
-              <SupportInfoIcon style={{ color: 'transparent' }}>·</SupportInfoIcon>
-              <span style={{ fontSize: '12px', color: '#6b7280' }}>PIN: 1779</span>
+            <SupportInfoRow style={{ paddingLeft: '22px' }}>
+              <span style={{ fontSize: '12px', color: '#9ca3af' }}>PIN: 1779</span>
             </SupportInfoRow>
             <SupportInfoRow>
-              <SupportInfoIcon>✉</SupportInfoIcon>
+              <EnvelopeIcon size={14} color="currentColor" />
               <SupportContactLink href="mailto:cc.standard.support@digicert.com">
                 cc.standard.support@digicert.com
               </SupportContactLink>
             </SupportInfoRow>
             <SupportInfoRow>
-              <SupportInfoIcon>🔗</SupportInfoIcon>
-              <SupportContactLink href="#" target="_blank" rel="noopener noreferrer">
+              <ExternalLinkIcon size={14} color="currentColor" />
+              <SupportContactLink href="https://support.digicert.com" target="_blank" rel="noopener noreferrer">
                 Support portal
-                <ExternalLinkIcon size={11} color="currentColor" style={{ marginLeft: 3, verticalAlign: 'middle' }} />
               </SupportContactLink>
             </SupportInfoRow>
           </SupportInfoList>
@@ -618,15 +608,15 @@ function CertCentralSupportDrawer({ open, onClose }) {
           <SupportChatBtn type="button">Validation chat</SupportChatBtn>
           <SupportInfoList>
             <SupportInfoRow>
-              <SupportInfoIcon>📞</SupportInfoIcon>
+              <PhoneIcon size={14} color="currentColor" />
               <span>+1 800 579 2848</span>
             </SupportInfoRow>
             <SupportInfoRow>
-              <SupportInfoIcon>📞</SupportInfoIcon>
+              <PhoneIcon size={14} color="currentColor" />
               <span>+1 801 769 0749</span>
             </SupportInfoRow>
             <SupportInfoRow>
-              <SupportInfoIcon>✉</SupportInfoIcon>
+              <EnvelopeIcon size={14} color="currentColor" />
               <SupportContactLink href="mailto:standard.validation@digicert.com">
                 standard.validation@digicert.com
               </SupportContactLink>
@@ -639,34 +629,21 @@ function CertCentralSupportDrawer({ open, onClose }) {
 
         <SupportSubDivider />
 
-        <SalesContactCard>
-          <SalesCardLabel>Sales contact</SalesCardLabel>
-          <SalesCardDesc>Get help with any sales related questions.</SalesCardDesc>
-          <SalesCardTalkTo>Talk to your Sales contact:</SalesCardTalkTo>
-          <SalesAvatarRow>
-            <SalesAvatar>d</SalesAvatar>
-            <SalesAvatarInfo>
-              <SalesAvatarName>Sales Team</SalesAvatarName>
-              <SalesAvatarMeta>
-                <SalesInfoRow>
-                  <span>·</span>
-                </SalesInfoRow>
-                <SalesInfoRow>
-                  <EnvelopeIcon size={12} color="currentColor" />
-                  <SupportContactLink href="mailto:sales@digicert.com">sales@digicert.com</SupportContactLink>
-                </SalesInfoRow>
-              </SalesAvatarMeta>
-            </SalesAvatarInfo>
-          </SalesAvatarRow>
-        </SalesContactCard>
-
         <SupportSection>
-          <SupportSectionTitle style={{ fontSize: '13px' }}>Sales support</SupportSectionTitle>
-          <SupportSectionDesc>Get help with contract terms, pricing, and product selection.</SupportSectionDesc>
-          <SupportInfoRow>
-            <SupportInfoIcon>📞</SupportInfoIcon>
-            <span>+1 801 770 1701</span>
-          </SupportInfoRow>
+          <SupportSectionTitle>Sales</SupportSectionTitle>
+          <SupportInfoList>
+            <SupportInfoRow>
+              <PhoneIcon size={14} color="currentColor" />
+              <SupportContactLink href="tel:+18017019600">+1 (801) 701-9600</SupportContactLink>
+            </SupportInfoRow>
+            <SupportInfoRow>
+              <EnvelopeIcon size={14} color="currentColor" />
+              <SupportContactLink href="mailto:sales@digicert.com">sales@digicert.com</SupportContactLink>
+            </SupportInfoRow>
+          </SupportInfoList>
+          <SupportHoursTitle>Support hours</SupportHoursTitle>
+          <SupportHoursRow>Monday – Friday: 24 hours</SupportHoursRow>
+          <SupportHoursRow>Saturday and Sunday: Closed</SupportHoursRow>
         </SupportSection>
       </DrawerBody>
     </DrawerPanel>
@@ -811,6 +788,7 @@ export default function ContactUsDrawer({ open, onClose, helpContext = 'default'
       <CertCentralSupportDrawer
         open={isSupportOpen}
         onClose={() => setIsSupportOpen(false)}
+        onCloseAll={() => { setIsSupportOpen(false); onClose() }}
       />
     </>
   )
