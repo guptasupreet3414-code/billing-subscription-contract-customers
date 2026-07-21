@@ -1,7 +1,10 @@
 import { useEffect, useRef } from 'react'
 import styled from 'styled-components'
-import { EnvelopeIcon, ExternalLinkIcon } from '../Icons'
+import { EnvelopeIcon, ExternalLinkIcon, LifeRingIcon } from '../Icons'
 import { accountManager } from '../../data/billingData'
+import { PrototypeToggle } from '../../context/PrototypeContext'
+
+/* ── Shell ── */
 
 const Overlay = styled.div`
   position: fixed;
@@ -39,6 +42,13 @@ const DrawerHeader = styled.div`
   padding: 20px 24px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.neutral200};
   flex-shrink: 0;
+`
+
+const DrawerTitleRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: ${({ theme }) => theme.colors.neutral700};
 `
 
 const DrawerTitle = styled.h2`
@@ -88,6 +98,15 @@ const DrawerBody = styled.div`
   }
 `
 
+const DrawerFooter = styled.div`
+  flex-shrink: 0;
+  padding: 12px 16px;
+  border-top: 1.5px dashed #fde68a;
+  background: #fffbeb;
+`
+
+/* ── Manager card ── */
+
 const HelpCallout = styled.div`
   display: flex;
   flex-direction: column;
@@ -111,24 +130,6 @@ const BannerText = styled.p`
   font-size: 13px;
   color: ${({ theme }) => theme.colors.neutral700};
   line-height: 1.5;
-`
-
-const BannerRule = styled.div`
-  height: 1px;
-  background: rgba(1, 116, 195, 0.18);
-  margin: 4px 0;
-`
-
-const ContactSalesLink = styled.a`
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 13px;
-  font-weight: 500;
-  color: ${({ theme }) => theme.colors.blue300};
-  text-decoration: none;
-
-  &:hover { text-decoration: underline; }
 `
 
 const Divider = styled.div`
@@ -298,22 +299,57 @@ const SendBtn = styled.button`
   &:focus-visible { outline: 2px solid ${({ theme }) => theme.colors.blue300}; outline-offset: 2px; }
 `
 
+/* ── Alt help ── */
+
+const AltHelpWrap = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 20px;
+  border-top: 1px solid ${({ theme }) => theme.colors.neutral200};
+`
+
+const AltHelpLabel = styled.p`
+  margin: 0;
+  font-size: 12px;
+  color: ${({ theme }) => theme.colors.neutral600};
+`
+
+const AltHelpLink = styled.a`
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  color: ${({ theme }) => theme.colors.blue300};
+  text-decoration: none;
+  width: fit-content;
+
+  &:hover { text-decoration: underline; }
+  &:focus-visible { outline: 2px solid ${({ theme }) => theme.colors.blue300}; outline-offset: 2px; border-radius: 2px; }
+`
+
+/* ── Banner content ── */
+
 const BANNER_CONTENT = {
   subscriptions: {
     heading: 'Questions about subscriptions?',
     body: 'Use the form below to contact your DigiCert account manager.',
+    bodyNoManager: 'Fill out the form below and your message will be routed to the appropriate DigiCert team.',
   },
   'payment-details': {
     heading: 'Questions about payment details?',
     body: 'Use the form below to contact your DigiCert account manager about billing or payment questions.',
+    bodyNoManager: 'Fill out the form below about billing or payment questions and your message will be routed to the appropriate DigiCert team.',
   },
   receipts: {
     heading: 'Questions about your invoices?',
     body: 'Use the form below to contact your DigiCert account manager about receipts or billing history.',
+    bodyNoManager: 'Fill out the form below about receipts or billing history and your message will be routed to the appropriate DigiCert team.',
   },
 }
 
-export default function ContactManagerDrawer({ open, onClose, helpContext = 'subscriptions' }) {
+export default function ContactManagerDrawer({ open, onClose, helpContext = 'subscriptions', hasAccountManager = true }) {
   const banner = BANNER_CONTENT[helpContext] || BANNER_CONTENT.subscriptions
   const initials = accountManager.name.split(' ').map((w) => w[0]).join('')
   const firstFocusRef = useRef(null)
@@ -339,44 +375,40 @@ export default function ContactManagerDrawer({ open, onClose, helpContext = 'sub
         $open={open}
         role="dialog"
         aria-modal="true"
-        aria-label="Contact account manager"
+        aria-label="Need help?"
       >
         <DrawerHeader>
-          <DrawerTitle>Contact account manager</DrawerTitle>
+          <DrawerTitleRow>
+            <LifeRingIcon size={18} color="currentColor" />
+            <DrawerTitle>Need help?</DrawerTitle>
+          </DrawerTitleRow>
           <CloseBtn type="button" onClick={onClose} aria-label="Close drawer" ref={firstFocusRef}>
             ×
           </CloseBtn>
         </DrawerHeader>
 
         <DrawerBody>
-          <ManagerCard>
-            <AvatarRow>
-              <Avatar>{initials}</Avatar>
-              <AvatarInfo>
-                <AvatarName>{accountManager.name}</AvatarName>
-                <AvatarMeta>{accountManager.title}</AvatarMeta>
-              </AvatarInfo>
-            </AvatarRow>
-            <ContactList>
-              <ContactItem>
-                <EnvelopeIcon size={14} color="currentColor" />
-                <ContactLink href={`mailto:${accountManager.email}`}>{accountManager.email}</ContactLink>
-              </ContactItem>
-            </ContactList>
-          </ManagerCard>
+          {hasAccountManager && (
+            <ManagerCard>
+              <AvatarRow>
+                <Avatar>{initials}</Avatar>
+                <AvatarInfo>
+                  <AvatarName>{accountManager.name}</AvatarName>
+                  <AvatarMeta>{accountManager.title}</AvatarMeta>
+                </AvatarInfo>
+              </AvatarRow>
+              <ContactList>
+                <ContactItem>
+                  <EnvelopeIcon size={14} color="currentColor" />
+                  <ContactLink href={`mailto:${accountManager.email}`}>{accountManager.email}</ContactLink>
+                </ContactItem>
+              </ContactList>
+            </ManagerCard>
+          )}
+
           <HelpCallout>
             <BannerHeading>{banner.heading}</BannerHeading>
-            <BannerText>{banner.body}</BannerText>
-            <BannerRule />
-            <BannerText>Need to speak with Sales instead?</BannerText>
-            <ContactSalesLink
-              href="https://www.digicert.com/contact-us"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Contact sales
-              <ExternalLinkIcon size={13} color="currentColor" />
-            </ContactSalesLink>
+            <BannerText>{hasAccountManager ? banner.body : banner.bodyNoManager}</BannerText>
           </HelpCallout>
 
           <Divider />
@@ -400,11 +432,31 @@ export default function ContactManagerDrawer({ open, onClose, helpContext = 'sub
               />
             </FieldGroup>
             <FormFooter>
-              <FormHelper>Your message will be sent to {accountManager.name}.</FormHelper>
+              <FormHelper>
+                {hasAccountManager
+                  ? `Your message will be sent to ${accountManager.name}.`
+                  : 'Your message will be routed to the appropriate DigiCert team.'}
+              </FormHelper>
               <SendBtn type="button">Send message</SendBtn>
             </FormFooter>
           </FormSection>
+
+          <AltHelpWrap>
+            <AltHelpLabel>Need to speak to sales instead?</AltHelpLabel>
+            <AltHelpLink
+              href="https://www.digicert.com/contact-us"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Contact sales
+              <ExternalLinkIcon size={12} color="currentColor" />
+            </AltHelpLink>
+          </AltHelpWrap>
         </DrawerBody>
+
+        <DrawerFooter>
+          <PrototypeToggle />
+        </DrawerFooter>
       </DrawerPanel>
     </>
   )

@@ -315,6 +315,14 @@ export const ChatBubbleIcon = ({ size = 20, color = 'currentColor' }) => (
   </svg>
 )
 
+export const LifeRingIcon = ({ size = 20, color = 'currentColor' }) => (
+  <svg width={size} height={size} viewBox="0 0 20 20" fill="none" aria-hidden="true">
+    <circle cx="10" cy="10" r="8" stroke={color} strokeWidth="1.5" />
+    <circle cx="10" cy="10" r="3.5" stroke={color} strokeWidth="1.5" />
+    <path d="M7.53 7.53 4.05 4.05M12.47 12.47l3.48 3.48M12.47 7.53l3.48-3.48M7.53 12.47l-3.48 3.48" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+  </svg>
+)
+
 export const ChipIcon = ({ size = 20, color = 'currentColor' }) => (
   <svg width={size} height={size} viewBox="0 0 20 20" fill="none" aria-hidden="true">
     <rect x="5" y="5" width="10" height="10" rx="1" stroke={color} strokeWidth="1.5" />

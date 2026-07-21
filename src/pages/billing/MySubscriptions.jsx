@@ -3,7 +3,8 @@ import styled from 'styled-components'
 import { getFixedSubscriptions } from '../../data/billingData'
 import SubscriptionCard from '../../components/billing/SubscriptionCard'
 import ContactManagerDrawer from '../../components/billing/ContactManagerDrawer'
-import { ChatBubbleIcon } from '../../components/Icons'
+import { LifeRingIcon } from '../../components/Icons'
+import { usePrototype } from '../../context/PrototypeContext'
 
 const Main = styled.main`
   padding: 32px;
@@ -121,6 +122,7 @@ const ProductGrid = styled.div`
 
 export default function MySubscriptions() {
   const [isContactDrawerOpen, setIsContactDrawerOpen] = useState(false)
+  const { hasAccountManager } = usePrototype()
 
   useEffect(() => {
     document.title = 'My subscriptions — DigiCert ONE'
@@ -138,8 +140,8 @@ export default function MySubscriptions() {
           </PageDescription>
         </PageTitleBlock>
         <NeedHelpBtn type="button" onClick={() => setIsContactDrawerOpen(true)}>
-          <ChatBubbleIcon size={15} color="currentColor" />
-          Contact account manager
+          <LifeRingIcon size={15} color="currentColor" />
+          Need help?
         </NeedHelpBtn>
       </PageHeader>
 
@@ -152,6 +154,7 @@ export default function MySubscriptions() {
       <ContactManagerDrawer
         open={isContactDrawerOpen}
         onClose={() => setIsContactDrawerOpen(false)}
+        hasAccountManager={hasAccountManager}
       />
     </Main>
   )

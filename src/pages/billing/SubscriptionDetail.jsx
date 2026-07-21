@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import styled from 'styled-components'
-import { ChevronLeftIcon, ChevronUpIcon, ChevronDownIcon, InfoCircleIcon, CartOutlineIcon, CalendarIcon, DollarIcon, ExternalLinkIcon, DotsVerticalIcon, ChatBubbleIcon, getIcon } from '../../components/Icons'
+import { ChevronLeftIcon, ChevronUpIcon, ChevronDownIcon, InfoCircleIcon, CartOutlineIcon, CalendarIcon, DollarIcon, ExternalLinkIcon, DotsVerticalIcon, LifeRingIcon, getIcon } from '../../components/Icons'
 import { getFixedSubscriptions, getMultiEnvSubscriptions, ENVIRONMENTS, contractTypeConfig } from '../../data/billingData'
+import { usePrototype } from '../../context/PrototypeContext'
 import ContactManagerDrawer from '../../components/billing/ContactManagerDrawer'
 import ContactUsDrawer from '../../components/billing/ContactUsDrawer'
 import PeakUsageChart from '../../components/billing/PeakUsageChart'
@@ -1164,6 +1165,7 @@ function ProductsSection({ categories }) {
 // ── Main component ────────────────────────────────────────────────────────────
 
 export default function SubscriptionDetail() {
+  const { hasAccountManager } = usePrototype()
   const { subscriptionId } = useParams()
   const [activeInstanceId, setActiveInstanceId] = useState(null)
   const [isContactDrawerOpen, setIsContactDrawerOpen] = useState(false)
@@ -1279,13 +1281,13 @@ export default function SubscriptionDetail() {
         <HeaderRight>
           {isEcommerceActive ? (
             <NeedHelpBtn type="button" onClick={() => setIsContactUsDrawerOpen(true)}>
-              <ChatBubbleIcon size={15} color="currentColor" />
-              Contact us
+              <LifeRingIcon size={15} color="currentColor" />
+              Need help?
             </NeedHelpBtn>
           ) : (
             <NeedHelpBtn type="button" onClick={() => setIsContactDrawerOpen(true)}>
-              <ChatBubbleIcon size={15} color="currentColor" />
-              Contact account manager
+              <LifeRingIcon size={15} color="currentColor" />
+              Need help?
             </NeedHelpBtn>
           )}
           {isEcommerceActive && (
@@ -1369,10 +1371,12 @@ export default function SubscriptionDetail() {
       <ContactManagerDrawer
         open={isContactDrawerOpen}
         onClose={() => setIsContactDrawerOpen(false)}
+        hasAccountManager={hasAccountManager}
       />
       <ContactUsDrawer
         open={isContactUsDrawerOpen}
         onClose={() => setIsContactUsDrawerOpen(false)}
+        hasAccountManager={hasAccountManager}
       />
     </Main>
   )
