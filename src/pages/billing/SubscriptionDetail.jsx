@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import styled from 'styled-components'
-import { ChevronLeftIcon, ChevronUpIcon, ChevronDownIcon, InfoCircleIcon, CartOutlineIcon, CalendarIcon, DollarIcon, ExternalLinkIcon, DotsVerticalIcon, ChatBubbleIcon, getIcon } from '../../components/Icons'
+import { ChevronLeftIcon, ChevronUpIcon, ChevronDownIcon, InfoCircleIcon, CartOutlineIcon, CalendarIcon, DollarIcon, ExternalLinkIcon, DotsVerticalIcon, LifeRingIcon, getIcon } from '../../components/Icons'
 import { getFixedSubscriptions, getMultiEnvSubscriptions, ENVIRONMENTS, contractTypeConfig } from '../../data/billingData'
 import ContactManagerDrawer from '../../components/billing/ContactManagerDrawer'
 import ContactUsDrawer from '../../components/billing/ContactUsDrawer'
@@ -1276,13 +1276,13 @@ export default function SubscriptionDetail() {
         <HeaderRight>
           {isEcommerceActive ? (
             <NeedHelpBtn type="button" onClick={() => setIsContactUsDrawerOpen(true)}>
-              <ChatBubbleIcon size={15} color="currentColor" />
-              Contact us
+              <LifeRingIcon size={15} color="currentColor" />
+              Need help?
             </NeedHelpBtn>
           ) : (
             <NeedHelpBtn type="button" onClick={() => setIsContactDrawerOpen(true)}>
-              <ChatBubbleIcon size={15} color="currentColor" />
-              Contact account manager
+              <LifeRingIcon size={15} color="currentColor" />
+              Need help?
             </NeedHelpBtn>
           )}
           {isEcommerceActive && (

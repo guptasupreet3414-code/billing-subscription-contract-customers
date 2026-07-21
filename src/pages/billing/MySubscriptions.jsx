@@ -4,7 +4,7 @@ import styled from 'styled-components'
 import { ENVIRONMENTS, getMultiEnvSubscriptions } from '../../data/billingData'
 import SubscriptionCard from '../../components/billing/SubscriptionCard'
 import ContactManagerDrawer from '../../components/billing/ContactManagerDrawer'
-import { ChatBubbleIcon, ChevronDownIcon } from '../../components/Icons'
+import { LifeRingIcon, ChevronDownIcon } from '../../components/Icons'
 
 const Main = styled.main`
   padding: 32px;
@@ -245,8 +245,8 @@ export default function MySubscriptions() {
           </PageDescription>
         </PageTitleBlock>
         <NeedHelpBtn type="button" onClick={() => setIsContactDrawerOpen(true)}>
-          <ChatBubbleIcon size={15} color="currentColor" />
-          Contact account manager
+          <LifeRingIcon size={15} color="currentColor" />
+          Need help?
         </NeedHelpBtn>
       </PageHeader>
 

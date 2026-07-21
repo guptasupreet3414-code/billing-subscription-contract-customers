@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Purchase History — CertCentral</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+      font-size: 14px;
+      color: #333;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    a { color: #0174c3; text-decoration: none; cursor: pointer; }
+    a:hover { text-decoration: underline; }
+
+    /* ─── Top navbar ─────────────────────────────────── */
+    .topnav {
+      height: 50px;
+      background: #0174c3;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
+      flex-shrink: 0;
+      position: sticky;
+      top: 0;
+      z-index: 200;
+    }
+    .topnav-left {
+      display: flex;
+      align-items: center;
+    }
+    .digi-logo {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      color: white;
+      text-decoration: none;
+    }
+    .digi-mark {
+      flex-shrink: 0;
+    }
+    .digi-word {
+      font-size: 15px;
+      font-weight: 300;
+      color: white;
+      letter-spacing: 0.2px;
+    }
+    .nav-pipe {
+      width: 1px;
+      height: 22px;
+      background: rgba(255,255,255,0.35);
+      margin: 0 14px;
+    }
+    .cc-word {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 1.6px;
+      text-transform: uppercase;
+      color: white;
+    }
+    .ent-badge {
+      margin-left: 10px;
+      border: 1px solid rgba(255,255,255,0.5);
+      color: rgba(255,255,255,0.9);
+      font-size: 11px;
+      font-weight: 500;
+      padding: 2px 8px;
+      border-radius: 3px;
+      letter-spacing: 0.2px;
+    }
+    .topnav-right {
+      display: flex;
+      align-items: center;
+    }
+    .nav-right-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      color: rgba(255,255,255,0.92);
+      font-size: 13px;
+      cursor: pointer;
+      white-space: nowrap;
+      padding: 4px 2px;
+    }
+    .nav-right-item:hover { color: #fff; }
+    .nav-vsep {
+      width: 1px;
+      height: 18px;
+      background: rgba(255,255,255,0.28);
+      margin: 0 13px;
+    }
+    .help-btn {
+      width: 22px;
+      height: 22px;
+      border: 1.5px solid rgba(255,255,255,0.6);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.9);
+      cursor: pointer;
+    }
+    .help-btn:hover { border-color: white; color: white; }
+
+    /* ─── Layout ─────────────────────────────────────── */
+    .layout {
+      display: flex;
+      flex: 1;
+      min-height: calc(100vh - 50px);
+    }
+
+    /* ─── Sidebar ────────────────────────────────────── */
+    .sidebar {
+      width: 228px;
+      min-width: 228px;
+      background: #152d48;
+      display: flex;
+      flex-direction: column;
+    }
+    .sb-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 14px 14px 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+    .sb-cc-box {
+      width: 38px;
+      height: 38px;
+      background: #1a6fbe;
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      flex-shrink: 0;
+    }
+    .sb-cc-label {
+      color: rgba(255,255,255,0.88);
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 1.3px;
+      text-transform: uppercase;
+    }
+    .sb-nav {
+      flex: 1;
+      padding: 6px 0 20px;
+    }
+    .nav-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      color: rgba(255,255,255,0.76);
+      cursor: pointer;
+      font-size: 13px;
+      user-select: none;
+    }
+    .nav-row:hover { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.95); }
+    .nav-row.open { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.92); }
+    .nav-icon { width: 18px; height: 18px; flex-shrink: 0; opacity: 0.82; }
+    .nav-caret { margin-left: auto; opacity: 0.5; }
+    .sb-subitems {}
+    .sb-sub {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 14px 8px 44px;
+      color: rgba(255,255,255,0.65);
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .sb-sub:hover { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.9); }
+    .sb-sub.active {
+      color: #fff;
+      background: rgba(255,255,255,0.09);
+      border-left: 3px solid #5ab4ff;
+      padding-left: 41px;
+    }
+    .new-pill {
+      background: #1d9a3c;
+      color: white;
+      font-size: 9.5px;
+      font-weight: 700;
+      padding: 1px 5px;
+      border-radius: 3px;
+      letter-spacing: 0.2px;
+    }
+
+    /* ─── Main content ───────────────────────────────── */
+    .main {
+      flex: 1;
+      padding: 28px 32px 40px;
+      background: #fff;
+      overflow-y: auto;
+    }
+    .page-title {
+      font-size: 26px;
+      font-weight: 400;
+      color: #1a1a1a;
+      margin-bottom: 20px;
+    }
+
+    /* Action buttons */
+    .action-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 22px;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 16px;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+      line-height: 1.4;
+      transition: background 0.12s, border-color 0.12s;
+    }
+    .btn-secondary {
+      background: #fff;
+      border: 1px solid #bbb;
+      color: #444;
+    }
+    .btn-secondary:hover { background: #f4f4f4; }
+    .btn-primary {
+      background: #0174c3;
+      border: 1px solid #0174c3;
+      color: #fff;
+    }
+    .btn-primary:hover { background: #015fa8; border-color: #015fa8; }
+
+    /* Filters */
+    .filter-bar {
+      display: flex;
+      align-items: flex-end;
+      gap: 12px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+    .f-field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .f-label {
+      font-size: 12px;
+      color: #555;
+      font-weight: 500;
+    }
+    .f-select {
+      height: 34px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 13px;
+      font-family: inherit;
+      color: #333;
+      padding: 0 10px;
+      background: white;
+      outline: none;
+      min-width: 110px;
+      cursor: pointer;
+    }
+    .f-select:focus { border-color: #0174c3; box-shadow: 0 0 0 2px rgba(1,116,195,0.15); }
+    .f-date-pair {
+      display: flex;
+      gap: 6px;
+    }
+    .f-date {
+      display: flex;
+      align-items: center;
+      height: 34px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      padding: 0 9px;
+      gap: 7px;
+      background: white;
+    }
+    .f-date:focus-within { border-color: #0174c3; box-shadow: 0 0 0 2px rgba(1,116,195,0.15); }
+    .f-date input {
+      border: none;
+      outline: none;
+      font-size: 13px;
+      font-family: inherit;
+      color: #555;
+      width: 74px;
+      background: transparent;
+    }
+    .f-date input::placeholder { color: #b0b0b0; }
+    .f-search {
+      display: flex;
+      align-items: center;
+      height: 34px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      padding: 0 9px;
+      gap: 7px;
+      background: white;
+      min-width: 162px;
+    }
+    .f-search:focus-within { border-color: #0174c3; box-shadow: 0 0 0 2px rgba(1,116,195,0.15); }
+    .f-search input {
+      border: none;
+      outline: none;
+      font-size: 13px;
+      font-family: inherit;
+      color: #333;
+      width: 100%;
+      background: transparent;
+    }
+    .f-search input::placeholder { color: #b0b0b0; }
+    .go-btn {
+      height: 34px;
+      padding: 0 24px;
+      background: #0174c3;
+      color: white;
+      border: 1px solid #0174c3;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.12s;
+    }
+    .go-btn:hover { background: #015fa8; }
+
+    /* Toggle */
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin-bottom: 24px;
+    }
+    .tog-track {
+      width: 40px;
+      height: 22px;
+      background: #0174c3;
+      border-radius: 11px;
+      position: relative;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .tog-thumb {
+      position: absolute;
+      right: 3px;
+      top: 3px;
+      width: 16px;
+      height: 16px;
+      background: white;
+      border-radius: 50%;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+    }
+    .toggle-label {
+      font-size: 13px;
+      color: #333;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .q-mark {
+      width: 17px;
+      height: 17px;
+      border: 1.5px solid #0174c3;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 700;
+      color: #0174c3;
+      cursor: default;
+      flex-shrink: 0;
+    }
+
+    /* Table */
+    .table-wrap {
+      border: 1px solid #dde3ea;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .data-table thead tr {
+      background: #f5f8fb;
+    }
+    .data-table th {
+      text-align: left;
+      padding: 11px 16px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #555;
+      border-bottom: 2px solid #dde3ea;
+      white-space: nowrap;
+    }
+    .sort-arrows {
+      display: inline-flex;
+      flex-direction: column;
+      gap: 1px;
+      vertical-align: middle;
+      margin-left: 4px;
+      opacity: 0.45;
+    }
+    .sort-arrows svg { display: block; }
+    .data-table td {
+      padding: 11px 16px;
+      border-bottom: 1px solid #f0f2f5;
+      color: #333;
+      white-space: nowrap;
+    }
+    .data-table tbody tr:last-child td { border-bottom: none; }
+    .data-table tbody tr:hover td { background: #f6fafd; }
+    .order-link { color: #0174c3; }
+    .receipt-link { color: #0174c3; font-size: 13px; }
+  </style>
+</head>
+<body>
+
+<!-- ─── Top navbar ─────────────────────────────────── -->
+<nav class="topnav">
+  <div class="topnav-left">
+    <a class="digi-logo" href="#">
+      <!-- DigiCert diamond mark -->
+      <svg class="digi-mark" width="20" height="22" viewBox="0 0 20 22" fill="none">
+        <polygon points="10,0 20,6 20,16 10,22 0,16 0,6" fill="rgba(255,255,255,0.15)"/>
+        <polygon points="10,3 17,7.5 17,14.5 10,19 3,14.5 3,7.5" fill="rgba(255,255,255,0.22)"/>
+        <polygon points="10,6 14,8.5 14,13.5 10,16 6,13.5 6,8.5" fill="white"/>
+      </svg>
+      <span class="digi-word">digicert</span>
+    </a>
+    <div class="nav-pipe"></div>
+    <span class="cc-word">CertCentral</span>
+    <span class="ent-badge">Enterprise</span>
+  </div>
+
+  <div class="topnav-right">
+    <div class="nav-right-item">
+      CertCentral
+      <svg width="9" height="5" viewBox="0 0 9 5" fill="none"><path d="M1 1l3.5 3L8 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="nav-vsep"></div>
+    <div class="nav-right-item">
+      Supreet Gupta
+      <svg width="9" height="5" viewBox="0 0 9 5" fill="none"><path d="M1 1l3.5 3L8 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="nav-vsep"></div>
+    <div class="nav-right-item">
+      <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+        <circle cx="7.5" cy="7.5" r="6.5" stroke="currentColor" stroke-width="1.4"/>
+        <circle cx="7.5" cy="5.5" r="2" stroke="currentColor" stroke-width="1.4"/>
+        <path d="M3 13c0-2.2 2-3.8 4.5-3.8S12 10.8 12 13" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+      </svg>
+      Standard support
+    </div>
+    <div class="nav-vsep"></div>
+    <div class="help-btn">?</div>
+  </div>
+</nav>
+
+<div class="layout">
+
+  <!-- ─── Sidebar ────────────────────────────────────── -->
+  <aside class="sidebar">
+    <div class="sb-brand">
+      <div class="sb-cc-box">CC</div>
+      <span class="sb-cc-label">CertCentral</span>
+    </div>
+
+    <nav class="sb-nav">
+
+      <!-- Request a Certificate -->
+      <div class="nav-row">
+        <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a1 1 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/>
+        </svg>
+        Request a Certificate
+      </div>
+
+      <!-- Dashboard -->
+      <div class="nav-row">
+        <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M2 4a2 2 0 012-2h3a2 2 0 012 2v3a2 2 0 01-2 2H4a2 2 0 01-2-2V4zm9 0a2 2 0 012-2h3a2 2 0 012 2v3a2 2 0 01-2 2h-3a2 2 0 01-2-2V4zM2 13a2 2 0 012-2h3a2 2 0 012 2v3a2 2 0 01-2 2H4a2 2 0 01-2-2v-3zm9 0a2 2 0 012-2h3a2 2 0 012 2v3a2 2 0 01-2 2h-3a2 2 0 01-2-2v-3z"/>
+        </svg>
+        Dashboard
+      </div>
+
+      <!-- Certificates -->
+      <div class="nav-row">
+        <svg class="nav-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6">
+          <path d="M5 3h7l3 3v11a1 1 0 01-1 1H5a1 1 0 01-1-1V4a1 1 0 011-1z" stroke-linejoin="round"/>
+          <path d="M12 3v3h3" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M7 9.5h6M7 12.5h4" stroke-linecap="round"/>
+        </svg>
+        Certificates
+        <svg class="nav-caret" width="12" height="12" viewBox="0 0 12 12" fill="none">
+          <path d="M4 5l2 2 2-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+
+      <!-- Discovery -->
+      <div class="nav-row">
+        <svg class="nav-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6">
+          <circle cx="10" cy="10" r="7.5"/>
+          <circle cx="10" cy="10" r="4"/>
+          <circle cx="10" cy="10" r="1.2" fill="currentColor" stroke="none"/>
+        </svg>
+        Discovery
+        <svg class="nav-caret" width="12" height="12" viewBox="0 0 12 12" fill="none">
+          <path d="M4 5l2 2 2-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+
+      <!-- Automation -->
+      <div class="nav-row">
+        <svg class="nav-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6">
+          <path d="M10 3a7 7 0 100 14A7 7 0 0010 3z"/>
+          <path d="M10 6v4l3 2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Automation
+        <svg class="nav-caret" width="12" height="12" viewBox="0 0 12 12" fill="none">
+          <path d="M4 5l2 2 2-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+
+      <!-- Finances (expanded) -->
+      <div class="nav-row open">
+        <svg class="nav-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6">
+          <rect x="2" y="5" width="16" height="12" rx="2"/>
+          <path d="M2 9h16" stroke-linecap="round"/>
+          <path d="M6 13.5h3" stroke-linecap="round"/>
+          <path d="M13.5 13.5h.5" stroke-linecap="round" stroke-width="2"/>
+        </svg>
+        Finances
+        <svg class="nav-caret" width="12" height="12" viewBox="0 0 12 12" fill="none">
+          <path d="M4 7l2-2 2 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+
+      <div class="sb-subitems">
+        <div class="sb-sub active">Purchase History</div>
+        <div class="sb-sub">Balance History</div>
+        <div class="sb-sub">Account Pricing</div>
+        <div class="sb-sub">Deposit Funds</div>
+        <div class="sb-sub">Pay Invoice <span class="new-pill">New</span></div>
+      </div>
+
+    </nav>
+  </aside>
+
+  <!-- ─── Main content ─────────────────────────────── -->
+  <main class="main">
+    <h1 class="page-title">Purchase history</h1>
+
+    <div class="action-row">
+      <button class="btn btn-secondary">Spending report</button>
+      <button class="btn btn-primary">
+        Download CSV
+        <svg width="10" height="6" viewBox="0 0 10 6" fill="none">
+          <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Filter bar -->
+    <div class="filter-bar">
+
+      <div class="f-field">
+        <span class="f-label">Payment Method</span>
+        <select class="f-select">
+          <option value="">All</option>
+          <option>Credit Card</option>
+          <option>Contract</option>
+          <option>Bank Transfer</option>
+        </select>
+      </div>
+
+      <div class="f-field">
+        <span class="f-label">Transaction Date</span>
+        <div class="f-date-pair">
+          <div class="f-date">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="#999" stroke-width="1.3">
+              <rect x="0.5" y="1.5" width="12" height="11" rx="1.5"/>
+              <path d="M0.5 5h12" stroke-linecap="round"/>
+              <path d="M3.5 0.5v2M9.5 0.5v2" stroke-linecap="round"/>
+            </svg>
+            <input type="text" placeholder="From...">
+          </div>
+          <div class="f-date">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="#999" stroke-width="1.3">
+              <rect x="0.5" y="1.5" width="12" height="11" rx="1.5"/>
+              <path d="M0.5 5h12" stroke-linecap="round"/>
+              <path d="M3.5 0.5v2M9.5 0.5v2" stroke-linecap="round"/>
+            </svg>
+            <input type="text" placeholder="To...">
+          </div>
+        </div>
+      </div>
+
+      <div class="f-field">
+        <span class="f-label">Order ID</span>
+        <div class="f-search">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="#999" stroke-width="1.3">
+            <circle cx="5.5" cy="5.5" r="4.5"/>
+            <path d="M9 9l3 3" stroke-linecap="round"/>
+          </svg>
+          <input type="text" placeholder="Search for...">
+        </div>
+      </div>
+
+      <div class="f-field">
+        <span class="f-label">Order placed by</span>
+        <select class="f-select" style="min-width:175px; color:#999;">
+          <option value="" style="color:#999;">Order placed by</option>
+          <option style="color:#333;">CertCentral</option>
+          <option style="color:#333;">Supreet Gupta</option>
+        </select>
+      </div>
+
+      <button class="go-btn">Go</button>
+    </div>
+
+    <!-- Exact match toggle -->
+    <div class="toggle-row">
+      <div class="tog-track">
+        <div class="tog-thumb"></div>
+      </div>
+      <span class="toggle-label">
+        Exact match enabled
+        <span class="q-mark">?</span>
+      </span>
+    </div>
+
+    <!-- Data table -->
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>
+              Date
+              <span class="sort-arrows">
+                <svg width="7" height="4" viewBox="0 0 7 4"><path d="M1 3.5l2.5-3L6 3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+                <svg width="7" height="4" viewBox="0 0 7 4"><path d="M1 0.5l2.5 3L6 0.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+              </span>
+            </th>
+            <th>
+              Order #
+              <span class="sort-arrows">
+                <svg width="7" height="4" viewBox="0 0 7 4"><path d="M1 3.5l2.5-3L6 3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+                <svg width="7" height="4" viewBox="0 0 7 4"><path d="M1 0.5l2.5 3L6 0.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+              </span>
+            </th>
+            <th>
+              Product
+              <span class="sort-arrows">
+                <svg width="7" height="4" viewBox="0 0 7 4"><path d="M1 3.5l2.5-3L6 3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+                <svg width="7" height="4" viewBox="0 0 7 4"><path d="M1 0.5l2.5 3L6 0.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+              </span>
+            </th>
+            <th>
+              Purchase Amount
+              <span class="sort-arrows">
+                <svg width="7" height="4" viewBox="0 0 7 4"><path d="M1 3.5l2.5-3L6 3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+                <svg width="7" height="4" viewBox="0 0 7 4"><path d="M1 0.5l2.5 3L6 0.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+              </span>
+            </th>
+            <th>
+              Payment Method
+              <span class="sort-arrows">
+                <svg width="7" height="4" viewBox="0 0 7 4"><path d="M1 3.5l2.5-3L6 3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+                <svg width="7" height="4" viewBox="0 0 7 4"><path d="M1 0.5l2.5 3L6 0.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+              </span>
+            </th>
+            <th>
+              Order placed by
+              <span class="sort-arrows">
+                <svg width="7" height="4" viewBox="0 0 7 4"><path d="M1 3.5l2.5-3L6 3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+                <svg width="7" height="4" viewBox="0 0 7 4"><path d="M1 0.5l2.5 3L6 0.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+              </span>
+            </th>
+            <th>Receipt / Invoice</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>13 May 2026</td>
+            <td><a class="order-link" href="#">1522644625</a></td>
+            <td>Secure Site Pro SSL</td>
+            <td>$0.00 (USD)</td>
+            <td>Contract</td>
+            <td>CertCentral</td>
+            <td><a class="receipt-link" href="#">View Receipt / Invoice</a></td>
+          </tr>
+          <tr>
+            <td>01 May 2026</td>
+            <td><a class="order-link" href="#">1513327844</a></td>
+            <td>Secure Site Pro SSL</td>
+            <td>$0.00 (USD)</td>
+            <td>Contract</td>
+            <td>CertCentral</td>
+            <td><a class="receipt-link" href="#">View Receipt / Invoice</a></td>
+          </tr>
+          <tr>
+            <td>07 Nov 2025</td>
+            <td><a class="order-link" href="#">1389126892</a></td>
+            <td>Private SSL OV</td>
+            <td>$0.00 (USD)</td>
+            <td>Contract</td>
+            <td>CertCentral</td>
+            <td><a class="receipt-link" href="#">View Receipt / Invoice</a></td>
+          </tr>
+          <tr>
+            <td>06 Nov 2025</td>
+            <td><a class="order-link" href="#">1388544070</a></td>
+            <td>Verified Mark Certificate</td>
+            <td>$0.00 (USD)</td>
+            <td>Contract</td>
+            <td>CertCentral</td>
+            <td><a class="receipt-link" href="#">View Receipt / Invoice</a></td>
+          </tr>
+          <tr>
+            <td>04 Nov 2025</td>
+            <td><a class="order-link" href="#">1387316688</a></td>
+            <td>Code Signing</td>
+            <td>$0.00 (USD)</td>
+            <td>Contract</td>
+            <td>CertCentral</td>
+            <td><a class="receipt-link" href="#">View Receipt / Invoice</a></td>
+          </tr>
+          <tr>
+            <td>31 Oct 2025</td>
+            <td><a class="order-link" href="#">1384472396</a></td>
+            <td>Secure Site Pro SSL</td>
+            <td>$0.00 (USD)</td>
+            <td>Contract</td>
+            <td>CertCentral</td>
+            <td><a class="receipt-link" href="#">View Receipt / Invoice</a></td>
+          </tr>
+          <tr>
+            <td>31 Oct 2025</td>
+            <td><a class="order-link" href="#">1384456218</a></td>
+            <td>Secure Site Pro SSL</td>
+            <td>$0.00 (USD)</td>
+            <td>Contract</td>
+            <td>CertCentral</td>
+            <td><a class="receipt-link" href="#">View Receipt / Invoice</a></td>
+          </tr>
+          <tr>
+            <td>15 Oct 2025</td>
+            <td><a class="order-link" href="#">1374163323</a></td>
+            <td>Basic OV</td>
+            <td>$0.00 (USD)</td>
+            <td>Contract</td>
+            <td>CertCentral</td>
+            <td><a class="receipt-link" href="#">View Receipt / Invoice</a></td>
+          </tr>
+          <tr>
+            <td>04 Oct 2025</td>
+            <td><a class="order-link" href="#">1367402191</a></td>
+            <td>Basic OV</td>
+            <td>$0.00 (USD)</td>
+            <td>Contract</td>
+            <td>CertCentral</td>
+            <td><a class="receipt-link" href="#">View Receipt / Invoice</a></td>
+          </tr>
+          <tr>
+            <td>11 Sep 2025</td>
+            <td><a class="order-link" href="#">1353202349</a></td>
+            <td>Basic OV</td>
+            <td>$0.00 (USD)</td>
+            <td>Contract</td>
+            <td>CertCentral</td>
+            <td><a class="receipt-link" href="#">View Receipt / Invoice</a></td>
+          </tr>
+          <tr>
+            <td>14 Jul 2025</td>
+            <td><a class="order-link" href="#">1321547832</a></td>
+            <td>Secure Site Pro SSL</td>
+            <td>$0.00 (USD)</td>
+            <td>Contract</td>
+            <td>CertCentral</td>
+            <td><a class="receipt-link" href="#">View Receipt / Invoice</a></td>
+          </tr>
+          <tr>
+            <td>02 Jun 2025</td>
+            <td><a class="order-link" href="#">1298734561</a></td>
+            <td>Code Signing</td>
+            <td>$0.00 (USD)</td>
+            <td>Contract</td>
+            <td>CertCentral</td>
+            <td><a class="receipt-link" href="#">View Receipt / Invoice</a></td>
+          </tr>
+          <tr>
+            <td>18 Apr 2025</td>
+            <td><a class="order-link" href="#">1271894320</a></td>
+            <td>Basic OV</td>
+            <td>$0.00 (USD)</td>
+            <td>Contract</td>
+            <td>CertCentral</td>
+            <td><a class="receipt-link" href="#">View Receipt / Invoice</a></td>
+          </tr>
+          <tr>
+            <td>05 Mar 2025</td>
+            <td><a class="order-link" href="#">1248562017</a></td>
+            <td>Wildcard SSL</td>
+            <td>$0.00 (USD)</td>
+            <td>Contract</td>
+            <td>CertCentral</td>
+            <td><a class="receipt-link" href="#">View Receipt / Invoice</a></td>
+          </tr>
+          <tr>
+            <td>22 Jan 2025</td>
+            <td><a class="order-link" href="#">1219043785</a></td>
+            <td>EV SSL</td>
+            <td>$0.00 (USD)</td>
+            <td>Contract</td>
+            <td>CertCentral</td>
+            <td><a class="receipt-link" href="#">View Receipt / Invoice</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </main>
+</div>
+
+</body>
+</html>

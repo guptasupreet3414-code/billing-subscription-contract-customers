@@ -93,8 +93,6 @@ const enterpriseProducts = [
     includedResources: [
       { name: 'Repositories', includedWithPlan: 'Up to 100', available: 100, used: 76, remaining: 24 },
       { name: 'Test signatures', includedWithPlan: '2,500,000', available: 2500000, used: 812430, remaining: 1687570 },
-      { name: 'Active releases per repository', includedWithPlan: '10 most recent releases', available: 10, used: 7, remaining: 3 },
-      { name: 'Users per keypair/certificate', includedWithPlan: 'Up to 10', available: 10, used: 6, remaining: 4 },
     ],
   },
   {
