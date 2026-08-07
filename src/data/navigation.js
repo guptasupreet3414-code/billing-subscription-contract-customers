@@ -512,6 +512,7 @@ export const allRoutes = [
   '/quantum-central/dashboard',
   '/quantum-central/settings',
   '/certcentral',
+  '/certcentral/support',
   '/certcentral/dashboard',
   '/certcentral/reports',
   '/certcentral/audit-logs',

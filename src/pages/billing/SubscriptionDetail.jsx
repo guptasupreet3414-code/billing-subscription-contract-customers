@@ -1274,7 +1274,7 @@ export default function SubscriptionDetail() {
           </TitleBlock>
         </HeaderLeft>
         <HeaderRight>
-          {isEcommerceActive ? (
+          {isCertCentral ? (
             <NeedHelpBtn type="button" onClick={() => setIsContactUsDrawerOpen(true)}>
               <LifeRingIcon size={15} color="currentColor" />
               Need help?
