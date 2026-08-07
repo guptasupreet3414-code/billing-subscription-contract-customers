@@ -13,6 +13,7 @@ import SubscriptionDetail from './pages/billing/SubscriptionDetail'
 import Receipts from './pages/billing/Receipts'
 import PaymentDetails from './pages/billing/PaymentDetails'
 import AllProducts from './pages/billing/AllProducts'
+import CertCentralSupport from './pages/billing/CertCentralSupport'
 import { allRoutes } from './data/navigation'
 
 function ScrollToTop({ containerRef }) {
@@ -217,6 +218,7 @@ export default function App() {
               else if (r === '/settings/billing') element = <MySubscriptions />
               else if (r === '/settings/billing/receipts') element = <Receipts scenario={billingScenario} />
               else if (r === '/settings/billing/payment-details') element = <PaymentDetails scenario={billingScenario} />
+              else if (r === '/certcentral/support') element = <CertCentralSupport />
               return <Route key={r} path={r} element={element} />
             })}
           <Route path="/settings/billing/all-products" element={<AllProducts />} />

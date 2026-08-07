@@ -1,8 +1,6 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
-import { EnvelopeIcon, ExternalLinkIcon, LifeRingIcon } from '../Icons'
-import { accountManager } from '../../data/billingData'
-import { PrototypeToggle } from '../../context/PrototypeContext'
+import { ExternalLinkIcon, LifeRingIcon, ChevronDownIcon, ChevronUpIcon, DollarIcon, GearIcon } from '../Icons'
 
 /* ── Shell ── */
 
@@ -98,260 +96,128 @@ const DrawerBody = styled.div`
   }
 `
 
-const DrawerFooter = styled.div`
-  flex-shrink: 0;
-  padding: 12px 16px;
-  border-top: 1.5px dashed #fde68a;
-  background: #fffbeb;
-`
+/* ── Category cards ── */
 
-/* ── Manager card ── */
-
-const HelpCallout = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 14px 16px;
-  border-radius: ${({ theme }) => theme.borderRadius.md};
-  background: #EAF1FB;
-  font-size: 13px;
-  line-height: 1.5;
-`
-
-const BannerHeading = styled.p`
+const QuestionHeading = styled.h3`
   margin: 0;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 600;
   color: ${({ theme }) => theme.colors.neutral900};
 `
 
-const BannerText = styled.p`
-  margin: 0;
-  font-size: 13px;
-  color: ${({ theme }) => theme.colors.neutral700};
-  line-height: 1.5;
-`
-
-const Divider = styled.div`
-  height: 1px;
-  background: ${({ theme }) => theme.colors.neutral200};
-`
-
-const FormSection = styled.div`
+const CategoryList = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 16px;
-`
-
-const FormTitle = styled.h3`
-  margin: 0 0 4px;
-  font-size: 14px;
-  font-weight: 600;
-  color: ${({ theme }) => theme.colors.neutral800};
-`
-
-const FieldGroup = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-`
-
-const FieldLabel = styled.label`
-  font-size: 13px;
-  font-weight: 500;
-  color: ${({ theme }) => theme.colors.neutral700};
-`
-
-const Input = styled.input`
-  width: 100%;
-  padding: 10px 12px;
-  border-radius: ${({ theme }) => theme.borderRadius.md};
-  border: 1px solid ${({ theme }) => theme.colors.neutral300};
-  font-family: ${({ theme }) => theme.typography.fontFamily};
-  font-size: 13px;
-  color: ${({ theme }) => theme.colors.neutral900};
-
-  &::placeholder { color: ${({ theme }) => theme.colors.neutral400}; }
-  &:focus {
-    outline: none;
-    border-color: ${({ theme }) => theme.colors.blue300};
-    box-shadow: 0 0 0 2px rgba(1, 116, 195, 0.15);
-  }
-`
-
-const Textarea = styled.textarea`
-  width: 100%;
-  min-height: 100px;
-  padding: 10px 12px;
-  border-radius: ${({ theme }) => theme.borderRadius.md};
-  border: 1px solid ${({ theme }) => theme.colors.neutral300};
-  font-family: ${({ theme }) => theme.typography.fontFamily};
-  font-size: 13px;
-  color: ${({ theme }) => theme.colors.neutral900};
-  resize: vertical;
-
-  &::placeholder { color: ${({ theme }) => theme.colors.neutral400}; }
-  &:focus {
-    outline: none;
-    border-color: ${({ theme }) => theme.colors.blue300};
-    box-shadow: 0 0 0 2px rgba(1, 116, 195, 0.15);
-  }
-`
-
-const FormFooter = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   gap: 12px;
 `
 
-const FormHelper = styled.p`
-  margin: 0;
-  font-size: 12px;
+const CategoryCard = styled.div`
+  border: 1.5px solid ${({ $selected, theme }) => ($selected ? theme.colors.blue300 : theme.colors.neutral200)};
+  border-radius: ${({ theme }) => theme.borderRadius.lg};
+  overflow: hidden;
+  transition: border-color 0.15s;
+
+  &:hover {
+    border-color: ${({ $selected, theme }) => ($selected ? theme.colors.blue300 : theme.colors.neutral400)};
+  }
+`
+
+const CategoryTrigger = styled.button`
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+  padding: 16px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  gap: 12px;
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+
+  &:focus-visible {
+    outline: 2px solid ${({ theme }) => theme.colors.blue300};
+    outline-offset: -2px;
+  }
+`
+
+const CategoryIconWrap = styled.div`
+  flex-shrink: 0;
+  color: ${({ theme }) => theme.colors.neutral500};
+  padding-top: 1px;
+`
+
+const CategoryContent = styled.div`
+  flex: 1;
+  min-width: 0;
+`
+
+const CategoryTitle = styled.div`
+  font-size: 14px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.neutral900};
+  margin-bottom: 4px;
+`
+
+const CategoryHelper = styled.div`
+  font-size: 13px;
+  color: ${({ theme }) => theme.colors.neutral500};
+  line-height: 1.45;
+`
+
+const CategoryChevron = styled.div`
+  flex-shrink: 0;
   color: ${({ theme }) => theme.colors.neutral500};
 `
 
-const ManagerCard = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  padding: 16px;
-  border: 1px solid ${({ theme }) => theme.colors.neutral200};
-  border-radius: ${({ theme }) => theme.borderRadius.md};
-  background: ${({ theme }) => theme.colors.neutral50};
+const CategoryCTAWrap = styled.div`
+  padding: 12px 16px;
+  border-top: 1px solid ${({ theme }) => theme.colors.neutral200};
 `
 
-const AvatarRow = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 12px;
-`
-
-const Avatar = styled.div`
+const CTALink = styled.a`
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: #D5E6F7;
-  color: ${({ theme }) => theme.colors.blue300};
-  font-size: 15px;
-  font-weight: 600;
-  flex-shrink: 0;
-`
-
-const AvatarInfo = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-`
-
-const AvatarName = styled.div`
-  font-size: 14px;
-  font-weight: 600;
-  color: ${({ theme }) => theme.colors.neutral900};
-`
-
-const AvatarMeta = styled.div`
-  font-size: 12px;
-  color: ${({ theme }) => theme.colors.neutral600};
-`
-
-const ContactList = styled.div`
-  display: flex;
-  flex-direction: column;
   gap: 8px;
-`
-
-const ContactItem = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 13px;
-  color: ${({ theme }) => theme.colors.neutral700};
-`
-
-const ContactLink = styled.a`
-  color: ${({ theme }) => theme.colors.blue300};
-  text-decoration: none;
-  &:hover { text-decoration: underline; }
-`
-
-const SendBtn = styled.button`
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 20px;
+  width: 100%;
+  padding: 11px 20px;
   border-radius: ${({ theme }) => theme.borderRadius.md};
-  border: none;
   background: ${({ theme }) => theme.colors.blue300};
   color: white;
   font-family: ${({ theme }) => theme.typography.fontFamily};
   font-size: 14px;
   font-weight: 500;
+  text-decoration: none;
   cursor: pointer;
-  white-space: nowrap;
-  flex-shrink: 0;
   transition: background 0.15s;
+  box-sizing: border-box;
 
   &:hover { background: ${({ theme }) => theme.colors.blue500}; }
-  &:focus-visible { outline: 2px solid ${({ theme }) => theme.colors.blue300}; outline-offset: 2px; }
+  &:focus-visible {
+    outline: 2px solid ${({ theme }) => theme.colors.blue300};
+    outline-offset: 2px;
+  }
 `
 
-/* ── Alt help ── */
-
-const AltHelpWrap = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding-top: 20px;
-  border-top: 1px solid ${({ theme }) => theme.colors.neutral200};
-`
-
-const AltHelpLabel = styled.p`
-  margin: 0;
-  font-size: 12px;
-  color: ${({ theme }) => theme.colors.neutral600};
-`
-
-const AltHelpLink = styled.a`
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 13px;
-  font-weight: 500;
-  color: ${({ theme }) => theme.colors.blue300};
-  text-decoration: none;
-  width: fit-content;
-
-  &:hover { text-decoration: underline; }
-  &:focus-visible { outline: 2px solid ${({ theme }) => theme.colors.blue300}; outline-offset: 2px; border-radius: 2px; }
-`
-
-/* ── Banner content ── */
-
-const BANNER_CONTENT = {
-  subscriptions: {
-    heading: 'Questions about subscriptions?',
-    body: 'Use the form below to contact your DigiCert account manager.',
-    bodyNoManager: 'Fill out the form below and your message will be routed to the appropriate DigiCert team.',
+const CATEGORIES = [
+  {
+    id: 'sales',
+    title: 'Sales',
+    helper: 'Questions about purchasing, pricing, renewals, account growth, additional products, or billing.',
+    cta: 'Contact sales',
+    href: 'https://www.digicert.com/contact-us',
   },
-  'payment-details': {
-    heading: 'Questions about payment details?',
-    body: 'Use the form below to contact your DigiCert account manager about billing or payment questions.',
-    bodyNoManager: 'Fill out the form below about billing or payment questions and your message will be routed to the appropriate DigiCert team.',
+  {
+    id: 'support',
+    title: 'Support',
+    helper: 'Help with product issues, errors, troubleshooting, or technical questions.',
+    cta: 'Contact support',
+    href: 'https://www.digicert.com/support/pki-support',
   },
-  receipts: {
-    heading: 'Questions about your invoices?',
-    body: 'Use the form below to contact your DigiCert account manager about receipts or billing history.',
-    bodyNoManager: 'Fill out the form below about receipts or billing history and your message will be routed to the appropriate DigiCert team.',
-  },
-}
+]
 
-export default function ContactManagerDrawer({ open, onClose, helpContext = 'subscriptions', hasAccountManager = true }) {
-  const banner = BANNER_CONTENT[helpContext] || BANNER_CONTENT.subscriptions
-  const initials = accountManager.name.split(' ').map((w) => w[0]).join('')
+export default function ContactManagerDrawer({ open, onClose }) {
+  const [selected, setSelected] = useState(null)
   const firstFocusRef = useRef(null)
 
   useEffect(() => {
@@ -366,6 +232,7 @@ export default function ContactManagerDrawer({ open, onClose, helpContext = 'sub
     if (open && firstFocusRef.current) {
       setTimeout(() => firstFocusRef.current?.focus(), 260)
     }
+    if (!open) setSelected(null)
   }, [open])
 
   return (
@@ -388,75 +255,53 @@ export default function ContactManagerDrawer({ open, onClose, helpContext = 'sub
         </DrawerHeader>
 
         <DrawerBody>
-          {hasAccountManager && (
-            <ManagerCard>
-              <AvatarRow>
-                <Avatar>{initials}</Avatar>
-                <AvatarInfo>
-                  <AvatarName>{accountManager.name}</AvatarName>
-                  <AvatarMeta>{accountManager.title}</AvatarMeta>
-                </AvatarInfo>
-              </AvatarRow>
-              <ContactList>
-                <ContactItem>
-                  <EnvelopeIcon size={14} color="currentColor" />
-                  <ContactLink href={`mailto:${accountManager.email}`}>{accountManager.email}</ContactLink>
-                </ContactItem>
-              </ContactList>
-            </ManagerCard>
-          )}
+          <QuestionHeading>What do you need help with?</QuestionHeading>
 
-          <HelpCallout>
-            <BannerHeading>{banner.heading}</BannerHeading>
-            <BannerText>{hasAccountManager ? banner.body : banner.bodyNoManager}</BannerText>
-          </HelpCallout>
+          <CategoryList>
+            {CATEGORIES.map((cat) => {
+              const isExpanded = selected === cat.id
+              return (
+                <CategoryCard key={cat.id} $selected={isExpanded}>
+                  <CategoryTrigger
+                    type="button"
+                    onClick={() => setSelected(isExpanded ? null : cat.id)}
+                    aria-expanded={isExpanded}
+                  >
+                    <CategoryIconWrap>
+                      {cat.id === 'sales'
+                        ? <DollarIcon size={18} color="currentColor" />
+                        : <GearIcon size={18} color="currentColor" />
+                      }
+                    </CategoryIconWrap>
+                    <CategoryContent>
+                      <CategoryTitle>{cat.title}</CategoryTitle>
+                      <CategoryHelper>{cat.helper}</CategoryHelper>
+                    </CategoryContent>
+                    <CategoryChevron>
+                      {isExpanded
+                        ? <ChevronUpIcon size={16} color="currentColor" />
+                        : <ChevronDownIcon size={16} color="currentColor" />
+                      }
+                    </CategoryChevron>
+                  </CategoryTrigger>
 
-          <Divider />
-
-          <FormSection>
-            <FormTitle>Send a message</FormTitle>
-            <FieldGroup>
-              <FieldLabel htmlFor="drawer-subject">Subject</FieldLabel>
-              <Input
-                id="drawer-subject"
-                type="text"
-                placeholder="e.g. Request additional SSL/TLS licenses"
-              />
-            </FieldGroup>
-            <FieldGroup>
-              <FieldLabel htmlFor="drawer-message">Message</FieldLabel>
-              <Textarea
-                id="drawer-message"
-                placeholder="Describe what you need help with..."
-                rows={4}
-              />
-            </FieldGroup>
-            <FormFooter>
-              <FormHelper>
-                {hasAccountManager
-                  ? `Your message will be sent to ${accountManager.name}.`
-                  : 'Your message will be routed to the appropriate DigiCert team.'}
-              </FormHelper>
-              <SendBtn type="button">Send message</SendBtn>
-            </FormFooter>
-          </FormSection>
-
-          <AltHelpWrap>
-            <AltHelpLabel>Need to speak to sales instead?</AltHelpLabel>
-            <AltHelpLink
-              href="https://www.digicert.com/contact-us"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Contact sales
-              <ExternalLinkIcon size={12} color="currentColor" />
-            </AltHelpLink>
-          </AltHelpWrap>
+                  {isExpanded && (
+                    <CategoryCTAWrap>
+                      <CTALink
+                        href={cat.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {cat.cta}
+                        <ExternalLinkIcon size={14} color="currentColor" />
+                      </CTALink>
+                    </CategoryCTAWrap>
+                  )}
+                </CategoryCard>
+              )
+            })}
+          </CategoryList>
         </DrawerBody>
-
-        <DrawerFooter>
-          <PrototypeToggle />
-        </DrawerFooter>
       </DrawerPanel>
     </>
   )
