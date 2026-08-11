@@ -278,6 +278,14 @@ export default function Receipts({ scenario }) {
 
   return (
     <Main>
+      <PageHeader>
+        <TitleBlock>
+          <PageTitle>Receipts and invoices</PageTitle>
+          <PageDescription>
+            Track your invoices, receipts, and refunds for all e-commerce products, self-service add-ons, and other usage.
+          </PageDescription>
+        </TitleBlock>
+      </PageHeader>
       <ScopeBanner>
         <ScopeBannerIcon>
           <InfoCircleIcon size={16} color="currentColor" />
@@ -287,14 +295,6 @@ export default function Receipts({ scenario }) {
           Enterprise contract billing documents are managed separately — contact your account manager for enterprise invoices or billing records.
         </span>
       </ScopeBanner>
-      <PageHeader>
-        <TitleBlock>
-          <PageTitle>Receipts and invoices</PageTitle>
-          <PageDescription>
-            Track your invoices, receipts, and refunds for all e-commerce products, self-service add-ons, and other usage.
-          </PageDescription>
-        </TitleBlock>
-      </PageHeader>
 
       <SummaryRow>
         <SummaryCard $alert>
