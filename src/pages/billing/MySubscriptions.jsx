@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import styled from 'styled-components'
-import { ENVIRONMENTS, getMultiEnvSubscriptions } from '../../data/billingData'
+import { ENVIRONMENTS, CURRENT_ENV_ID, getMultiEnvSubscriptions } from '../../data/billingData'
 import SubscriptionCard from '../../components/billing/SubscriptionCard'
 import ContactManagerDrawer from '../../components/billing/ContactManagerDrawer'
 import { LifeRingIcon, ChevronDownIcon } from '../../components/Icons'
@@ -172,13 +172,28 @@ const FilterDropdownItem = styled.button`
   color: ${({ $active, theme }) => ($active ? theme.colors.blue300 : theme.colors.neutral800)};
   font-weight: ${({ $active }) => ($active ? 500 : 400)};
 
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
   &:hover { background: ${({ $active, theme }) => ($active ? '#EAF1FB' : theme.colors.neutral50)}; }
+`
+
+const CurrentEnvBadge = styled.span`
+  flex-shrink: 0;
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 600;
+  background: #EAF1FB;
+  color: ${({ theme }) => theme.colors.blue300};
+  white-space: nowrap;
 `
 
 export default function MySubscriptions() {
   const [isContactDrawerOpen, setIsContactDrawerOpen] = useState(false)
   const [searchParams, setSearchParams] = useSearchParams()
-  const envFilter = searchParams.get('env') || 'all'
+  const envFilter = searchParams.get('env') || CURRENT_ENV_ID
   const productFilter = searchParams.get('product') || 'all'
   const [envDropdownOpen, setEnvDropdownOpen] = useState(false)
   const [productDropdownOpen, setProductDropdownOpen] = useState(false)
@@ -271,13 +286,14 @@ export default function MySubscriptions() {
                   onClick={() => {
                     setSearchParams(prev => {
                       const next = new URLSearchParams(prev)
-                      env.id === 'all' ? next.delete('env') : next.set('env', env.id)
+                      next.set('env', env.id)
                       return next
                     }, { replace: true })
                     setEnvDropdownOpen(false)
                   }}
                 >
                   {env.name}
+                  {env.isCurrent && <CurrentEnvBadge>Current</CurrentEnvBadge>}
                 </FilterDropdownItem>
               ))}
             </FilterDropdownList>

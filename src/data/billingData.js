@@ -648,12 +648,14 @@ export function getBillingTypeSummary(subs) {
 // ── Multi-environment support ─────────────────────────────────────────────────
 
 export const ENVIRONMENTS = [
-  { id: 'us-prod', name: 'Acme — US production', region: 'US' },
+  { id: 'us-prod', name: 'Acme — US production', region: 'US', isCurrent: true },
   { id: 'us-stage', name: 'Acme — US stage', region: 'US' },
   { id: 'eu-prod', name: 'Acme — EU production', region: 'EU' },
   { id: 'eu-stage', name: 'Acme — EU stage', region: 'EU' },
   { id: 'in-prod', name: 'Acme — IN', region: 'IN' },
 ]
+
+export const CURRENT_ENV_ID = ENVIRONMENTS.find(e => e.isCurrent)?.id ?? ENVIRONMENTS[0].id
 
 const ENV_PRODUCTS = {
   'us-prod':  ['trust-lifecycle', 'software-trust', 'private-ca', 'certcentral-acme-global-security', 'certcentral-acme-marketing', 'certcentral-acme-enterprise'],
