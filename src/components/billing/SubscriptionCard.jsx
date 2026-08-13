@@ -399,7 +399,6 @@ function buildMetaItems(subscription) {
   const tierValue = subscription.tier || 'Enterprise'
   const items = [{ label: 'Tier', value: tierValue }]
   if (subscription.plan) items.push({ label: 'Plan', value: subscription.plan })
-  if (subscription.autoRenewal !== undefined) items.push({ label: 'Auto-renewal', value: subscription.autoRenewal ? 'On' : 'Off' })
   return items
 }
 
