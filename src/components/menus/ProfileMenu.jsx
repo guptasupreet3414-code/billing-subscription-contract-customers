@@ -79,12 +79,16 @@ const MenuItem = styled.a`
   }
 `
 
-export default function ProfileMenu({ onClose, onSelectProduct }) {
+export default function ProfileMenu({ onClose, onSelectProduct, onSelectProductFromTopNav }) {
   const navigate = useNavigate()
 
   const handleProfile = (e) => {
     e.preventDefault()
-    onSelectProduct('profile')
+    if (onSelectProductFromTopNav) {
+      onSelectProductFromTopNav('profile')
+    } else {
+      onSelectProduct('profile')
+    }
     navigate('/profile')
     onClose()
   }

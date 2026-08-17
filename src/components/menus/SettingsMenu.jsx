@@ -58,11 +58,15 @@ const MenuItem = styled.a`
   }
 `
 
-export default function SettingsMenu({ onClose, onSelectProduct }) {
+export default function SettingsMenu({ onClose, onSelectProduct, onSelectProductFromTopNav }) {
   const navigate = useNavigate()
 
   const handleClick = (link) => {
-    onSelectProduct(link.productId)
+    if (onSelectProductFromTopNav) {
+      onSelectProductFromTopNav(link.productId)
+    } else {
+      onSelectProduct(link.productId)
+    }
     navigate(link.route)
     onClose()
   }
