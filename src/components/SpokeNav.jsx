@@ -54,6 +54,36 @@ const SpokeContent = styled.div`
   }
 `
 
+const BackLinkBar = styled.div`
+  flex-shrink: 0;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.neutral300};
+`
+
+const BackBtn = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 10px 16px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-family: ${({ theme }) => theme.typography.fontFamily};
+  font-size: 13px;
+  color: ${({ theme }) => theme.colors.blue300};
+  text-align: left;
+  transition: background 0.12s, color 0.12s;
+
+  &:hover {
+    background: ${({ theme }) => theme.colors.neutral200};
+  }
+
+  &:focus-visible {
+    outline: 2px solid ${({ theme }) => theme.colors.blue300};
+    outline-offset: -2px;
+  }
+`
+
 const SpokeHeader = styled.div`
   padding: 14px 16px 10px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.neutral300};
@@ -229,7 +259,7 @@ function NavSection({ section, index }) {
   )
 }
 
-export default function SpokeNav({ activeProductId, isSpokeOpen, onToggleSpoke, billingScenario }) {
+export default function SpokeNav({ activeProductId, isSpokeOpen, onToggleSpoke, billingScenario, previousRoute, onGoBack }) {
   let product = productSubNavs[activeProductId]
 
   if (activeProductId === 'settings-billing' && billingScenario === 'enterprise') {
@@ -253,6 +283,14 @@ export default function SpokeNav({ activeProductId, isSpokeOpen, onToggleSpoke, 
       <SpokeWrap $open={isSpokeOpen} id="spoke-panel" aria-hidden={!isSpokeOpen}>
         <SpokeInner>
           <SpokeContent $open={isSpokeOpen}>
+            {previousRoute && (
+              <BackLinkBar>
+                <BackBtn onClick={() => onGoBack(previousRoute)} aria-label="Back">
+                  <ChevronLeftIcon size={12} color="currentColor" />
+                  Back
+                </BackBtn>
+              </BackLinkBar>
+            )}
             {product && (
               <>
                 <SpokeHeader>

@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
-import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
+import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { createGlobalStyle } from 'styled-components'
 import styled from 'styled-components'
 import TopNav from './components/TopNav'
@@ -107,15 +107,39 @@ function useAppState() {
   const [isSpokeOpen, setIsSpokeOpen] = useState(true)
   const [activeTopNav, setActiveTopNav] = useState(null)
   const [billingScenario, setBillingScenario] = useState('mixed')
+  const [previousRoute, setPreviousRoute] = useState(null)
+  const [previousProductId, setPreviousProductId] = useState(null)
 
   const toggleDrawer = useCallback(() => setIsDrawerOpen((v) => !v), [])
   const closeDrawer = useCallback(() => setIsDrawerOpen(false), [])
   const toggleSpoke = useCallback(() => setIsSpokeOpen((v) => !v), [])
 
+  // Icon rail navigation — clears the back link
   const selectProduct = useCallback((id) => {
     setActiveProductId(id)
     setIsSpokeOpen(true)
+    setPreviousRoute(null)
+    setPreviousProductId(null)
   }, [])
+
+  // Top nav menu navigation — captures origin so the Back link can return there
+  const navigateFromTopNav = useCallback((id, fromPathname, fromProductId) => {
+    const isAlreadyInSettings = fromProductId.startsWith('settings-') || fromProductId === 'profile'
+    if (!isAlreadyInSettings) {
+      setPreviousRoute(fromPathname)
+      setPreviousProductId(fromProductId)
+    }
+    setActiveProductId(id)
+    setIsSpokeOpen(true)
+  }, [])
+
+  // Back link click — restore origin product and clear back state
+  const goBack = useCallback(() => {
+    if (previousProductId !== null) setActiveProductId(previousProductId)
+    setIsSpokeOpen(true)
+    setPreviousRoute(null)
+    setPreviousProductId(null)
+  }, [previousProductId])
 
   const selectProductFromDrawer = useCallback((id) => {
     setActiveProductId(id)
@@ -131,21 +155,34 @@ function useAppState() {
 
   return {
     activeProductId, isDrawerOpen, isSpokeOpen, activeTopNav, billingScenario,
+    previousRoute,
     toggleDrawer, closeDrawer, toggleSpoke, setBillingScenario,
-    selectProduct, selectProductFromDrawer, openTopNav, closeTopNav,
+    selectProduct, navigateFromTopNav, goBack, selectProductFromDrawer, openTopNav, closeTopNav,
   }
 }
 
 export default function App() {
   const {
     activeProductId, isDrawerOpen, isSpokeOpen, activeTopNav, billingScenario,
+    previousRoute,
     toggleDrawer, closeDrawer, toggleSpoke, setBillingScenario,
-    selectProduct, selectProductFromDrawer, openTopNav, closeTopNav,
+    selectProduct, navigateFromTopNav, goBack, selectProductFromDrawer, openTopNav, closeTopNav,
   } = useAppState()
 
   const viewport = useViewport()
   const isMobile = viewport === 'mobile'
   const mainRef = useRef(null)
+  const location = useLocation()
+  const navigate = useNavigate()
+
+  const handleSelectProductFromTopNav = useCallback((id) => {
+    navigateFromTopNav(id, location.pathname, activeProductId)
+  }, [navigateFromTopNav, location.pathname, activeProductId])
+
+  const handleGoBack = useCallback((route) => {
+    navigate(route)
+    goBack()
+  }, [navigate, goBack])
 
   useEffect(() => {
     if (viewport !== 'mobile' && isDrawerOpen) closeDrawer()
@@ -179,6 +216,7 @@ export default function App() {
         onOpenTopNav={openTopNav}
         onCloseTopNav={closeTopNav}
         onSelectProduct={selectProduct}
+        onSelectProductFromTopNav={handleSelectProductFromTopNav}
         cartCount={3}
       />
 
@@ -192,6 +230,8 @@ export default function App() {
         isSpokeOpen={isSpokeOpen}
         onToggleSpoke={toggleSpoke}
         billingScenario={billingScenario}
+        previousRoute={previousRoute}
+        onGoBack={handleGoBack}
       />
 
       <MobileDrawer

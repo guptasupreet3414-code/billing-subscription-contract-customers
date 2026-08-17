@@ -138,6 +138,7 @@ export default function TopNav({
   onOpenTopNav,
   onCloseTopNav,
   onSelectProduct,
+  onSelectProductFromTopNav,
   cartCount = 3,
 }) {
   const hasOverlay = activeTopNav === 'settings' || activeTopNav === 'help' || activeTopNav === 'profile'
@@ -188,7 +189,7 @@ export default function TopNav({
               <GearIcon size={20} />
             </IconBtn>
             {activeTopNav === 'settings' && (
-              <SettingsMenu onClose={onCloseTopNav} onSelectProduct={onSelectProduct} />
+              <SettingsMenu onClose={onCloseTopNav} onSelectProduct={onSelectProduct} onSelectProductFromTopNav={onSelectProductFromTopNav} />
             )}
           </MenuWrap>
 
@@ -227,7 +228,7 @@ export default function TopNav({
               D
             </AvatarBtn>
             {activeTopNav === 'profile' && (
-              <ProfileMenu onClose={onCloseTopNav} onSelectProduct={onSelectProduct} />
+              <ProfileMenu onClose={onCloseTopNav} onSelectProduct={onSelectProduct} onSelectProductFromTopNav={onSelectProductFromTopNav} />
             )}
           </MenuWrap>
         </RightGroup>
