@@ -389,11 +389,11 @@ function buildMetaItems(subscription) {
   if (isCertCentral) {
     const hasEnt = subscription.subscriptionTypes.includes('enterprise')
     const hasEcom = subscription.subscriptionTypes.includes('ecommerce')
-    const tierLabel = hasEnt && hasEcom ? 'Enterprise + E-commerce' : hasEnt ? 'Enterprise' : 'E-commerce'
+    const tierLabel = hasEnt && hasEcom ? 'Enterprise + ecommerce' : hasEnt ? 'Enterprise' : 'ecommerce'
     return [
       { label: 'Tier', value: tierLabel },
-      { label: 'Account name', value: subscription.accountName },
-      { label: 'Account ID', value: subscription.accountId },
+      { label: 'Instance name', value: subscription.accountName },
+      { label: 'Instance ID', value: subscription.accountId },
     ]
   }
   const tierValue = subscription.tier || 'Enterprise'
@@ -451,7 +451,7 @@ function MixedInstanceCard({ subscription }) {
             $active={inst.instanceId === activeId}
             onClick={(e) => { e.preventDefault(); e.stopPropagation(); setActiveId(inst.instanceId) }}
           >
-            {inst.subscriptionType === 'enterprise' ? 'Enterprise' : 'E-commerce'}
+            {inst.subscriptionType === 'enterprise' ? 'Enterprise' : 'ecommerce'}
           </SegmentBtn>
         ))}
       </SegmentedContainer>
@@ -464,7 +464,7 @@ function MixedInstanceCard({ subscription }) {
           }
           <BottomRow>
             {extraCount > 0 && <MoreLink>+{extraCount} more</MoreLink>}
-            <ManagedByText>Managed by your Account Manager</ManagedByText>
+            <ManagedByText>Managed by DigiCert</ManagedByText>
           </BottomRow>
         </>
       ) : (
@@ -472,7 +472,7 @@ function MixedInstanceCard({ subscription }) {
           <EntitlementRows entitlements={instance.entitlements} maxVisible={3} />
           <BottomRow>
             <span />
-            <ManagedByText>Self-service subscription</ManagedByText>
+            <ManagedByText>Managed by you</ManagedByText>
           </BottomRow>
         </>
       )}
@@ -496,9 +496,9 @@ export default function SubscriptionCard({ subscription }) {
   const extraCount = entitlements.length - visibleEntitlements.length
 
   const bottomText = isEnterprise
-    ? 'Managed by your Account Manager'
+    ? 'Managed by DigiCert'
     : isEcommerce
-    ? 'Self-service subscription'
+    ? 'Managed by you'
     : null
 
   const productOpenName = isCertCentral ? 'CertCentral' : name

@@ -282,19 +282,10 @@ export default function Receipts({ scenario }) {
         <TitleBlock>
           <PageTitle>Receipts and invoices</PageTitle>
           <PageDescription>
-            Track your invoices, receipts, and refunds for all e-commerce products, self-service add-ons, and other usage.
+            Track your invoices, receipts, and refunds for all ecommerce products, self-service add-ons, and other usage. Contact your account manager for enterprise invoices and billing records.
           </PageDescription>
         </TitleBlock>
       </PageHeader>
-      <ScopeBanner>
-        <ScopeBannerIcon>
-          <InfoCircleIcon size={16} color="currentColor" />
-        </ScopeBannerIcon>
-        <span>
-          Receipts and invoices apply to <strong>self-service (e-commerce) subscriptions only</strong>.
-          Enterprise contract billing documents are managed separately — contact your account manager for enterprise invoices or billing records.
-        </span>
-      </ScopeBanner>
 
       <SummaryRow>
         <SummaryCard $alert>
