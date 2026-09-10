@@ -268,7 +268,7 @@ export default function PaymentDetails({ scenario }) {
         <TitleBlock>
           <PageTitle>Payment details</PageTitle>
           <PageDescription>
-            Payments for e-commerce products, self-service add-ons, and other usage are made using your default payment method.
+            Payments for ecommerce products, self-service add-ons, and other usage are made using your default payment method.
           </PageDescription>
         </TitleBlock>
         <NeedHelpLink href="#">
@@ -276,15 +276,6 @@ export default function PaymentDetails({ scenario }) {
           Need help?
         </NeedHelpLink>
       </PageHeader>
-      <ScopeBanner>
-        <ScopeBannerIcon>
-          <InfoCircleIcon size={16} color="currentColor" />
-        </ScopeBannerIcon>
-        <span>
-          Payment details apply to <strong>self-service (e-commerce) subscriptions only</strong>.
-          Enterprise contract billing is managed separately — contact your account manager for invoices or payment changes related to enterprise products.
-        </span>
-      </ScopeBanner>
 
       <SectionBlock>
         <SectionHeader>

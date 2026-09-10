@@ -386,7 +386,7 @@ function PlanTypeCard({ instance, isCertCentral, plan }) {
   }, [tooltipOpen])
 
   const isEnterprise = instance.subscriptionType === 'enterprise'
-  const tierLabel = instance.tier || (isEnterprise ? 'Enterprise' : 'E-commerce')
+  const tierLabel = instance.tier || (isEnterprise ? 'Enterprise' : 'Ecommerce')
 
   let tooltipContent
   if (isEnterprise && !isCertCentral) {
@@ -1118,7 +1118,7 @@ function ProductAccordion({ category }) {
             <Table>
               <thead>
                 <tr>
-                  <Th style={{ width: '40%' }}>Product</Th>
+                  <Th style={{ width: '40%' }}>Entitlement</Th>
                   <Th $align="right">Purchased</Th>
                   <Th $align="right">Used</Th>
                   <Th $align="right">Available</Th>
@@ -1150,7 +1150,7 @@ function ProductAccordion({ category }) {
 function ProductsSection({ categories }) {
   return (
     <Section>
-      <SectionTitle>Products</SectionTitle>
+      <SectionTitle>Entitlements and usage</SectionTitle>
       {categories.map((cat) => (
         <ProductAccordion key={cat.id} category={cat} />
       ))}
@@ -1264,10 +1264,10 @@ export default function SubscriptionDetail() {
                 )}
                 {effectiveEnvDisplay && subscription.accountName && <> | </>}
                 {subscription.accountName && (
-                  <><strong>Account name:</strong> {subscription.accountName}</>
+                  <><strong>Instance name:</strong> {subscription.accountName}</>
                 )}
                 {subscription.accountId && (
-                  <> | <strong>Account ID:</strong> {subscription.accountId}</>
+                  <> | <strong>Instance ID:</strong> {subscription.accountId}</>
                 )}
               </SummaryLine>
             )}
@@ -1329,7 +1329,7 @@ export default function SubscriptionDetail() {
               aria-selected={instance.instanceId === activeInstance.instanceId}
               onClick={() => setActiveInstanceId(instance.instanceId)}
             >
-              {instance.subscriptionType === 'enterprise' ? 'Enterprise' : 'E-commerce'}
+              {instance.subscriptionType === 'enterprise' ? 'Enterprise' : 'Ecommerce'}
             </InstanceTab>
           ))}
         </InstanceTabRow>
