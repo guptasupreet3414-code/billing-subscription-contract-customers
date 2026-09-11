@@ -134,9 +134,9 @@ const Section = styled.section`
 
 const SectionTitle = styled.h2`
   margin: 0 0 14px;
-  font-size: 11px;
+  font-size: 20px;
   font-weight: 600;
-  color: ${({ theme }) => theme.colors.neutral500};
+  color: ${({ theme }) => theme.colors.neutral900};
 `
 
 // ── KPI cards ──────────────────────────────────────────────────────────────────
@@ -694,7 +694,7 @@ function PeakUsageUSDTable({ series }) {
       <Table>
         <thead>
           <tr>
-            <Th style={{ width: '40%' }}>Certificate type</Th>
+            <Th style={{ width: '40%' }}>Entitlement</Th>
             <Th $align="right">Current month ($)</Th>
             <Th $align="right">Period peak ($)</Th>
             <Th $align="right">Peak date</Th>
@@ -1121,7 +1121,7 @@ function ProductAccordion({ category }) {
             <Table>
               <thead>
                 <tr>
-                  <Th style={{ width: '40%' }}>Entitlement</Th>
+                  <Th style={{ width: '40%' }}>Certificate type</Th>
                   <Th $align="right">Purchased</Th>
                   <Th $align="right">Used</Th>
                   <Th $align="right">Available</Th>
