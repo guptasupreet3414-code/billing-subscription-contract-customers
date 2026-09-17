@@ -937,6 +937,78 @@ function SoftwareTrustSection({ instance }) {
   )
 }
 
+// ── DigiCert DNS: query capacity + included resources sections ────────────────
+
+function DigiCertDNSSection({ instance }) {
+  const { dnsQueryCapacity, includedResources = [] } = instance
+
+  return (
+    <>
+      <Section>
+        <SectionTitle>Entitlements and usage</SectionTitle>
+        <TableWrap>
+          <Table>
+            <thead>
+              <tr>
+                <Th style={{ width: '40%' }}>Entitlement</Th>
+                <Th $align="right">Purchased</Th>
+                <Th $align="right">Used</Th>
+                <Th $align="right">Remaining</Th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <Td>DNS queries</Td>
+                <Td $align="right">{dnsQueryCapacity.purchased.toLocaleString()}</Td>
+                <Td $align="right">{dnsQueryCapacity.used.toLocaleString()}</Td>
+                <Td $align="right">
+                  <RemainingValue>{dnsQueryCapacity.remaining.toLocaleString()}</RemainingValue>
+                </Td>
+              </tr>
+            </tbody>
+          </Table>
+        </TableWrap>
+      </Section>
+
+      {includedResources.length > 0 && (
+        <Section>
+          <SectionTitle>Included resources</SectionTitle>
+          <SectionDesc>
+            Resource quotas included with your plan. Quotas increase automatically when you upgrade your plan.
+          </SectionDesc>
+          <TableWrap>
+            <Table>
+              <thead>
+                <tr>
+                  <Th style={{ width: '40%' }}>Entitlement</Th>
+                  <Th $align="right">Monthly allocated</Th>
+                  <Th $align="right">Used</Th>
+                  <Th $align="right">Remaining</Th>
+                </tr>
+              </thead>
+              <tbody>
+                {includedResources.map(res => {
+                  const tone = res.remaining === 0 ? 'error' : undefined
+                  return (
+                    <tr key={res.name}>
+                      <Td>{res.name}</Td>
+                      <Td $align="right">{res.available.toLocaleString()}</Td>
+                      <Td $align="right">{res.used.toLocaleString()}</Td>
+                      <Td $align="right">
+                        <RemainingValue $tone={tone}>{res.remaining.toLocaleString()}</RemainingValue>
+                      </Td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </Table>
+          </TableWrap>
+        </Section>
+      )}
+    </>
+  )
+}
+
 function ManageCertCentralSection() {
   return (
     <Section>
@@ -1340,6 +1412,8 @@ export default function SubscriptionDetail() {
           <ContractInfoSection instance={activeInstance} isCertCentral={isCertCentral} />
           {subscription.id === 'software-trust' ? (
             <SoftwareTrustSection instance={activeInstance} />
+          ) : subscription.id === 'dns' ? (
+            <DigiCertDNSSection instance={activeInstance} />
           ) : isCertCentral && activeInstance.contractType === 'peak-usage' ? (
             <PeakUsageSection instance={activeInstance} purchasedOnly={subscription.accountId === '1001445'} />
           ) : (

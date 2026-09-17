@@ -348,6 +348,7 @@ export function getIcon(iconType, size = 20, color = 'white') {
     case 'key': return <KeyIcon {...props} />
     case 'atom': return <AtomIcon {...props} />
     case 'chip': return <ChipIcon {...props} />
+    case 'layers': return <LayersIcon {...props} />
     default: return <DashboardIcon {...props} />
   }
 }
