@@ -132,6 +132,7 @@ const enterpriseProducts = [
     id: 'device-trust',
     name: 'Device Trust',
     iconType: 'mobile',
+    plan: 'Premium',
     contractId: 'CTR-2024-DVT-00153',
     contractTerm: 'Aug 15, 2025 – Aug 14, 2026',
     contractOwner: 'IoT Platform Team',
@@ -149,22 +150,31 @@ const enterpriseProducts = [
     id: 'dns',
     name: 'DigiCert DNS',
     iconType: 'globe',
+    plan: 'Essentials',
     contractId: 'CTR-2024-DNS-00076',
     contractTerm: 'Jun 7, 2025 – Jun 6, 2026',
     contractOwner: 'Network Engineering',
     renewalDate: 'Jun 6, 2026',
     environment: 'Production',
     status: 'healthy',
-    primaryEntitlement: { label: 'Queries', consumed: 450000, total: 1000000 },
+    primaryEntitlement: { label: 'DNS queries', consumed: 5000000, total: 10000000 },
     entitlements: [
-      { name: 'Queries', purchased: 1000000, allocated: 1000000, consumed: 450000, remaining: 550000 },
+      { name: 'DNS queries', purchased: 10000000, allocated: 10000000, consumed: 5000000, remaining: 5000000 },
+    ],
+    dnsQueryCapacity: { purchased: 10000000, used: 5000000, remaining: 5000000 },
+    includedResources: [
+      { name: 'Domains', available: 20, used: 10, remaining: 10 },
+      { name: 'Records', available: 6000, used: 2000, remaining: 4000 },
+      { name: 'Users', available: 2, used: 2, remaining: 0 },
+      { name: 'A/AAAA Failover records', available: 2, used: 0, remaining: 2 },
+      { name: 'GTD enabled domains', available: 1, used: 0, remaining: 1 },
     ],
   },
   {
     id: 'valimail',
     name: 'Valimail',
     iconType: 'envelope',
-    plan: 'Essential',
+    plan: 'Essentials',
     autoRenewal: false,
     contractId: 'CTR-2024-VML-00038',
     contractTerm: 'Jul 16, 2025 – Jul 15, 2026',
@@ -172,10 +182,66 @@ const enterpriseProducts = [
     renewalDate: 'Jul 15, 2026',
     environment: 'Production',
     status: 'healthy',
-    primaryEntitlement: { label: 'Domains', consumed: 18, total: 25 },
+    primaryEntitlement: { label: 'Domains — up to 100K emails/month', consumed: 1, total: 5 },
     entitlements: [
-      { name: 'Domains', purchased: 25, allocated: 25, consumed: 18, remaining: 7 },
-      { name: 'Email volume/month', purchased: 5000000, allocated: 5000000, consumed: 2800000, remaining: 2200000 },
+      { name: 'Domains — up to 100K emails/month', purchased: 5, allocated: 5, consumed: 1, remaining: 4 },
+      { name: 'Domains — up to 500K emails/month', purchased: 3, allocated: 3, consumed: 1, remaining: 2 },
+    ],
+    emailUsageByDomain: [
+      { domain: 'abc.com', allowance: 100000, used: 72000, remaining: 28000 },
+      { domain: 'example.com', allowance: 500000, used: 41000, remaining: 59000 },
+    ],
+  },
+  {
+    id: 'quantum-central',
+    name: 'Quantum Central',
+    iconType: 'atom',
+    tier: 'Enterprise',
+    contractId: 'CTR-2024-QC-00112',
+    contractTerm: 'Jun 7, 2025 – Jun 6, 2026',
+    contractOwner: 'Security Operations',
+    renewalDate: 'Jun 6, 2026',
+    environment: 'Production',
+    status: 'healthy',
+    primaryEntitlement: { label: 'Cryptographic operations', consumed: 250000, total: 500000 },
+    entitlements: [
+      { name: 'Cryptographic operations', purchased: 500000, allocated: 500000, consumed: 250000, remaining: 250000 },
+      { name: 'Quantum key pairs', purchased: 1000, allocated: 1000, consumed: 450, remaining: 550 },
+      { name: 'API calls / month', purchased: 2000000, allocated: 2000000, consumed: 800000, remaining: 1200000 },
+    ],
+  },
+  {
+    id: 'ai-trust',
+    name: 'AI Trust',
+    iconType: 'sparkle',
+    tier: 'Enterprise',
+    contractId: 'CTR-2024-AIT-00045',
+    contractTerm: 'Jun 7, 2025 – Jun 6, 2026',
+    contractOwner: 'AI Platform Team',
+    renewalDate: 'Jun 6, 2026',
+    environment: 'Production',
+    status: 'healthy',
+    primaryEntitlement: { label: 'AI Assets units', consumed: 28, total: 50 },
+    entitlements: [
+      { name: 'AI Assets units', purchased: 50, allocated: 50, consumed: 28, remaining: 22 },
+    ],
+  },
+  {
+    id: 'posture-management',
+    name: 'Posture Management',
+    iconType: 'settings',
+    tier: 'Enterprise',
+    contractId: 'CTR-2024-PM-00067',
+    contractTerm: 'Jun 7, 2025 – Jun 6, 2026',
+    contractOwner: 'Security Operations',
+    renewalDate: 'Jun 6, 2026',
+    environment: 'Production',
+    status: 'healthy',
+    primaryEntitlement: { label: 'Assets monitored', consumed: 1200, total: 5000 },
+    entitlements: [
+      { name: 'Assets monitored', purchased: 5000, allocated: 5000, consumed: 1200, remaining: 3800 },
+      { name: 'Policy scans / month', purchased: 3, allocated: 3, consumed: 3, remaining: 0 },
+      { name: 'API calls / month', purchased: 500000, allocated: 500000, consumed: 180000, remaining: 320000 },
     ],
   },
   {
@@ -577,7 +643,7 @@ const enterpriseSubscriptions = enterpriseProducts.map(wrapEnterpriseProduct)
 //                 account 3 both — to demonstrate the mixed layout
 // Fixed subscription set used by MySubscriptions:
 // all enterprise products + 3 CertCentral cards (fixed value, negotiated pricing, ecommerce).
-const REMOVED_PRODUCT_IDS = new Set(['device-trust', 'dns', 'valimail', 'iot-trust'])
+const REMOVED_PRODUCT_IDS = new Set(['iot-trust'])
 
 export function getFixedSubscriptions() {
   const certCentralCards = [
