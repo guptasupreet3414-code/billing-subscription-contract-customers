@@ -289,7 +289,7 @@ export const productSubNavs = {
         ],
       },
       {
-        title: 'Self-service',
+        title: 'Ecommerce billing',
         isSelfService: true,
         isNavParent: true,
         defaultExpanded: true,

@@ -937,6 +937,60 @@ function SoftwareTrustSection({ instance }) {
   )
 }
 
+// ── Valimail: entitlements + email usage by domain sections ──────────────────
+
+function ValimailSection({ instance }) {
+  const { entitlements, emailUsageByDomain = [], contractType } = instance
+
+  const formatK = n => {
+    const k = n / 1000
+    return Number.isInteger(k) ? `${k}k` : `${k.toLocaleString()}k`
+  }
+
+  return (
+    <>
+      <Section>
+        <SectionTitle>Entitlements and usage</SectionTitle>
+        <EntitlementsTable entitlements={entitlements} contractType={contractType} />
+      </Section>
+
+      {emailUsageByDomain.length > 0 && (
+        <Section>
+          <SectionTitle>Email usage by domain</SectionTitle>
+          <TableWrap>
+            <Table>
+              <thead>
+                <tr>
+                  <Th style={{ width: '35%' }}>Domain</Th>
+                  <Th $align="right">Email allowance/month</Th>
+                  <Th $align="right">Used</Th>
+                  <Th $align="right">Remaining</Th>
+                </tr>
+              </thead>
+              <tbody>
+                {emailUsageByDomain.map(row => {
+                  const pct = row.allowance > 0 ? row.used / row.allowance : 0
+                  const tone = pct >= 0.8 ? 'warning' : undefined
+                  return (
+                    <tr key={row.domain}>
+                      <Td>{row.domain}</Td>
+                      <Td $align="right">{formatK(row.allowance)}</Td>
+                      <Td $align="right">{formatK(row.used)}</Td>
+                      <Td $align="right">
+                        <RemainingValue $tone={tone}>{formatK(row.remaining)}</RemainingValue>
+                      </Td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </Table>
+          </TableWrap>
+        </Section>
+      )}
+    </>
+  )
+}
+
 // ── DigiCert DNS: query capacity + included resources sections ────────────────
 
 function DigiCertDNSSection({ instance }) {
@@ -951,7 +1005,7 @@ function DigiCertDNSSection({ instance }) {
             <thead>
               <tr>
                 <Th style={{ width: '40%' }}>Entitlement</Th>
-                <Th $align="right">Purchased</Th>
+                <Th $align="right">Allocated</Th>
                 <Th $align="right">Used</Th>
                 <Th $align="right">Remaining</Th>
               </tr>
@@ -1412,6 +1466,8 @@ export default function SubscriptionDetail() {
           <ContractInfoSection instance={activeInstance} isCertCentral={isCertCentral} />
           {subscription.id === 'software-trust' ? (
             <SoftwareTrustSection instance={activeInstance} />
+          ) : subscription.id === 'valimail' ? (
+            <ValimailSection instance={activeInstance} />
           ) : subscription.id === 'dns' ? (
             <DigiCertDNSSection instance={activeInstance} />
           ) : isCertCentral && activeInstance.contractType === 'peak-usage' ? (

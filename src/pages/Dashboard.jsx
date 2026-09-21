@@ -332,14 +332,14 @@ const productCards = [
     ],
   },
   {
-    title: 'AI Agents',
+    title: 'AI Trust',
     subtitle: 'AI identity & governance',
     iconType: 'sparkle',
     actions: [
-      { label: 'Register agents', href: '/ai-agents/dashboard' },
-      { label: 'Manage agent identities', href: '/ai-agents/dashboard' },
-      { label: 'Review agent activity', href: '/ai-agents/dashboard' },
-      { label: 'Configure trust policies', href: '/ai-agents/dashboard' },
+      { label: 'Register agents', href: '/ai-trust/dashboard' },
+      { label: 'Manage agent identities', href: '/ai-trust/dashboard' },
+      { label: 'Review agent activity', href: '/ai-trust/dashboard' },
+      { label: 'Configure trust policies', href: '/ai-trust/dashboard' },
     ],
   },
   {

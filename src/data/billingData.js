@@ -184,10 +184,14 @@ const enterpriseProducts = [
     renewalDate: 'Jul 15, 2026',
     environment: 'Production',
     status: 'healthy',
-    primaryEntitlement: { label: 'Domains', consumed: 18, total: 25 },
+    primaryEntitlement: { label: 'Domains — up to 100K emails/month', consumed: 1, total: 5 },
     entitlements: [
-      { name: 'Domains', purchased: 25, allocated: 25, consumed: 18, remaining: 7 },
-      { name: 'Email volume/month', purchased: 5000000, allocated: 5000000, consumed: 2800000, remaining: 2200000 },
+      { name: 'Domains — up to 100K emails/month', purchased: 5, allocated: 5, consumed: 1, remaining: 4 },
+      { name: 'Domains — up to 500K emails/month', purchased: 3, allocated: 3, consumed: 1, remaining: 2 },
+    ],
+    emailUsageByDomain: [
+      { domain: 'abc.com', allowance: 100000, used: 72000, remaining: 28000 },
+      { domain: 'example.com', allowance: 500000, used: 41000, remaining: 59000 },
     ],
   },
   {
@@ -209,8 +213,8 @@ const enterpriseProducts = [
     ],
   },
   {
-    id: 'ai-agents',
-    name: 'AI Agents',
+    id: 'ai-trust',
+    name: 'AI Trust',
     iconType: 'sparkle',
     tier: 'Enterprise',
     contractId: 'CTR-2024-AIA-00045',
@@ -219,11 +223,9 @@ const enterpriseProducts = [
     renewalDate: 'Jun 6, 2026',
     environment: 'Production',
     status: 'healthy',
-    primaryEntitlement: { label: 'Active agents', consumed: 28, total: 50 },
+    primaryEntitlement: { label: 'AI Assets units', consumed: 28, total: 50 },
     entitlements: [
-      { name: 'Active agents', purchased: 50, allocated: 50, consumed: 28, remaining: 22 },
-      { name: 'API calls / month', purchased: 5000000, allocated: 5000000, consumed: 2100000, remaining: 2900000 },
-      { name: 'Data records processed', purchased: 10000000, allocated: 10000000, consumed: 4200000, remaining: 5800000 },
+      { name: 'AI Assets units', purchased: 50, allocated: 50, consumed: 28, remaining: 22 },
     ],
   },
   {
@@ -724,9 +726,9 @@ export const ENVIRONMENTS = [
 export const CURRENT_ENV_ID = ENVIRONMENTS.find(e => e.isCurrent)?.id ?? ENVIRONMENTS[0].id
 
 const ENV_PRODUCTS = {
-  'us-prod':  ['trust-lifecycle', 'software-trust', 'private-ca', 'certcentral-acme-global-security', 'certcentral-acme-marketing', 'certcentral-acme-enterprise', 'content-trust', 'device-trust', 'dns', 'valimail', 'quantum-central', 'ai-agents', 'posture-management'],
-  'us-stage': ['trust-lifecycle', 'software-trust', 'certcentral-acme-global-security', 'certcentral-acme-marketing', 'content-trust', 'device-trust', 'dns', 'valimail', 'quantum-central', 'ai-agents', 'posture-management'],
-  'eu-prod':  ['trust-lifecycle', 'private-ca', 'certcentral-acme-global-security', 'certcentral-acme-enterprise', 'content-trust', 'device-trust', 'dns', 'valimail', 'quantum-central', 'ai-agents', 'posture-management'],
+  'us-prod':  ['trust-lifecycle', 'software-trust', 'private-ca', 'certcentral-acme-global-security', 'certcentral-acme-marketing', 'certcentral-acme-enterprise', 'content-trust', 'device-trust', 'dns', 'valimail', 'quantum-central', 'ai-trust', 'posture-management'],
+  'us-stage': ['trust-lifecycle', 'software-trust', 'certcentral-acme-global-security', 'certcentral-acme-marketing', 'content-trust', 'device-trust', 'dns', 'valimail', 'quantum-central', 'ai-trust', 'posture-management'],
+  'eu-prod':  ['trust-lifecycle', 'private-ca', 'certcentral-acme-global-security', 'certcentral-acme-enterprise', 'content-trust', 'device-trust', 'dns', 'valimail', 'quantum-central', 'ai-trust', 'posture-management'],
   'eu-stage': ['software-trust', 'certcentral-acme-marketing', 'content-trust', 'dns', 'valimail', 'quantum-central'],
   'in-prod':  ['software-trust', 'certcentral-acme-enterprise', 'content-trust', 'device-trust', 'dns', 'valimail'],
 }
