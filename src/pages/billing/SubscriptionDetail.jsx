@@ -843,6 +843,31 @@ const OpenCertCentralBtn = styled.a`
   &:focus-visible { outline: 2px solid ${({ theme }) => theme.colors.blue300}; outline-offset: 2px; }
 `
 
+// ── Device Trust: per-plan entitlement tables ────────────────────────────────
+
+function DeviceTrustSection({ instance }) {
+  const { planEntitlements, entitlements, contractType } = instance
+
+  if (planEntitlements) {
+    return (
+      <Section>
+        <SectionTitle>Entitlements and usage</SectionTitle>
+        <ChartSubLabel>Essentials plan</ChartSubLabel>
+        <EntitlementsTable entitlements={planEntitlements.essentials} contractType={contractType} />
+        <ChartSubLabel style={{ marginTop: 20 }}>Advanced plan</ChartSubLabel>
+        <EntitlementsTable entitlements={planEntitlements.advanced} contractType={contractType} />
+      </Section>
+    )
+  }
+
+  return (
+    <Section>
+      <SectionTitle>Entitlements and usage</SectionTitle>
+      <EntitlementsTable entitlements={entitlements} contractType={contractType} />
+    </Section>
+  )
+}
+
 // ── Software Trust: purchased controls + included resources tables ─────────────
 
 const SectionDesc = styled.p`
@@ -1464,7 +1489,9 @@ export default function SubscriptionDetail() {
       {activeInstance.subscriptionType === 'enterprise' ? (
         <>
           <ContractInfoSection instance={activeInstance} isCertCentral={isCertCentral} />
-          {subscription.id === 'software-trust' ? (
+          {subscription.id === 'device-trust' ? (
+            <DeviceTrustSection instance={activeInstance} />
+          ) : subscription.id === 'software-trust' ? (
             <SoftwareTrustSection instance={activeInstance} />
           ) : subscription.id === 'valimail' ? (
             <ValimailSection instance={activeInstance} />

@@ -132,7 +132,7 @@ const enterpriseProducts = [
     id: 'device-trust',
     name: 'Device Trust',
     iconType: 'mobile',
-    plan: 'Premium',
+    plan: 'Essentials and Advanced',
     tier: 'Enterprise',
     contractId: 'CTR-2024-DVT-00153',
     contractTerm: 'Aug 15, 2025 – Aug 14, 2026',
@@ -140,12 +140,15 @@ const enterpriseProducts = [
     renewalDate: 'Aug 14, 2026',
     environment: 'Production',
     status: 'healthy',
-    primaryEntitlement: { label: 'Device certificates', consumed: 45000, total: 100000 },
+    primaryEntitlement: { label: 'Certificates', consumed: 45000, total: 100000 },
     entitlements: [
-      { name: 'Device certificates', purchased: 100000, allocated: 100000, consumed: 45000, remaining: 55000 },
-      { name: 'Device groups', purchased: 50, allocated: 50, consumed: 32, remaining: 18 },
-      { name: 'API calls / month', purchased: 1000000, allocated: 1000000, consumed: 620000, remaining: 380000 },
+      { name: 'Certificates', purchased: 100000, allocated: 100000, consumed: 45000, remaining: 55000 },
+      { name: 'Devices', purchased: 50000, allocated: 50000, consumed: 20000, remaining: 30000 },
     ],
+    planEntitlements: {
+      essentials: [{ name: 'Certificates', purchased: 100000, allocated: 100000, consumed: 45000, remaining: 55000 }],
+      advanced: [{ name: 'Devices', purchased: 50000, allocated: 50000, consumed: 20000, remaining: 30000 }],
+    },
   },
   {
     id: 'dns',
@@ -198,6 +201,7 @@ const enterpriseProducts = [
     id: 'quantum-central',
     name: 'Quantum Central',
     iconType: 'settings',
+    plan: 'Essentials / Advanced',
     tier: 'Enterprise',
     contractId: 'CTR-2024-QC-00112',
     contractTerm: 'Jun 7, 2025 – Jun 6, 2026',
@@ -205,11 +209,9 @@ const enterpriseProducts = [
     renewalDate: 'Jun 6, 2026',
     environment: 'Production',
     status: 'healthy',
-    primaryEntitlement: { label: 'Cryptographic operations', consumed: 250000, total: 500000 },
+    primaryEntitlement: { label: 'Cryptographic assets', consumed: 250000, total: 500000 },
     entitlements: [
-      { name: 'Cryptographic operations', purchased: 500000, allocated: 500000, consumed: 250000, remaining: 250000 },
-      { name: 'Quantum key pairs', purchased: 1000, allocated: 1000, consumed: 450, remaining: 550 },
-      { name: 'API calls / month', purchased: 2000000, allocated: 2000000, consumed: 800000, remaining: 1200000 },
+      { name: 'Cryptographic assets', purchased: 500000, allocated: 500000, consumed: 250000, remaining: 250000 },
     ],
   },
   {
@@ -729,8 +731,8 @@ const ENV_PRODUCTS = {
   'us-prod':  ['trust-lifecycle', 'software-trust', 'private-ca', 'certcentral-acme-global-security', 'certcentral-acme-marketing', 'certcentral-acme-enterprise', 'content-trust', 'device-trust', 'dns', 'valimail', 'quantum-central', 'ai-trust', 'posture-management'],
   'us-stage': ['trust-lifecycle', 'software-trust', 'certcentral-acme-global-security', 'certcentral-acme-marketing', 'content-trust', 'device-trust', 'dns', 'valimail', 'quantum-central', 'ai-trust', 'posture-management'],
   'eu-prod':  ['trust-lifecycle', 'private-ca', 'certcentral-acme-global-security', 'certcentral-acme-enterprise', 'content-trust', 'device-trust', 'dns', 'valimail', 'quantum-central', 'ai-trust', 'posture-management'],
-  'eu-stage': ['software-trust', 'certcentral-acme-marketing', 'content-trust', 'dns', 'valimail', 'quantum-central'],
-  'in-prod':  ['software-trust', 'certcentral-acme-enterprise', 'content-trust', 'device-trust', 'dns', 'valimail'],
+  'eu-stage': ['software-trust', 'certcentral-acme-marketing', 'content-trust', 'dns', 'valimail'],
+  'in-prod':  ['software-trust', 'certcentral-acme-enterprise', 'content-trust', 'device-trust', 'dns', 'valimail', 'quantum-central'],
 }
 
 const SCALE_FACTORS = {
@@ -739,6 +741,31 @@ const SCALE_FACTORS = {
   'eu-prod':  0.65,
   'eu-stage': 0.15,
   'in-prod':  0.40,
+}
+
+const QUANTUM_CENTRAL_ENV_PLANS = {
+  'us-prod':  'Advanced',
+  'eu-prod':  'Advanced',
+  'us-stage': 'Essentials',
+  'in-prod':  'Essentials',
+}
+
+const DEVICE_TRUST_ENV_OVERRIDES = {
+  'us-stage': {
+    plan: 'Essentials',
+    entitlements: [{ name: 'Certificates', purchased: 100000, allocated: 100000, consumed: 45000, remaining: 55000 }],
+    primaryEntitlement: { label: 'Certificates', consumed: 45000, total: 100000 },
+  },
+  'eu-prod': {
+    plan: 'Essentials',
+    entitlements: [{ name: 'Certificates', purchased: 100000, allocated: 100000, consumed: 45000, remaining: 55000 }],
+    primaryEntitlement: { label: 'Certificates', consumed: 45000, total: 100000 },
+  },
+  'in-prod': {
+    plan: 'Advanced',
+    entitlements: [{ name: 'Devices', purchased: 50000, allocated: 50000, consumed: 20000, remaining: 30000 }],
+    primaryEntitlement: { label: 'Devices', consumed: 20000, total: 50000 },
+  },
 }
 
 export function getMultiEnvSubscriptions() {
@@ -819,6 +846,52 @@ export function getMultiEnvSubscriptions() {
           }
           return scaledInst
         })
+
+        if (productId === 'quantum-central' && QUANTUM_CENTRAL_ENV_PLANS[env.id]) {
+          const envPlan = QUANTUM_CENTRAL_ENV_PLANS[env.id]
+          const overrideInstances = scaledInstances.map(inst => ({ ...inst, plan: envPlan }))
+          result.push({
+            ...base,
+            envId: env.id,
+            envName: env.name,
+            plan: envPlan,
+            entitlements: scaledEntitlements,
+            primaryEntitlement: scaledPrimaryEntitlement,
+            instances: overrideInstances,
+          })
+          continue
+        }
+
+        if (productId === 'device-trust' && DEVICE_TRUST_ENV_OVERRIDES[env.id]) {
+          const override = DEVICE_TRUST_ENV_OVERRIDES[env.id]
+          const overrideEnts = override.entitlements.map(ent => ({
+            ...ent,
+            consumed: scaleVal(ent.consumed),
+            remaining: ent.allocated - scaleVal(ent.consumed),
+          }))
+          const overridePrimary = {
+            ...override.primaryEntitlement,
+            consumed: scaleVal(override.primaryEntitlement.consumed),
+          }
+          const overrideInstances = scaledInstances.map(inst => ({
+            ...inst,
+            plan: override.plan,
+            entitlements: overrideEnts,
+            primaryEntitlement: overridePrimary,
+            planEntitlements: undefined,
+          }))
+          result.push({
+            ...base,
+            envId: env.id,
+            envName: env.name,
+            plan: override.plan,
+            entitlements: overrideEnts,
+            primaryEntitlement: overridePrimary,
+            instances: overrideInstances,
+            planEntitlements: undefined,
+          })
+          continue
+        }
 
         result.push({
           ...base,
