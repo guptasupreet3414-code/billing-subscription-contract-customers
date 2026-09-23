@@ -990,6 +990,29 @@ const SectionDesc = styled.p`
   color: ${({ theme }) => theme.colors.neutral600};
 `
 
+function DeviceTrustSection({ instance }) {
+  const { planEntitlements, entitlements, contractType } = instance
+
+  if (planEntitlements) {
+    return (
+      <Section>
+        <SectionTitle>Entitlements and usage</SectionTitle>
+        <ChartSubLabel>Essentials plan</ChartSubLabel>
+        <EntitlementsTable entitlements={planEntitlements.essentials} contractType={contractType} />
+        <ChartSubLabel style={{ marginTop: 20 }}>Advanced plan</ChartSubLabel>
+        <EntitlementsTable entitlements={planEntitlements.advanced} contractType={contractType} />
+      </Section>
+    )
+  }
+
+  return (
+    <Section>
+      <SectionTitle>Entitlements and usage</SectionTitle>
+      <EntitlementsTable entitlements={entitlements} contractType={contractType} />
+    </Section>
+  )
+}
+
 function SoftwareTrustSection({ instance }) {
   const { purchasedControls = [], includedResources = [] } = instance
 
@@ -1476,7 +1499,9 @@ export default function SubscriptionDetail() {
       {activeInstance.subscriptionType === 'enterprise' ? (
         <>
           <ContractInfoSection instance={activeInstance} isCertCentral={isCertCentral} />
-          {subscription.id === 'software-trust' ? (
+          {subscription.id === 'device-trust' ? (
+            <DeviceTrustSection instance={activeInstance} />
+          ) : subscription.id === 'software-trust' ? (
             <SoftwareTrustSection instance={activeInstance} />
           ) : subscription.id === 'valimail' ? (
             <ValimailSection instance={activeInstance} />
