@@ -750,6 +750,20 @@ const QUANTUM_CENTRAL_ENV_PLANS = {
   'in-prod':  'Essentials',
 }
 
+const PRIVATE_CA_ENV_OVERRIDES = {
+  'eu-prod': {
+    entitlements: [
+      { name: 'Private root certificates',            purchased: 10,    allocated: 10,    consumed: 9,    remaining: 1    },
+      { name: 'Private intermediate CA certificates', purchased: 25,    allocated: 25,    consumed: 20,   remaining: 5    },
+      { name: 'Private end-entity certificates',      purchased: 10000, allocated: 10000, consumed: 6000, remaining: 4000 },
+      { name: 'PQC private root certificates',        purchased: 5,     allocated: 5,     consumed: 2,    remaining: 3    },
+      { name: 'PQC private intermediate CA certificates', purchased: 15, allocated: 15,  consumed: 8,    remaining: 7    },
+      { name: 'PQC private end-entity certificates',  purchased: 5000,  allocated: 5000,  consumed: 2000, remaining: 3000 },
+    ],
+    primaryEntitlement: { label: 'Private root certificates', consumed: 9, total: 10 },
+  },
+}
+
 const DEVICE_TRUST_ENV_OVERRIDES = {
   'us-stage': {
     plan: 'Essentials',
@@ -857,6 +871,33 @@ export function getMultiEnvSubscriptions() {
             plan: envPlan,
             entitlements: scaledEntitlements,
             primaryEntitlement: scaledPrimaryEntitlement,
+            instances: overrideInstances,
+          })
+          continue
+        }
+
+        if (productId === 'private-ca' && PRIVATE_CA_ENV_OVERRIDES[env.id]) {
+          const override = PRIVATE_CA_ENV_OVERRIDES[env.id]
+          const overrideEnts = override.entitlements.map(ent => ({
+            ...ent,
+            consumed: scaleVal(ent.consumed),
+            remaining: ent.allocated - scaleVal(ent.consumed),
+          }))
+          const overridePrimary = {
+            ...override.primaryEntitlement,
+            consumed: scaleVal(override.primaryEntitlement.consumed),
+          }
+          const overrideInstances = scaledInstances.map(inst => ({
+            ...inst,
+            entitlements: overrideEnts,
+            primaryEntitlement: overridePrimary,
+          }))
+          result.push({
+            ...base,
+            envId: env.id,
+            envName: env.name,
+            entitlements: overrideEnts,
+            primaryEntitlement: overridePrimary,
             instances: overrideInstances,
           })
           continue
