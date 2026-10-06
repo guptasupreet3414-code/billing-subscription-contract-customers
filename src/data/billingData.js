@@ -241,12 +241,10 @@ const enterpriseProducts = [
     renewalDate: 'Jun 6, 2026',
     environment: 'Production',
     status: 'healthy',
-    primaryEntitlement: { label: 'Assets monitored', consumed: 3240, total: 5000 },
-    entitlements: [
-      { name: 'Assets monitored', purchased: 5000, allocated: 5000, consumed: 3240, remaining: 1760 },
-      { name: 'Policy scans / month', purchased: 500, allocated: 500, consumed: 312, remaining: 188 },
-      { name: 'Reports', purchased: 100, allocated: 100, consumed: 67, remaining: 33 },
-    ],
+    // Entitlements not yet confirmed — card and details page show "TBD".
+    entitlementsTBD: true,
+    primaryEntitlement: null,
+    entitlements: [],
   },
   {
     id: 'iot-trust',
@@ -600,6 +598,7 @@ function wrapEnterpriseProduct(product) {
     status: rest.status,
     primaryEntitlement: rest.primaryEntitlement,
     entitlements: rest.entitlements,
+    entitlementsTBD: rest.entitlementsTBD,
     plan: rest.plan,
     tier: rest.tier,
     autoRenewal: rest.autoRenewal,
@@ -816,10 +815,9 @@ export function getMultiEnvSubscriptions() {
           remaining: ent.allocated - scaleVal(ent.consumed),
         }))
 
-        const scaledPrimaryEntitlement = {
-          ...base.primaryEntitlement,
-          consumed: scaleVal(base.primaryEntitlement.consumed),
-        }
+        const scaledPrimaryEntitlement = base.primaryEntitlement
+          ? { ...base.primaryEntitlement, consumed: scaleVal(base.primaryEntitlement.consumed) }
+          : base.primaryEntitlement
 
         const scaledInstances = base.instances.map(inst => {
           const scaledInst = {

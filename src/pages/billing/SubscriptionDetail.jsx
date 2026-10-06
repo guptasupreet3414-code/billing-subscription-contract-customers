@@ -521,7 +521,11 @@ const NoDataBox = styled.div`
   line-height: 20px;
 `
 
-function EntitlementsTable({ entitlements, contractType }) {
+function EntitlementsTable({ entitlements, contractType, tbd }) {
+  if (tbd) {
+    return <NoDataBox>Entitlements: TBD</NoDataBox>
+  }
+
   if (entitlements.length === 0) {
     return (
       <NoDataBox>
@@ -1502,7 +1506,7 @@ export default function SubscriptionDetail() {
           ) : (
             <Section>
               <SectionTitle>Entitlements and usage</SectionTitle>
-              <EntitlementsTable entitlements={activeInstance.entitlements} contractType={activeInstance.contractType} />
+              <EntitlementsTable entitlements={activeInstance.entitlements} contractType={activeInstance.contractType} tbd={activeInstance.entitlementsTBD} />
             </Section>
           )}
           {isCertCentral && subscription.accountId !== '1001445' && subscription.accountId !== '2003891' && (

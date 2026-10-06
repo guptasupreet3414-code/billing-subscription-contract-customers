@@ -547,7 +547,9 @@ export default function SubscriptionCard({ subscription }) {
         ))}
       </MetaSection>
 
-      {visibleEntitlements.length > 0 ? (
+      {subscription.entitlementsTBD ? (
+        <NoUsageBlock>Entitlements: TBD</NoUsageBlock>
+      ) : visibleEntitlements.length > 0 ? (
         <EntitlementRows entitlements={entitlements} maxVisible={3} />
       ) : (
         <NoUsageBlock>Usage data is not available for this product yet.</NoUsageBlock>
