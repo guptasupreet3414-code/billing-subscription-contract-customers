@@ -139,14 +139,14 @@ const enterpriseProducts = [
     renewalDate: 'Aug 14, 2026',
     environment: 'Production',
     status: 'healthy',
-    primaryEntitlement: { label: 'Certificates', consumed: 45000, total: 100000 },
+    primaryEntitlement: { label: 'Certificates for unmanaged devices', consumed: 45000, total: 100000 },
     entitlements: [
-      { name: 'Certificates', purchased: 100000, allocated: 100000, consumed: 45000, remaining: 55000 },
-      { name: 'Devices', purchased: 50000, allocated: 50000, consumed: 20000, remaining: 30000 },
+      { name: 'Certificates for unmanaged devices', purchased: 100000, allocated: 100000, consumed: 45000, remaining: 55000 },
+      { name: 'Managed devices', purchased: 50000, allocated: 50000, consumed: 20000, remaining: 30000 },
     ],
     planEntitlements: {
-      essentials: [{ name: 'Certificates', purchased: 100000, allocated: 100000, consumed: 45000, remaining: 55000 }],
-      advanced: [{ name: 'Devices', purchased: 50000, allocated: 50000, consumed: 20000, remaining: 30000 }],
+      essentials: [{ name: 'Certificates for unmanaged devices', purchased: 100000, allocated: 100000, consumed: 45000, remaining: 55000 }],
+      advanced: [{ name: 'Managed devices', purchased: 50000, allocated: 50000, consumed: 20000, remaining: 30000 }],
     },
   },
   {
@@ -169,7 +169,7 @@ const enterpriseProducts = [
       { name: 'Domains', available: 20, used: 10, remaining: 10 },
       { name: 'Records', available: 6000, used: 2000, remaining: 4000 },
       { name: 'Users', available: 2, used: 2, remaining: 0 },
-      { name: 'A/AAAA Failover records', available: 2, used: 0, remaining: 2 },
+      { name: 'A/AAAA failover records', available: 2, used: 0, remaining: 2 },
       { name: 'GTD enabled domains', available: 1, used: 0, remaining: 1 },
     ],
   },
@@ -185,10 +185,10 @@ const enterpriseProducts = [
     renewalDate: 'Jul 15, 2026',
     environment: 'Production',
     status: 'healthy',
-    primaryEntitlement: { label: 'Domains — up to 100K emails/month', consumed: 1, total: 5 },
+    primaryEntitlement: { label: 'Domains (100,000 emails per month)', consumed: 1, total: 5 },
     entitlements: [
-      { name: 'Domains — up to 100K emails/month', purchased: 5, allocated: 5, consumed: 1, remaining: 4 },
-      { name: 'Domains — up to 500K emails/month', purchased: 3, allocated: 3, consumed: 1, remaining: 2 },
+      { name: 'Domains (100,000 emails per month)', purchased: 5, allocated: 5, consumed: 1, remaining: 4 },
+      { name: 'Domains (500,000 emails per month)', purchased: 3, allocated: 3, consumed: 1, remaining: 2 },
     ],
     emailUsageByDomain: [
       { domain: 'abc.com', allowance: 100000, used: 72000, remaining: 28000 },
@@ -223,9 +223,9 @@ const enterpriseProducts = [
     renewalDate: 'Jun 6, 2026',
     environment: 'Production',
     status: 'healthy',
-    primaryEntitlement: { label: 'AI Assets units', consumed: 28, total: 50 },
+    primaryEntitlement: { label: 'AI assets', consumed: 28, total: 50 },
     entitlements: [
-      { name: 'AI Assets units', purchased: 50, allocated: 50, consumed: 28, remaining: 22 },
+      { name: 'AI assets', purchased: 50, allocated: 50, consumed: 28, remaining: 22 },
     ],
   },
   {
