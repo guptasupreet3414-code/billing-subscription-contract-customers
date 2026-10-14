@@ -4,12 +4,15 @@ import { BrowserRouter } from 'react-router-dom'
 import { ThemeProvider } from 'styled-components'
 import { theme } from './theme'
 import App from './App'
+import { PhaseProvider } from './phase'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
       <ThemeProvider theme={theme}>
-        <App />
+        <PhaseProvider>
+          <App />
+        </PhaseProvider>
       </ThemeProvider>
     </BrowserRouter>
   </StrictMode>

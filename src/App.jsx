@@ -15,6 +15,10 @@ import PaymentDetails from './pages/billing/PaymentDetails'
 import AllProducts from './pages/billing/AllProducts'
 import CertCentralSupport from './pages/billing/CertCentralSupport'
 import { allRoutes } from './data/navigation'
+import { usePhase, PhaseSwitcher } from './phase'
+
+// Ecommerce billing pages are not part of Phase 1 (MVP)
+const ECOMMERCE_BILLING_ROUTES = new Set(['/settings/billing/receipts', '/settings/billing/payment-details'])
 
 function ScrollToTop({ containerRef }) {
   const { pathname } = useLocation()
@@ -174,6 +178,7 @@ export default function App() {
   const mainRef = useRef(null)
   const location = useLocation()
   const navigate = useNavigate()
+  const { isMvp } = usePhase()
 
   const handleSelectProductFromTopNav = useCallback((id) => {
     navigateFromTopNav(id, location.pathname, activeProductId)
@@ -230,6 +235,7 @@ export default function App() {
         isSpokeOpen={isSpokeOpen}
         onToggleSpoke={toggleSpoke}
         billingScenario={billingScenario}
+        hideSelfService={isMvp}
         previousRoute={previousRoute}
         onGoBack={handleGoBack}
       />
@@ -238,6 +244,7 @@ export default function App() {
         open={isDrawerOpen}
         activeProductId={activeProductId}
         onSelectProduct={selectProductFromDrawer}
+        hideSelfService={isMvp}
         onClose={closeDrawer}
       />
 
@@ -256,6 +263,7 @@ export default function App() {
               let element = <StubPage />
               if (r === '/dashboard') element = <Dashboard />
               else if (r === '/settings/billing') element = <MySubscriptions />
+              else if (isMvp && ECOMMERCE_BILLING_ROUTES.has(r)) element = <Navigate to="/settings/billing" replace />
               else if (r === '/settings/billing/receipts') element = <Receipts scenario={billingScenario} />
               else if (r === '/settings/billing/payment-details') element = <PaymentDetails scenario={billingScenario} />
               else if (r === '/certcentral/support') element = <CertCentralSupport />
@@ -266,6 +274,8 @@ export default function App() {
           <Route path="*" element={<StubPage />} />
         </Routes>
       </MainContent>
+
+      <PhaseSwitcher />
     </>
   )
 }

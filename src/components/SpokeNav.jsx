@@ -259,10 +259,10 @@ function NavSection({ section, index }) {
   )
 }
 
-export default function SpokeNav({ activeProductId, isSpokeOpen, onToggleSpoke, billingScenario, previousRoute, onGoBack }) {
+export default function SpokeNav({ activeProductId, isSpokeOpen, onToggleSpoke, billingScenario, hideSelfService, previousRoute, onGoBack }) {
   let product = productSubNavs[activeProductId]
 
-  if (activeProductId === 'settings-billing' && billingScenario === 'enterprise') {
+  if (activeProductId === 'settings-billing' && (billingScenario === 'enterprise' || hideSelfService)) {
     product = {
       ...product,
       sections: product.sections.filter((section) => !section.isSelfService),

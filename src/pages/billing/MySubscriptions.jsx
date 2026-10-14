@@ -5,6 +5,7 @@ import { ENVIRONMENTS, CURRENT_ENV_ID, getMultiEnvSubscriptions } from '../../da
 import SubscriptionCard from '../../components/billing/SubscriptionCard'
 import ContactManagerDrawer from '../../components/billing/ContactManagerDrawer'
 import { LifeRingIcon, ChevronDownIcon } from '../../components/Icons'
+import { usePhase } from '../../phase'
 
 const Main = styled.main`
   padding: 32px;
@@ -222,7 +223,10 @@ export default function MySubscriptions() {
     return () => document.removeEventListener('mousedown', handler)
   }, [productDropdownOpen])
 
+  const { isMvp } = usePhase()
+  // Phase 1 (MVP) hides the CertCentral e-commerce card
   const allSubscriptions = getMultiEnvSubscriptions()
+    .filter(s => !(isMvp && s.subscriptionTypes?.includes('ecommerce')))
   const uniqueProducts = [...new Map(allSubscriptions.map(s => [s.name, { id: s.name, name: s.name }])).values()]
 
   const filteredSubscriptions = allSubscriptions.filter(s => {

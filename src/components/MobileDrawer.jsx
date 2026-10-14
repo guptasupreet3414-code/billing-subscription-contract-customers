@@ -202,7 +202,7 @@ const SubNavLink = styled(NavLink)`
   }
 `
 
-export default function MobileDrawer({ open, activeProductId, onSelectProduct, onClose }) {
+export default function MobileDrawer({ open, activeProductId, onSelectProduct, onClose, hideSelfService }) {
   const navigate = useNavigate()
   const location = useLocation()
   const drawerRef = useRef(null)
@@ -365,7 +365,7 @@ export default function MobileDrawer({ open, activeProductId, onSelectProduct, o
             <DrawerBody>
               {drillProduct && (
                 <nav aria-label={`${drillProduct.label} navigation`}>
-                  {drillProduct.sections.map((section, i) => (
+                  {drillProduct.sections.filter((section) => !(hideSelfService && section.isSelfService)).map((section, i) => (
                     <div key={section.title || i}>
                       {section.title && <SectionTitle>{section.title}</SectionTitle>}
                       {section.items.map((item) => (
